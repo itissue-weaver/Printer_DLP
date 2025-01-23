@@ -1,0 +1,21 @@
+{
+    "filepath": "D:/Pycharm_Projects/Printer_DLP/pyramid_test.stl",
+    "rotation": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "scale": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "translation": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "width_part": 20.0,
+    "height_part": 20.0,
+    "depth_part": 20.0
+}
