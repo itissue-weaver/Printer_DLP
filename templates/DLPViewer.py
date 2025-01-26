@@ -21,6 +21,14 @@ from OpenGL.raw.GL.VERSION.GL_1_0 import (
     glVertex2f,
     glDisable,
     glPopMatrix,
+    glClearColor,
+    glClear,
+    GL_COLOR_BUFFER_BIT,
+    GL_DEPTH_BUFFER_BIT,
+    glBlendFunc,
+    GL_BLEND,
+    GL_SRC_ALPHA,
+    GL_ONE_MINUS_SRC_ALPHA,
 )
 from OpenGL.raw.GL.VERSION.GL_1_1 import glBindTexture
 from OpenGL.raw.GL.VERSION.GL_4_0 import GL_QUADS
@@ -39,9 +47,9 @@ class DlpViewer:
     def load_texture(self):
         texture = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, texture)
-        image = pygame.image.load(self.image_path)
-        image = pygame.transform.flip(image, False, True)  # Flip the image vertically
-        image_data = pygame.image.tostring(image, "RGBA", 1)
+        image = pygame.image.load(self.image_path).convert_alpha()
+        image = pygame.transform.flip(image, False, False)  # Flip the image vertically
+        image_data = pygame.image.tostring(image, "RGBA", True)
         width, height = image.get_rect().size
         glTexImage2D(
             GL_TEXTURE_2D,
@@ -76,8 +84,13 @@ class DlpViewer:
     def display_image(self):
         try:
             self.init_display()
+            # Enable blending and set the blend function
+            glEnable(GL_BLEND)
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
             while True:
                 self.dlp.clear()
+                glClearColor(0.0, 0.0, 0.0, 1.0)  # Set the clear color to black
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)  #
                 glPushMatrix()
 
                 glEnable(GL_TEXTURE_2D)

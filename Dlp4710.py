@@ -150,8 +150,45 @@ class Dlp4710:
         if self.change_mode:
             set_mode(60)
 
+    # def clear(self):
+    #     if self.n == 0:
+    #         t = time.process_time()
+    #         if self.last_t is not None:
+    #             frame_dur = t - self.last_t
+    #             self.frame_dur_sum += frame_dur
+    #             self.frame_dur_n += 1
+    #         self.last_t = t
+    #         if self.mode == 180:
+    #             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE)
+    #         elif self.mode == 1440:
+    #             glLogicOp(GL_COPY)
+    #             # glBlendFunc(GL_ONE, GL_ZERO)
+    #         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+#
+    #     if self.mode == 180:
+    #         # in mode 180, always use grays: glColor(g, g, g)
+    #         if self.n == 0:
+    #             glColorMask(GL_FALSE, GL_FALSE, GL_TRUE, GL_TRUE)
+    #         elif self.n == 1:
+    #             glColorMask(GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE)
+    #         elif self.n == 2:
+    #             glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE)
+    #     elif self.mode == 1440:
+    #         # set the color; when drawing in mode 1440, DON'T CHANGE COLOR
+    #         glLogicOp(GL_OR)
+    #         # glBlendFunc(GL_ONE, GL_ONE)
+    #         c = 2 - self.n // 8
+    #         d = self.n % 8
+    #         col = 3 * [0]
+    #         col[c] = 1 << d
+    #         glColor3ubv(col)
+
     def clear(self):
         if self.n == 0:
+            glColorMask(GL_TRUE, GL_TRUE, GL_TRUE,
+                        GL_TRUE)  # Ensure color mask is set to allow writing to all color channels
+            glClearColor(0.0, 0.0, 0.0, 1.0)  # Ensure clear color is black
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             t = time.process_time()
             if self.last_t is not None:
                 frame_dur = t - self.last_t
@@ -159,14 +196,11 @@ class Dlp4710:
                 self.frame_dur_n += 1
             self.last_t = t
             if self.mode == 180:
-                glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE)
+                glColorMask(GL_FALSE, GL_FALSE, GL_TRUE, GL_TRUE)
             elif self.mode == 1440:
                 glLogicOp(GL_COPY)
-                # glBlendFunc(GL_ONE, GL_ZERO)
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         if self.mode == 180:
-            # in mode 180, always use grays: glColor(g, g, g)
             if self.n == 0:
                 glColorMask(GL_FALSE, GL_FALSE, GL_TRUE, GL_TRUE)
             elif self.n == 1:
@@ -174,9 +208,7 @@ class Dlp4710:
             elif self.n == 2:
                 glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE)
         elif self.mode == 1440:
-            # set the color; when drawing in mode 1440, DON'T CHANGE COLOR
             glLogicOp(GL_OR)
-            # glBlendFunc(GL_ONE, GL_ONE)
             c = 2 - self.n // 8
             d = self.n % 8
             col = 3 * [0]

@@ -63,6 +63,12 @@ class PlotSTL(ttk.Frame):
                     height_inch = projector_height_cm / 2.54
                     # Set the figure size
                     self.figure.set_size_inches(width_inch, height_inch)
+
+                    # Set the background color of the figure and axes to black
+                    self.figure.patch.set_facecolor('black')
+                    self.figure.gca().patch.set_facecolor('black')
+                    self.figure.gca().tick_params(
+                        colors='white')  # Optional: Set the tick color to white for better visibility
                     # Turn off the axes
                     self.figure.gca().axis('off')
                     # Save the figure without axes lines at 1:1 scale
