@@ -11,10 +11,8 @@ from templates.Frame_ReadFile import ReadFile
 class MainGUI(ttk.Window):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.title("PySLM")
-        self.geometry("800x600")
-        self.resizable(True, True)
-        self.configure(bg="#f0f0f0")
+        self.title("DLP Slice")
+        self.after(0, lambda: self.state("zoomed"))
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
         # --------------------notebook-------------------
@@ -27,6 +25,6 @@ class MainGUI(ttk.Window):
         self.notebook.columnconfigure(0, weight=1)
         self.notebook.rowconfigure(0, weight=1)
         tab1 = ReadFile(self.notebook)
-        self.notebook.add(tab1, text="Leer archivo")
+        self.notebook.add(tab1, text="Geometría")
         tab2 = SliceFile(self.notebook)
         self.notebook.add(tab2, text="Slicer")

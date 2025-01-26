@@ -13,13 +13,15 @@ from templates.PlotFrame import PlotSTL
 
 def create_input_widgets(master, **kwargs):
     entries = []
-    ttk.Label(master, text="File path:").grid(row=0, column=0, sticky="w")
+    ttk.Label(master, text="Path: ").grid(row=0, column=1, sticky="w", padx=3, pady=5)
     entry_path = kwargs.get("var_path")
-    ttk.Entry(master, textvariable=entry_path).grid(row=0, column=2, sticky="ew")
+    ttk.Label(master, textvariable=entry_path).grid(
+        row=0, column=2, sticky="ew", padx=3, pady=5
+    )
     entries.append(entry_path)
     ttk.Button(
         master, text="Buscar archivo", command=kwargs.get("callback_searchFile", None)
-    ).grid(row=0, column=1, sticky="ew")
+    ).grid(row=0, column=0, sticky="ew", padx=3, pady=5)
     return entries
 
 
@@ -37,11 +39,10 @@ def import_file_stl(var_path):
 
 def create_buttons(master, **kwargs):
     ttk.Button(
-        master, text="Set gemetry", command=kwargs.get("callback_setGeometry", None)
+        master,
+        text="Establecer Geometria",
+        command=kwargs.get("callback_setGeometry", None),
     ).grid(row=0, column=0, sticky="n")
-    ttk.Button(
-        master, text="Slice", command=kwargs.get("callback_sliceFile", None)
-    ).grid(row=0, column=1, sticky="n")
 
 
 def read_stl(**kwargs):
@@ -71,8 +72,8 @@ class ReadFile(ttk.Frame):
         self.file_path = ttk.StringVar()
         self.Figure = None
         # ----------------------widgets----------------------
-        self.frame_inputs = ttk.Frame(self)
-        self.frame_inputs.grid(row=0, column=0, sticky="nsew")
+        self.frame_inputs = ttk.LabelFrame(self, text="3D")
+        self.frame_inputs.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
         self.frame_inputs.columnconfigure(2, weight=1)
         self.entries = create_input_widgets(
             self.frame_inputs,
@@ -82,11 +83,10 @@ class ReadFile(ttk.Frame):
         # ----------------------buttons----------------------
         self.frame_buttons = ttk.Frame(self)
         self.frame_buttons.grid(row=1, column=0, sticky="nsew")
-        self.frame_buttons.columnconfigure((0, 1), weight=1)
+        self.frame_buttons.columnconfigure(0, weight=1)
         create_buttons(
             self.frame_buttons,
             callback_setGeometry=self.set_geometry_from_file,
-            callback_sliceFile=lambda: print("Slice file"),
         )
         # ----------------------axes---------------------------
         self.frame_axes = ttk.Frame(self)

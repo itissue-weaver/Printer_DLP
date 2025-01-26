@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 __author__ = "Edisson A. Naula"
 __date__ = "$ 19/ene/2025  at 15:16 $"
+import subprocess
+import time
+
+import pygame
+from OpenGL.GL import *
+from pygame.locals import *
 
 '''
 Helper class for using the DLP4710 (written by Mark Wexler, public domain)
@@ -66,12 +72,7 @@ finally:
     pygame.quit()
 '''
 
-import subprocess
-import time
 
-import pygame
-from OpenGL.GL import *
-from pygame.locals import *
 
 modes = (60, 180, 1440)
 default_parameters = {

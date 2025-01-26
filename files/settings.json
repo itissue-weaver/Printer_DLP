@@ -17,5 +17,13 @@
     ],
     "width_part": 20.0,
     "height_part": 20.0,
-    "depth_part": 20.0
+    "depth_part": 20.0,
+    "hatcher_type": "Base",
+    "hatch_angle": 10.0,
+    "volume_offset_hatch": 0.0,
+    "spot_compensation": 0.0,
+    "num_inner_contours": 2,
+    "num_outer_contours": 1,
+    "hatch_spacing": 0.5,
+    "stripe_width": 0.5
 }

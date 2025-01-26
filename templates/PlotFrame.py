@@ -2,6 +2,7 @@
 __author__ = "Edisson A. Naula"
 __date__ = "$ 22/ene/2025  at 21:03 $"
 
+import matplotlib
 import ttkbootstrap as ttk
 from matplotlib.backends._backend_tk import NavigationToolbar2Tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -15,6 +16,7 @@ class PlotSTL(ttk.Frame):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
         self.type_plot = kwargs.get("type_plot", "mesh_3d")
+        self.save_temp_flag = kwargs.get("save_temp_flag", False)
         match self.type_plot:
             case "mesh_3d":
                 solid_trimesh_part = kwargs.get("solid_trimesh_part")
@@ -40,7 +42,10 @@ class PlotSTL(ttk.Frame):
                 layer = kwargs.get("layer")
                 if layer is None:
                     return
-                self.figure = Figure(figsize=(5, 5), dpi=150)
+                self.dpi = kwargs.get("dpi", 300)  # Adjust as needed to achieve the scale
+
+                matplotlib.pyplot.close("all")
+                self.figure = Figure(figsize=(5, 5), dpi=self.dpi)
                 self.axes = self.figure.add_subplot(111)
                 self.figure, self.axes = pyslm.visualise.plot(
                     layer,
@@ -48,9 +53,25 @@ class PlotSTL(ttk.Frame):
                     plotOrderLine=True,
                     plotArrows=False,
                 )
-                self.canvas = FigureCanvasTkAgg(self.figure, self)
-                toolbar = NavigationToolbar2Tk(self.canvas, self)
-                toolbar.update()
-                self.canvas.get_tk_widget().pack(side=ttk.TOP, fill=ttk.BOTH, expand=1)
+                if self.save_temp_flag:
+                    # projector_width_cm = 15.0  # Width of the projected image at a 10 cm distance
+                    # projector_height_cm = 10.0  # Height of the projected image at a 10 cm distance
+                    projector_width_cm = kwargs.get("projector_width_cm", 10.0)
+                    projector_height_cm = kwargs.get("projector_height_cm", 10.0)
+                    # Convert cm to inches (1 inch = 2.54 cm)
+                    width_inch = projector_width_cm / 2.54
+                    height_inch = projector_height_cm / 2.54
+                    # Set the figure size
+                    self.figure.set_size_inches(width_inch, height_inch)
+                    # Turn off the axes
+                    self.figure.gca().axis('off')
+                    # Save the figure without axes lines at 1:1 scale
+                    self.figure.savefig("temp.png", bbox_inches="tight", pad_inches=0,
+                                        dpi=self.dpi, transparent=True)
+                else:
+                    self.canvas = FigureCanvasTkAgg(self.figure, self)
+                    toolbar = NavigationToolbar2Tk(self.canvas, self)
+                    toolbar.update()
+                    self.canvas.get_tk_widget().pack(side=ttk.TOP, fill=ttk.BOTH, expand=1)
             case _:
                 print("No type plot")
