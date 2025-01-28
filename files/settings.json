@@ -25,5 +25,22 @@
     "num_inner_contours": 2,
     "num_outer_contours": 1,
     "hatch_spacing": 0.5,
-    "stripe_width": 0.5
+    "stripe_width": 0.5,
+    "projector_dimension": [
+        30.0,
+        20.0
+    ],
+    "projector_resolution": [
+        1920,
+        1080
+    ],
+    "projector_offset": [
+        0.0,
+        0.0,
+        10.0
+    ],
+    "dpi": 300,
+    "layer_depth": 0.5,
+    "delta_layer": 0.5,
+    "plate": 1
 }

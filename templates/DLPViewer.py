@@ -39,12 +39,13 @@ from Dlp4710 import Dlp4710 as dlp4710
 
 class DlpViewer:
     def __init__(self, mode=60, image_path="temp.png"):
+        self.flag_reload = False
         self.mode = mode
         self.image_path = image_path
         self.dlp = None
         self.texture = None
 
-    def load_texture(self):
+    def load_texture(self, n=0):
         texture = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, texture)
         image = pygame.image.load(self.image_path).convert_alpha()
@@ -79,6 +80,7 @@ class DlpViewer:
         glMatrixMode(GL_MODELVIEW)
 
         self.texture = self.load_texture()
+        print("first texture", self.texture)
         self.dlp = dlp4710(self.mode, change_mode=False)
 
     def display_image(self):
@@ -88,6 +90,9 @@ class DlpViewer:
             glEnable(GL_BLEND)
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
             while True:
+                if self.flag_reload:
+                    self.reload_image()
+                    self.flag_reload = False
                 self.dlp.clear()
                 glClearColor(0.0, 0.0, 0.0, 1.0)  # Set the clear color to black
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)  #
@@ -114,6 +119,15 @@ class DlpViewer:
         finally:
             self.cleanup()
             pygame.quit()
+
+    def reload_image(self, image_path=None):
+        if image_path:
+            self.image_path = image_path
+        self.texture = self.load_texture()
+
+    def star_reload(self, image):
+        self.flag_reload = True
+        self.image_path = image
 
     def cleanup(self):
         if self.dlp is not None:
