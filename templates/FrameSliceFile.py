@@ -275,14 +275,14 @@ def get_display_parameters(entries):
     projector_resolution = [int(i) for i in entries[12].get().split(",")]
     projector_offset = [float(i) for i in entries[13].get().split(",")]
     dpi = int(entries[14].get())
-    return (projector_dimension, projector_resolution, projector_offset, dpi)
+    return projector_dimension, projector_resolution, projector_offset, dpi
 
 
 def get_print_parameters(entries):
     layer_depth = float(entries[15].get())
     delta_layer = float(entries[16].get())
     plate = int(entries[17].get())
-    return (layer_depth, delta_layer, plate)
+    return layer_depth, delta_layer, plate
 
 
 def build_hatcher(

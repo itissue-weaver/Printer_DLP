@@ -42,5 +42,6 @@
     "dpi": 300,
     "layer_depth": 0.5,
     "delta_layer": 0.5,
-    "plate": 1
+    "plate": 1,
+    "HOST": "127.0.0.1"
 }

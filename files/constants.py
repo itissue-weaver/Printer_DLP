@@ -3,3 +3,4 @@ __author__ = "Edisson A. Naula"
 __date__ = "$ 22/ene/2025  at 21:05 $"
 
 settings_path = "files/settings.json"
+image_path_projector = "files/temp.png"
