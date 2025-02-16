@@ -6,6 +6,6 @@ settings_path = "files/settings.json"
 flags_path = "files/flags.json"
 image_path_projector = "files/img/temp.png"
 server_domain = "http://raspberrypi.local/"
-server_domain = "http://localhost:5000/"
+server_domain1 = "http://localhost:5000/"
 base_url = "api/v1/printer"
 headers = {"Content-Type": "application/json"}
