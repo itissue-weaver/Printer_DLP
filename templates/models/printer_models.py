@@ -10,3 +10,12 @@ expected_files_almacen = api.parser()
 expected_files_almacen.add_argument(
     "file", type=FileStorage, location="files", required=True
 )
+
+post_settings_model = api.model(
+    "PostSettings",
+    {
+        "HOST": api.fields.String(
+            description="Host of the server", example="127.0.0.1"
+        )
+    },
+)

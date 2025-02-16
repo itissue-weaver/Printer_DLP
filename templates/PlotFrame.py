@@ -9,6 +9,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import pyslm.visualise
 
+from files.constants import image_path_projector
+
 
 class PlotSTL(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
@@ -17,6 +19,7 @@ class PlotSTL(ttk.Frame):
         self.rowconfigure(0, weight=1)
         self.type_plot = kwargs.get("type_plot", "mesh_3d")
         self.save_temp_flag = kwargs.get("save_temp_flag", False)
+        self.path_to_save = kwargs.get("path_to_save", image_path_projector)
         match self.type_plot:
             case "mesh_3d":
                 solid_trimesh_part = kwargs.get("solid_trimesh_part")
@@ -72,7 +75,7 @@ class PlotSTL(ttk.Frame):
                     # Turn off the axes
                     self.figure.gca().axis('off')
                     # Save the figure without axes lines at 1:1 scale
-                    self.figure.savefig("temp.png", bbox_inches="tight", pad_inches=0,
+                    self.figure.savefig(self.path_to_save, bbox_inches="tight", pad_inches=0,
                                         dpi=self.dpi, transparent=True)
                 else:
                     self.canvas = FigureCanvasTkAgg(self.figure, self)

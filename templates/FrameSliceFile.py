@@ -2,20 +2,23 @@
 __author__ = "Edisson A. Naula"
 __date__ = "$ 22/ene/2025  at 21:05 $"
 
-import threading
 import time
 from time import perf_counter
+from tkinter import messagebox
 
 import pyslm
+import pyslm.visualise
 import ttkbootstrap as ttk
 from pyslm import hatching
-import pyslm.visualise
 
+from files.constants import image_path_projector
 from templates.AuxiliarFunctions import update_settings, read_settings
-from templates.DLPViewer import DlpViewer
 from templates.PlotFrame import PlotSTL
-
-from tkinter import messagebox
+from templates.midleware.MD_Printer import (
+    send_next_layer_file,
+    ask_status,
+    send_settings_printer,
+)
 
 
 def create_input_widgets(master, **kwargs):
@@ -315,7 +318,7 @@ def build_hatcher(
     return my_hatcher
 
 
-def slice_geometry_for_print(master, settings, current_z):
+def slice_geometry_for_print(master, settings, current_z, path_to_save):
     try:
         file_path = settings.get("filepath")
         rotation = settings.get("rotation")
@@ -387,7 +390,7 @@ class SliceFile(ttk.Frame):
             value=filepath if filepath is not None else "No file selected"
         )
         self.z_max = settings.get("depth_part", 100)
-        self.viewer = DlpViewer()
+        # self.viewer = DlpViewer()
         # ----------------------widgets----------------------
         self.frame_inputs = ttk.Frame(self)
         self.frame_inputs.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
@@ -473,18 +476,34 @@ class SliceFile(ttk.Frame):
         answer = messagebox.askyesno("Print", msg)
         if answer == "No":
             return None
+        update_settings(num_layers=num_layers)
+        code, data = send_settings_printer()
+        if code != 200:
+            messagebox.showerror("Error", f"{code}, {data}")
+            return None
+        print(f"{data}")
         # ---------------------print file--------------------
-        slice_geometry_for_print(
-            settings=settings, master=self.frame_axes, current_z=layer_depth
-        )
-        self.display_thread = threading.Thread(target=self.viewer.display_image)
-        self.display_thread.start()
+        # self.viewer.start_projecting()
+        # code, data = send_start_print()
+        # if code != 200:
+        #     messagebox.showerror("Error", data.get("msg"))
+        #     return None
+        # print(f"{data.get('msg')}")
         layer_sliced = 1
         layer_displayed = 1
+        for n_layer in range(1, num_layers + 1):
+            slice_geometry_for_print(
+                settings=settings,
+                master=self.frame_axes,
+                current_z=n_layer * layer_depth,
+                path_to_save=f"files/img/temp{n_layer}.png",
+            )
+            layer_sliced += 1
         time.sleep(1)
         start_time = perf_counter()
         last_time = start_time
-        while self.display_thread.is_alive():
+        return
+        while True:
             current_time = perf_counter()
             if layer_sliced != layer_displayed:
                 slice_geometry_for_print(
@@ -492,6 +511,10 @@ class SliceFile(ttk.Frame):
                     master=self.frame_axes,
                     current_z=layer_sliced * layer_depth,
                 )
+                code, data = send_next_layer_file(image_path_projector)
+                if code != 200:
+                    print(f"{data.get('msg')}")
+                    continue
                 layer_displayed = layer_sliced
             elapsed_layer_time = current_time - last_time
             print(
@@ -506,10 +529,26 @@ class SliceFile(ttk.Frame):
                     delta_layer * 0.25
                 )  # Sleep for a short duration to avoid excessive CPU usage
                 continue
-            self.viewer.star_reload("temp.png")
+            counter_try_reload = 0
+            while True:
+                counter_try_reload += 1
+                code, data = send_next_layer_file(image_path_projector)
+                if code == 200:
+                    break
+                if counter_try_reload > 10:
+                    break
+            # self.viewer.star_reload(image_path_projector)
             layer_sliced += 1
             print(f"layer sliced: {layer_sliced}")
             last_time = current_time
+            code, data = ask_status()
+            if code != 200:
+                print("Error to conect server")
+                continue
+            else:
+                if data.get("data", False):
+                    print("Projector is not alive")
+                    break
 
     def scale_callback(self, value):
         value = float(value)
