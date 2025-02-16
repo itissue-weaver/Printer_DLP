@@ -43,6 +43,6 @@
     "layer_depth": 0.5,
     "delta_layer": 0.5,
     "plate": 1,
-    "HOST": "localhost",
+    "HOST": "127.0.0.1",
     "num_layers": 400
 }

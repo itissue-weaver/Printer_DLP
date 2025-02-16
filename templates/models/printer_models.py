@@ -2,6 +2,7 @@
 __author__ = "Edisson A. Naula"
 __date__ = "$ 05/feb/2025  at 21:20 $"
 
+from flask_restx import fields
 from werkzeug.datastructures import FileStorage
 
 from templates.static.constants import api
@@ -13,9 +14,5 @@ expected_files_almacen.add_argument(
 
 post_settings_model = api.model(
     "PostSettings",
-    {
-        "HOST": api.fields.String(
-            description="Host of the server", example="127.0.0.1"
-        )
-    },
+    {"HOST": fields.String(description="Host of the server", example="127.0.0.1")},
 )

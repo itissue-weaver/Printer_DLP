@@ -58,7 +58,10 @@ class Start(Resource):
     def post(self):
         # start the print
         projector.start_projecting()
-        return {"msg": "Ok, projector started", "data": projector.is_alive_projector()}, 200
+        return {
+            "msg": "Ok, projector started",
+            "data": projector.is_alive_projector(),
+        }, 200
 
 
 @ns.route("/stop")
@@ -66,7 +69,10 @@ class Stop(Resource):
     def post(self):
         # stop the print
         projector.stop_projecting()
-        return {"msg": "Ok, projector stopped", "data": projector.is_alive_projector()}, 200
+        return {
+            "msg": "Ok, projector stopped",
+            "data": projector.is_alive_projector(),
+        }, 200
 
 
 @ns.route("/next/layer")
