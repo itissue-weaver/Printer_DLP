@@ -5,6 +5,7 @@ from PIL import Image
 import ttkbootstrap as ttk
 
 from templates.AuxiliarFunctions import read_settings
+from templates.SubFrames import SubFrameFormulaBiomaterial, SubFrameConfigTanks
 
 Image.CUBIC = Image.BICUBIC
 
@@ -13,6 +14,8 @@ class FrameBiomaterials(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
         self.columnconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
+        self.master = master
         # ----------------------buttons----------------------
         # Load biomaterials label
         ttk.Label(self, text="Load biomaterials", font=("Arial", 26)).grid(
@@ -21,6 +24,7 @@ class FrameBiomaterials(ttk.Frame):
         self.frame_workspace = ttk.Frame(self)
         self.frame_workspace.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
         self.frame_workspace.columnconfigure((0, 1), weight=1)
+        self.frame_workspace.rowconfigure(1, weight=1)
         #  ----------------------Levels----------------------
         self.frame_levels = SubFrameMeters(self.frame_workspace)
         self.frame_levels.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
@@ -32,36 +36,51 @@ class FrameBiomaterials(ttk.Frame):
         self.frame_buttons.rowconfigure((0, 1), weight=1)
         ttk.Button(
             self.frame_buttons,
-            text="Standard formula",
+            text="Customize materials",
             command=self.standard_formula_callback,
         ).grid(row=0, column=0, padx=5, pady=5)
         ttk.Button(
             self.frame_buttons,
-            text="Customize",
+            text="Customize Tanks",
             command=self.customize_callback,
         ).grid(row=1, column=0, padx=5, pady=5)
 
     def init_levels(self):
         settings = read_settings()
         self.frame_levels.update_levels(
-            settings["level1"],
-            settings["level2"],
-            settings["level3"],
-            settings["level4"],
+            settings.get("quantity1", 0.0),
+            settings.get("quantity2", 0.0),
+            settings.get("quantity3", 0.0),
+            settings.get("quantity4", 0.0),
+        )
+        self.frame_levels.update_subtext_meters(
+            settings.get("material1", "Default 1"),
+            settings.get("material2", "Default 2"),
+            settings.get("material3", "Default 3"),
+            settings.get("material4", "Default 4"),
+        )
+
+    def update_max_levels(self):
+        settings = read_settings()
+        self.frame_levels.update_max_levels(
+            settings.get("max_level1", 100.0),
+            settings.get("max_level2", 100.0),
+            settings.get("max_level3", 100.0),
+            settings.get("max_level4", 100.0),
         )
 
     def standard_formula_callback(self):
-        print("Standard formula button clicked")
+        SubFrameFormulaBiomaterial(self)
 
     def customize_callback(self):
-        print("Customize button clicked")
+        SubFrameConfigTanks(self)
 
 
 class SubFrameMeters(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
-        self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=1)
+        self.columnconfigure((0, 1), weight=1)
+        self.rowconfigure((0, 1), weight=1)
         # ----------------------widgets----------------------
         self.tank1 = ttk.Meter(
             self,
@@ -116,3 +135,15 @@ class SubFrameMeters(ttk.Frame):
             widget.configure(bootstyle="info")
         else:
             widget.configure(bootstyle="success")
+
+    def update_subtext_meters(self, text1, text2, text3, text4):
+        self.tank1.configure(subtext=text1)
+        self.tank2.configure(subtext=text2)
+        self.tank3.configure(subtext=text3)
+        self.tank4.configure(subtext=text4)
+
+    def update_max_level(self, max_level1, max_level2, max_level3, max_level4):
+        self.tank1.configure(amounttotal=max_level1)
+        self.tank2.configure(amounttotal=max_level2)
+        self.tank3.configure(amounttotal=max_level3)
+        self.tank4.configure(amounttotal=max_level4)

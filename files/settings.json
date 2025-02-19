@@ -44,5 +44,41 @@
     "delta_layer": 0.5,
     "plate": 1,
     "HOST": "127.0.0.1",
-    "num_layers": 400
+    "num_layers": 400,
+    "material1": "Solucion1",
+    "quantity1": 50.0,
+    "material2": "Water",
+    "quantity2": 50.0,
+    "material3": "Water",
+    "quantity3": 100.0,
+    "material4": "Water",
+    "quantity4": 100.0,
+    "max_level1": 10.0,
+    "shape1": "Cylinder",
+    "dimensions1": [
+        0.0,
+        1.0,
+        1.0
+    ],
+    "max_level2": 10.0,
+    "shape2": "Cylinder",
+    "dimensions2": [
+        0.0,
+        1.0,
+        1.0
+    ],
+    "max_level3": 10.0,
+    "shape3": "Cylinder",
+    "dimensions3": [
+        0.0,
+        1.0,
+        1.0
+    ],
+    "max_level4": 10.0,
+    "shape4": "Cylinder",
+    "dimensions4": [
+        0.0,
+        1.0,
+        1.0
+    ]
 }
