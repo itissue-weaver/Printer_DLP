@@ -7,6 +7,7 @@ from files.constants import settings_path
 
 def update_settings(**kwargs):
     import json
+
     with open(settings_path, "r", encoding="utf-8") as f:
         settings = json.load(f)
     for key, value in kwargs.items():

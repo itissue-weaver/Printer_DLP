@@ -505,6 +505,7 @@ class SliceFile(ttk.Frame):
         return
         while True:
             current_time = perf_counter()
+            # check for max layer
             if layer_sliced != layer_displayed:
                 slice_geometry_for_print(
                     settings=settings,

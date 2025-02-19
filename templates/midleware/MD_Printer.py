@@ -25,15 +25,30 @@ def send_settings_printer():
     settings = read_settings()
     response = requests.post(
         f"{server_domain + base_url}/settings",
+        json=settings,
         data=json.dumps(settings),
         headers=headers,
+        verify=False,
     )
-    print(f"{server_domain + base_url}/settings")
+    # print(f"{server_domain + base_url}/settings")
     if response.status_code == 200:
         data = response.json()
         return 200, data
     else:
         return response.status_code, f"Error settings sender: {response}"
+
+
+def get_settings_printer():
+    response = requests.get(
+        url=f"{server_domain + base_url}/settings", headers=headers, verify=False
+    )
+    print(f"{server_domain + base_url}/settings")
+    print(response.headers)
+    if response.status_code == 200:
+        data = response.json()
+        return 200, data
+    else:
+        return response.status_code, None
 
 
 def send_stop_print():
