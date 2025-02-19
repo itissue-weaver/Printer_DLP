@@ -503,7 +503,6 @@ class SubFrameConfigTanks(ttk.Toplevel):
             case 4:
                 self.entries[14].set(options[self.entries[13].get()])
 
-
     def on_close(self):
         # Obtener los valores de las entradas
         max_level1 = float(self.entries[0].get())
