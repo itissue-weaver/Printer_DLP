@@ -13,7 +13,7 @@ from pyslm import hatching
 
 from files.constants import image_path_projector
 from templates.AuxiliarFunctions import update_settings, read_settings
-from templates.PlotFrame import PlotSTL
+from templates.GUI.PlotFrame import PlotSTL
 from templates.midleware.MD_Printer import (
     send_next_layer_file,
     ask_status,
@@ -62,7 +62,7 @@ def create_input_widgets(master, **kwargs):
     entries.append(entry_translation)
 
     frame_hatching = ttk.LabelFrame(frame_inputs, text="Hatching")
-    frame_hatching.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
+    frame_hatching.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
     frame_hatching.columnconfigure(1, weight=1)
     ttk.Label(frame_hatching, text="Hatcher type:").grid(
         row=0, column=0, sticky="w", padx=10, pady=10
@@ -131,79 +131,14 @@ def create_input_widgets(master, **kwargs):
         row=7, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_stripe_width)
-    # ------------------------parameters display--------------------------
-    frame_display = ttk.LabelFrame(frame_inputs, text="Display")
-    frame_display.grid(row=0, column=2, sticky="nsew", padx=10, pady=10)
-    ttk.Label(frame_display, text="Projector dimension [width_cm, heigth_cm]:").grid(
-        row=0, column=0, sticky="w", padx=10, pady=10
-    )
-    entry_projector_dimension = ttk.StringVar(value="30.0, 20.0")
-    ttk.Entry(frame_display, textvariable=entry_projector_dimension).grid(
-        row=0, column=1, sticky="w", padx=5, pady=5
-    )
-    entries.append(entry_projector_dimension)
-    ttk.Label(frame_display, text="Projector resolution [width_px, heigth_px]:").grid(
-        row=1, column=0, sticky="w", padx=10, pady=10
-    )
-    entry_projector_resolution = ttk.StringVar(value="1920, 1080")
-    ttk.Entry(frame_display, textvariable=entry_projector_resolution).grid(
-        row=1, column=1, sticky="w", padx=5, pady=5
-    )
-    entries.append(entry_projector_resolution)
-    ttk.Label(frame_display, text="Projector offset [x, y, z] cm:").grid(
-        row=2, column=0, sticky="w", padx=10, pady=10
-    )
-    entry_projector_offset = ttk.StringVar(value="0.0, 0.0, 10.0")
-    ttk.Entry(frame_display, textvariable=entry_projector_offset).grid(
-        row=2, column=1, sticky="w", padx=5, pady=5
-    )
-    entries.append(entry_projector_offset)
-    ttk.Label(frame_display, text="DPI:").grid(
-        row=3, column=0, sticky="w", padx=10, pady=10
-    )
-    entry_dpi = ttk.StringVar(value="300")
-    ttk.Entry(frame_display, textvariable=entry_dpi).grid(
-        row=3, column=1, sticky="w", padx=5, pady=5
-    )
-    entries.append(entry_dpi)
-    # ----------------------parameters print--------------------
-    frame_print = ttk.LabelFrame(frame_inputs, text="Printer")
-    frame_print.grid(row=0, column=3, sticky="nsew", padx=10, pady=10)
-    ttk.Label(frame_print, text="Layer depth [mm]:").grid(
-        row=0, column=0, sticky="w", padx=10, pady=10
-    )
-    entry_layer_depth = ttk.StringVar(value="0.5")
-    ttk.Entry(frame_print, textvariable=entry_layer_depth).grid(
-        row=0, column=1, sticky="w", padx=5, pady=5
-    )
-    entries.append(entry_layer_depth)
-    ttk.Label(frame_print, text="Delta/Layer [s]:").grid(
-        row=1, column=0, sticky="w", padx=10, pady=10
-    )
-    entry_delta_layer = ttk.StringVar(value="0.5")
-    ttk.Entry(frame_print, textvariable=entry_delta_layer).grid(
-        row=1, column=1, sticky="w", padx=5, pady=5
-    )
-    entries.append(entry_delta_layer)
-    ttk.Label(frame_print, text="Plate:").grid(
-        row=2, column=0, sticky="w", padx=10, pady=10
-    )
-    entry_plate = ttk.StringVar(value="1")
-    ttk.Combobox(
-        frame_print,
-        values=["1", "2", "3"],
-        textvariable=entry_plate,
-        state="readonly",
-    ).grid(row=2, column=1, sticky="w", padx=5, pady=5)
-    entries.append(entry_plate)
     # ----------------------parameters visual--------------------
     frame_visual = ttk.LabelFrame(master, text="Visualization")
-    frame_visual.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+    frame_visual.grid(row=2, column=0, sticky="nsew", padx=10, pady=10)
     frame_visual.columnconfigure(2, weight=1)
     ttk.Label(frame_visual, text="z:").grid(
         row=0, column=0, sticky="w", padx=10, pady=10
     )
-    entry_z = ttk.StringVar(value="0.0")
+    entry_z = ttk.DoubleVar(value=0.0)
     ttk.Entry(frame_visual, textvariable=entry_z).grid(
         row=0, column=1, sticky="w", padx=5, pady=5
     )
@@ -234,7 +169,7 @@ def read_stl(**kwargs):
         return None
     rotation = kwargs.get("rotation", [0, 0, 0])
     scale = kwargs.get("scale", [1, 1, 1])
-    translation = kwargs.get("translation", [0, 0, 0])
+    translation = kwargs.get("translation", [0, -500, 0])
     update_settings(rotation=rotation, scale=scale, translation=translation)
     solid_part = pyslm.Part("myFrameGuide")
     solid_part.setGeometry(kwargs.get("file_path", None))
@@ -392,7 +327,9 @@ class SliceFile(ttk.Frame):
         self.z_max = settings.get("depth_part", 100)
         # self.viewer = DlpViewer()
         # ----------------------widgets----------------------
-        self.frame_inputs = ttk.Frame(self)
+        self.frame_widgets = ttk.Frame(self)
+        self.frame_widgets.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+        self.frame_inputs = ttk.Frame(self.frame_widgets)
         self.frame_inputs.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
         self.frame_inputs.columnconfigure(0, weight=1)
         self.entries = create_input_widgets(
@@ -403,7 +340,7 @@ class SliceFile(ttk.Frame):
         )
         self.entry_z = self.entries[-1]
         # ----------------------buttons----------------------
-        self.frame_buttons = ttk.Frame(self)
+        self.frame_buttons = ttk.Frame(self.frame_widgets)
         self.frame_buttons.grid(row=1, column=0, sticky="nsew")
         self.frame_buttons.columnconfigure((0, 1), weight=1)
         create_buttons(
@@ -413,6 +350,7 @@ class SliceFile(ttk.Frame):
         )
         # ----------------------axes---------------------------
         self.frame_axes = ttk.LabelFrame(self, text="Preview")
+        self.frame_axes.grid(row=0, column=1, sticky="nsew", padx=15, pady=15)
         self.frame_axes.columnconfigure(0, weight=1)
         self.frame_axes.rowconfigure(0, weight=1)
 
@@ -432,10 +370,6 @@ class SliceFile(ttk.Frame):
             hatch_spacing,
             stripe_width,
         ) = get_hatching_parameters(self.entries)
-        layer_depth, delta_layer, plate = get_print_parameters(self.entries)
-        projector_dimension, projector_resolution, projector_offset, dpi = (
-            get_display_parameters(self.entries)
-        )
         # ---------------------update parameters--------------------
         update_settings(
             rotation=rotation,
@@ -449,14 +383,8 @@ class SliceFile(ttk.Frame):
             num_outer_contours=outer_contours,
             hatch_spacing=hatch_spacing,
             stripe_width=stripe_width,
-            projector_dimension=projector_dimension,
-            projector_resolution=projector_resolution,
-            projector_offset=projector_offset,
-            dpi=dpi,
-            layer_depth=layer_depth,
-            delta_layer=delta_layer,
-            plate=plate,
         )
+        return
         # ---------------------calculate_layers--------------
         settings = read_settings()
         depth_part = settings.get("depth_part")
@@ -553,7 +481,6 @@ class SliceFile(ttk.Frame):
 
     def scale_callback(self, value):
         value = float(value)
-        print("scale_callback: ", value)
         if self.z_value != value:
             self.z_value = round(value, 3)
             self.entry_z.set(str(self.z_value))
@@ -596,7 +523,7 @@ class SliceFile(ttk.Frame):
                 msg = "z value out of range"
                 messagebox.showerror("Error", msg)
                 return None
-            print("slicing: ", settings.get("filepath"), " at z=", current_z)
+            # print("slicing: ", settings.get("filepath"), " at z=", current_z)
             my_hatcher = build_hatcher(
                 hatcher_type=hatcher_type,
                 hatch_angle=hatch_angle,
@@ -611,10 +538,8 @@ class SliceFile(ttk.Frame):
             geom_slice = solid_part.getVectorSlice(current_z)
             # Perform the hatching operations
             layer = my_hatcher.hatch(geom_slice)
-            print("layer: ", layer)
-            dpi = int(self.entries[14].get())
-            print("dpi: ", dpi)
-            self.frame_axes.grid(row=2, column=0, sticky="nsew", padx=15, pady=15)
+            dpi = settings.get("dpi")
+            self.frame_axes.grid(row=0, column=1, sticky="nsew", padx=15, pady=15)
             self.frame_plot.destroy() if self.frame_plot else None
             self.frame_plot = PlotSTL(
                 self.frame_axes,

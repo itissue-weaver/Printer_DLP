@@ -1,23 +1,23 @@
 {
-    "filepath": "D:/Pycharm_Projects/Printer_DLP/pyramid_test.stl",
+    "filepath": "D:/Pycharm_Projects/Printer_DLP/files/meniscus-flat.stl",
     "rotation": [
         0.0,
         0.0,
         0.0
     ],
     "scale": [
-        1.0,
-        1.0,
-        1.0
+        0.0,
+        0.0,
+        0.0
     ],
     "translation": [
         0.0,
         0.0,
         0.0
     ],
-    "width_part": 20.0,
-    "height_part": 20.0,
-    "depth_part": 20.0,
+    "width_part": 32.191,
+    "height_part": 38.168,
+    "depth_part": 8.151,
     "hatcher_type": "Base",
     "hatch_angle": 10.0,
     "volume_offset_hatch": 0.0,
@@ -53,32 +53,37 @@
     "quantity3": 100.0,
     "material4": "Water",
     "quantity4": 100.0,
-    "max_level1": 10.0,
+    "max_level1": 100.0,
     "shape1": "Cylinder",
     "dimensions1": [
         0.0,
         1.0,
         1.0
     ],
-    "max_level2": 10.0,
+    "max_level2": 100.0,
     "shape2": "Cylinder",
     "dimensions2": [
         0.0,
         1.0,
         1.0
     ],
-    "max_level3": 10.0,
-    "shape3": "Cylinder",
+    "max_level3": 100.0,
+    "shape3": "Rectangle",
     "dimensions3": [
         0.0,
         1.0,
         1.0
     ],
-    "max_level4": 10.0,
+    "max_level4": 100.0,
     "shape4": "Cylinder",
     "dimensions4": [
         0.0,
         1.0,
         1.0
+    ],
+    "centroide": [
+        36.423681095072496,
+        499.38455215701515,
+        9.719475415641815
     ]
 }

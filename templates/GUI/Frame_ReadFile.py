@@ -4,11 +4,10 @@ __date__ = "$ 22/ene/2025  at 19:25 $"
 
 from tkinter import filedialog
 
-import trimesh
 import ttkbootstrap as ttk
 
-from templates.AuxiliarFunctions import update_settings
-from templates.PlotFrame import PlotSTL
+from templates.AuxFunctionsPlots import read_stl
+from templates.GUI.PlotFrame import PlotSTL
 
 
 def create_input_widgets(master, **kwargs):
@@ -45,22 +44,7 @@ def create_buttons(master, **kwargs):
     ).grid(row=0, column=0, sticky="n")
 
 
-def read_stl(**kwargs):
-    filepath = kwargs.get("file_path", None)
-    if filepath is None:
-        return None
-    update_settings(filepath=filepath)
-    solid_trimesh_part = trimesh.load_mesh(filepath)
-    # Get the bounding box dimensions
-    bounding_box = solid_trimesh_part.bounding_box.extents
-    width, height, depth = bounding_box
-    width = round(width, 3)
-    height = round(height, 3)
-    depth = round(depth, 3)
-    update_settings(
-        filepath=filepath, width_part=width, height_part=height, depth_part=depth
-    )
-    return solid_trimesh_part
+
 
 
 class ReadFile(ttk.Frame):

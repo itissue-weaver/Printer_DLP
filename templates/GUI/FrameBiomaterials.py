@@ -5,7 +5,7 @@ from PIL import Image
 import ttkbootstrap as ttk
 
 from templates.AuxiliarFunctions import read_settings
-from templates.SubFrames import SubFrameFormulaBiomaterial, SubFrameConfigTanks
+from templates.GUI.SubFrames import SubFrameFormulaBiomaterial, SubFrameConfigTanks
 
 Image.CUBIC = Image.BICUBIC
 
@@ -47,6 +47,12 @@ class FrameBiomaterials(ttk.Frame):
 
     def init_levels(self):
         settings = read_settings()
+        self.frame_levels.update_max_level(
+            settings.get("max_level1", 100.0),
+            settings.get("max_level2", 100.0),
+            settings.get("max_level3", 100.0),
+            settings.get("max_level4", 100.0),
+        )
         self.frame_levels.update_levels(
             settings.get("quantity1", 0.0),
             settings.get("quantity2", 0.0),
@@ -58,15 +64,6 @@ class FrameBiomaterials(ttk.Frame):
             settings.get("material2", "Default 2"),
             settings.get("material3", "Default 3"),
             settings.get("material4", "Default 4"),
-        )
-
-    def update_max_levels(self):
-        settings = read_settings()
-        self.frame_levels.update_max_levels(
-            settings.get("max_level1", 100.0),
-            settings.get("max_level2", 100.0),
-            settings.get("max_level3", 100.0),
-            settings.get("max_level4", 100.0),
         )
 
     def standard_formula_callback(self):
@@ -117,21 +114,22 @@ class SubFrameMeters(ttk.Frame):
         self.update_levels(25, 50, 75, 100)
 
     def update_levels(self, level1, level2, level3, level4):
+        settings = read_settings()
         self.tank1.configure(amountused=level1)
         self.tank2.configure(amountused=level2)
         self.tank3.configure(amountused=level3)
         self.tank4.configure(amountused=level4)
-        self.configure_style(self.tank1, level1)
-        self.configure_style(self.tank2, level2)
-        self.configure_style(self.tank3, level3)
-        self.configure_style(self.tank4, level4)
+        self.configure_style(self.tank1, level1, settings.get("max_level1", 100.0))
+        self.configure_style(self.tank2, level2, settings.get("max_level2", 100.0))
+        self.configure_style(self.tank3, level3, settings.get("max_level3", 100.0))
+        self.configure_style(self.tank4, level4, settings.get("max_level4", 100.0))
 
-    def configure_style(self, widget, level):
-        if level <= 25:
+    def configure_style(self, widget, level, max_level):
+        if level <= 0.25 * max_level:
             widget.configure(bootstyle="danger")
-        elif level <= 50:
+        elif level <= 0.5 * max_level:
             widget.configure(bootstyle="warning")
-        elif level <= 75:
+        elif level <= 0.75 * max_level:
             widget.configure(bootstyle="info")
         else:
             widget.configure(bootstyle="success")

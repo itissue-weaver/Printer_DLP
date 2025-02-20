@@ -10,6 +10,7 @@ from matplotlib.figure import Figure
 import pyslm.visualise
 
 from files.constants import image_path_projector
+from templates.AuxiliarFunctions import read_settings
 
 
 class PlotSTL(ttk.Frame):
@@ -43,10 +44,18 @@ class PlotSTL(ttk.Frame):
                     self.axes.set_title("3D Part")
             case "layer":
                 layer = kwargs.get("layer")
+                settings = read_settings()
                 if layer is None:
                     return
-                self.dpi = kwargs.get("dpi", 300)  # Adjust as needed to achieve the scale
-
+                self.dpi = kwargs.get(
+                    "dpi", 300
+                )  # Adjust as needed to achieve the scale
+                centroide = settings.get("centroide", [0, 0, 0])
+                width = settings.get("width_part", 0.0)
+                height = settings.get("height_part", 0.0)
+                if width == 0.0 or height == 0.0:
+                    print("No width or height found")
+                    return
                 matplotlib.pyplot.close("all")
                 self.figure = Figure(figsize=(5, 5), dpi=self.dpi)
                 self.axes = self.figure.add_subplot(111)
@@ -55,6 +64,12 @@ class PlotSTL(ttk.Frame):
                     plot3D=False,
                     plotOrderLine=True,
                     plotArrows=False,
+                )
+                self.axes.set_xlim(
+                    [centroide[0] - width * 1.5 / 2, centroide[0] + width * 1.5 / 2]
+                )
+                self.axes.set_ylim(
+                    [centroide[1] - height * 1.5 / 2, centroide[1] + height * 1.5 / 2]
                 )
                 if self.save_temp_flag:
                     # projector_width_cm = 15.0  # Width of the projected image at a 10 cm distance
@@ -68,19 +83,27 @@ class PlotSTL(ttk.Frame):
                     self.figure.set_size_inches(width_inch, height_inch)
 
                     # Set the background color of the figure and axes to black
-                    self.figure.patch.set_facecolor('black')
-                    self.figure.gca().patch.set_facecolor('black')
+                    self.figure.patch.set_facecolor("black")
+                    self.figure.gca().patch.set_facecolor("black")
                     self.figure.gca().tick_params(
-                        colors='white')  # Optional: Set the tick color to white for better visibility
+                        colors="white"
+                    )  # Optional: Set the tick color to white for better visibility
                     # Turn off the axes
-                    self.figure.gca().axis('off')
+                    self.figure.gca().axis("off")
                     # Save the figure without axes lines at 1:1 scale
-                    self.figure.savefig(self.path_to_save, bbox_inches="tight", pad_inches=0,
-                                        dpi=self.dpi, transparent=True)
+                    self.figure.savefig(
+                        self.path_to_save,
+                        bbox_inches="tight",
+                        pad_inches=0,
+                        dpi=self.dpi,
+                        transparent=True,
+                    )
                 else:
                     self.canvas = FigureCanvasTkAgg(self.figure, self)
                     toolbar = NavigationToolbar2Tk(self.canvas, self)
                     toolbar.update()
-                    self.canvas.get_tk_widget().pack(side=ttk.TOP, fill=ttk.BOTH, expand=1)
+                    self.canvas.get_tk_widget().pack(
+                        side=ttk.TOP, fill=ttk.BOTH, expand=1
+                    )
             case _:
                 print("No type plot")
