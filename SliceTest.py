@@ -2,56 +2,64 @@
 __author__ = "Edisson A. Naula"
 __date__ = "$ 22/ene/2025  at 18:12 $"
 
+import numpy as np
 import pyslm.visualise
+import trimesh
+from matplotlib import pyplot as plt
 from pyslm import hatching as hatching
-import matplotlib.pyplot as plt
+
+
+def read_stl_trimesh(**kwargs):
+    filepath = kwargs.get("file_path", None)
+    if filepath is None:
+        return None
+    trimesh_part = trimesh.load_mesh(filepath)
+    return trimesh_part
+
 
 if __name__ == "__main__":
     # Imports the part and sets the geometry to an STL file (frameGuide.stl)
     solidPart = pyslm.Part("myFrameGuide")
-    solidPart.setGeometry("pyramid_test.stl")
+    solidPart.setGeometry("files/pyramid_test.stl")
+    solid_trimesh_part = read_stl_trimesh(file_path="files/pyramid_test.stl")
     solidPart.rotation = [0, 0, 0]
     solidPart.translation = [0, 0, 0]
     solidPart.scale = [1, 1, 1]
     solidPart.dropToPlatform()
 
+    bounding_box = solid_trimesh_part.bounding_box.extents
+    width, height, depth = bounding_box
+    # divide z in 4 parts
+    group_size = depth / 4
     # Set te slice layer position
-    z = 2.0
+    z_delta = 0.5
+    current_z = 0.0
+    resolution = 1  # The resolution of the bitmap to generate [pixels/length unit]
+    # Create a figure to visualize the current layer
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection="3d")
 
-    # Create a trimesh object
-    # solidTrimeshPart = trimesh.load_mesh('pyramid_test.stl')
-    # solidTrimeshPart.show()
+    while current_z < depth - z_delta:
+        current_z += z_delta
+        # Slice the object at Z and get the boundaries
+        planexy = solidPart.getBitmapSlice(
+            current_z, resolution
+        )  # ndarray true false data
+        planexy = planexy.astype(float)
 
-    # Create a StripeHatcher object for performing any hatching operations
-    # myHatcher = hatching.StripeHatcher()
-    # myHatcher = hatching.Hatcher()
-    # myHatcher = hatching.BaseHatcher()
-    myHatcher = hatching.IslandHatcher()
-    # myHatcher = hatching.BasicIslandHatcher()
+        # Create grid for the layer
+        x = np.linspace(-width / 2, width / 2, planexy.shape[1])
+        y = np.linspace(-height / 2, height / 2, planexy.shape[0])
+        X, Y = np.meshgrid(x, y)
+        Z = np.ones_like(X) * current_z
 
-    myHatcher.stripeWidth = 5.0  # [mm]
+        # Plot the current layer
+        ax.plot_surface(
+            X, Y, Z, facecolors=plt.cm.gray(planexy), rstride=1, cstride=1, alpha=0.5
+        )
 
-    # Set the base hatching parameters which are generated within Hatcher
-    myHatcher.hatchAngle = 0.0  # [°]
-    myHatcher.volumeOffsetHatch = (
-        0.08  # [mm] Offset between internal and external boundary
-    )
-    myHatcher.spotCompensation = (
-        0.06  # [mm] Additional offset to account for laser spot size
-    )
-    myHatcher.numInnerContours = 2
-    myHatcher.numOuterContours = 1
-    myHatcher.hatchSpacing = 0.1  # [mm] The spacing between hatch lines
-
-    # Slice the object at Z and get the boundaries
-    geomSlice = solidPart.getVectorSlice(z)
-
-    # Perform the hatching operations
-    layer = myHatcher.hatch(geomSlice)
-
-    # Plot the layer geometries generated
-    figure, axes = pyslm.visualise.plot(
-        layer, plot3D=True, plotOrderLine=True, plotArrows=False
-    )
-    figure.savefig("pyramid_test.png", dpi=300)
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    ax.set_zlabel("Z")
+    plt.title("3D Layer Visualization")
     plt.show()

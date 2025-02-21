@@ -9,16 +9,17 @@ from tkinter import messagebox
 import pyslm
 import pyslm.visualise
 import ttkbootstrap as ttk
-from pyslm import hatching
+from PIL import ImageTk, Image
 
 from files.constants import image_path_projector
 from templates.AuxiliarFunctions import update_settings, read_settings
-from templates.GUI.PlotFrame import PlotSTL
+from templates.GUI.PlotFrame import PlotSTL, ImageFrameApp
 from templates.midleware.MD_Printer import (
     send_next_layer_file,
     ask_status,
     send_settings_printer,
 )
+from templates.static.AuxiliarHatcher import build_hatcher
 
 
 def create_input_widgets(master, **kwargs):
@@ -131,36 +132,24 @@ def create_input_widgets(master, **kwargs):
         row=7, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_stripe_width)
-    # ----------------------parameters visual--------------------
-    frame_visual = ttk.LabelFrame(master, text="Visualization")
-    frame_visual.grid(row=2, column=0, sticky="nsew", padx=10, pady=10)
-    frame_visual.columnconfigure(2, weight=1)
-    ttk.Label(frame_visual, text="z:").grid(
-        row=0, column=0, sticky="w", padx=10, pady=10
-    )
-    entry_z = ttk.DoubleVar(value=0.0)
-    ttk.Entry(frame_visual, textvariable=entry_z).grid(
-        row=0, column=1, sticky="w", padx=5, pady=5
-    )
-    entries.append(entry_z)
-    ttk.Scale(
-        frame_visual,
-        from_=0.0,
-        to=kwargs.get("max_z", 100),
-        orient="horizontal",
-        command=kwargs.get("callback_scale"),
-        variable=entry_z,
-    ).grid(row=0, column=2, sticky="ew", padx=15, pady=5)
     return entries
 
 
 def create_buttons(master, **kwargs):
+    my_style = ttk.Style()
+    my_style.configure("info.TButton", font=("Arial", 18))
     ttk.Button(
-        master, text="Slice", command=kwargs.get("callback_sliceFile", None)
+        master,
+        text="Slice",
+        command=kwargs.get("callback_sliceFile", None),
+        style="info.TButton",
     ).grid(row=0, column=0, sticky="n")
-    ttk.Button(
-        master, text="Print", command=kwargs.get("callback_printFile", None)
-    ).grid(row=0, column=1, sticky="n")
+    # ttk.Button(
+    #     master,
+    #     text="Print",
+    #     command=kwargs.get("callback_printFile", None),
+    #     style="info.TButton",
+    # ).grid(row=0, column=1, sticky="n")
 
 
 def read_stl(**kwargs):
@@ -223,36 +212,6 @@ def get_print_parameters(entries):
     return layer_depth, delta_layer, plate
 
 
-def build_hatcher(
-    hatcher_type,
-    hatch_angle,
-    volume_offset_hatch,
-    spot_compensation,
-    num_inner_contours,
-    num_outer_contours,
-    hatch_spacing,
-    stripe_width,
-):
-    # Create a StripeHatcher object for performing any hatching operations
-    match hatcher_type:
-        case "Base":
-            my_hatcher = hatching.Hatcher()
-        case "Island":
-            my_hatcher = hatching.IslandHatcher()
-        case "Stripe":
-            my_hatcher = hatching.StripeHatcher()
-        case _:
-            my_hatcher = hatching.StripeHatcher()
-    my_hatcher.stripeWidth = stripe_width
-    my_hatcher.hatchAngle = hatch_angle
-    my_hatcher.volumeOffsetHatch = volume_offset_hatch
-    my_hatcher.spotCompensation = spot_compensation
-    my_hatcher.numInnerContours = num_inner_contours
-    my_hatcher.numOuterContours = num_outer_contours
-    my_hatcher.hatchSpacing = hatch_spacing
-    return my_hatcher
-
-
 def slice_geometry_for_print(master, settings, current_z, path_to_save):
     try:
         file_path = settings.get("filepath")
@@ -308,6 +267,21 @@ def slice_geometry_for_print(master, settings, current_z, path_to_save):
         return None
 
 
+def create_image_frame(master, canvas):
+    if canvas is not None:
+        canvas.destroy()
+    image = Image.open(r"files/img/temp.png")
+    width, height = image.size
+    new_width = int(width / 1)
+    new_height = int(height / 1)
+    image = image.resize((new_width, new_height))
+    image_start = ImageTk.PhotoImage(image)
+    canvas = ttk.Canvas(master, width=new_width, height=new_height)
+    canvas.grid(row=0, column=0, sticky="nswe")
+    canvas.create_image(0, 0, anchor="sw", image=image_start)
+    return canvas
+
+
 class SliceFile(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
@@ -315,6 +289,7 @@ class SliceFile(ttk.Frame):
         self.current_z = None
         self.display_thread = None
         self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
         # ----------------------variables--------------------
         self.entry_z = None
         self.frame_plot = None
@@ -329,30 +304,61 @@ class SliceFile(ttk.Frame):
         # ----------------------widgets----------------------
         self.frame_widgets = ttk.Frame(self)
         self.frame_widgets.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+        self.frame_widgets.columnconfigure(1, weight=1)
+        self.frame_widgets.rowconfigure(0, weight=1)
         self.frame_inputs = ttk.Frame(self.frame_widgets)
         self.frame_inputs.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
         self.frame_inputs.columnconfigure(0, weight=1)
+
         self.entries = create_input_widgets(
             self.frame_inputs,
             callback_scale=lambda value: self.scale_callback(value),
             var_path=self.show_path,
-            max_z=self.z_max,
         )
-        self.entry_z = self.entries[-1]
+        # ----------------------axes---------------------------
+        self.frame_axes = ttk.LabelFrame(self.frame_widgets, text="Preview")
+        self.frame_axes.grid(row=0, column=1, sticky="nsew", padx=15, pady=15)
+        self.frame_axes.columnconfigure(0, weight=1)
+        self.frame_axes.rowconfigure(0, weight=1)
+        self.canvas_img = ImageFrameApp(self.frame_axes)
+        self.canvas_img.grid(row=0, column=0, sticky="nsew")
+        # ----------------------parameters visual--------------------
+        frame_visual = ttk.LabelFrame(self, text="Visualization")
+        frame_visual.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+        frame_visual.columnconfigure(3, weight=1)
+        ttk.Label(frame_visual, text="z:").grid(
+            row=0, column=0, sticky="w", padx=10, pady=10
+        )
+        entry_z = ttk.DoubleVar(value=0.0)
+        ttk.Entry(frame_visual, textvariable=entry_z).grid(
+            row=0, column=1, sticky="w", padx=5, pady=5
+        )
+        self.min_value = ttk.StringVar(value="Min: 0.0")
+        ttk.Label(frame_visual, textvariable=self.min_value).grid(
+            row=0, column=2, sticky="w", padx=5, pady=5
+        )
+        ttk.Scale(
+            frame_visual,
+            from_=0.0,
+            to=self.z_max,
+            orient="horizontal",
+            command=self.scale_callback,
+            variable=entry_z,
+        ).grid(row=0, column=3, sticky="ew", padx=15, pady=5)
+        self.entry_z = entry_z
+        self.max_value = ttk.StringVar(value=f"Max: {self.z_max}")
+        ttk.Label(frame_visual, textvariable=self.max_value).grid(
+            row=0, column=4, sticky="w", padx=5, pady=5
+        )
         # ----------------------buttons----------------------
-        self.frame_buttons = ttk.Frame(self.frame_widgets)
-        self.frame_buttons.grid(row=1, column=0, sticky="nsew")
-        self.frame_buttons.columnconfigure((0, 1), weight=1)
+        self.frame_buttons = ttk.Frame(self)
+        self.frame_buttons.grid(row=2, column=0, sticky="nsew", padx=15, pady=15)
+        self.frame_buttons.columnconfigure(0, weight=1)
         create_buttons(
             self.frame_buttons,
             callback_sliceFile=self.slice_geometry,
             callback_printFile=self.print_file_callback,
         )
-        # ----------------------axes---------------------------
-        self.frame_axes = ttk.LabelFrame(self, text="Preview")
-        self.frame_axes.grid(row=0, column=1, sticky="nsew", padx=15, pady=15)
-        self.frame_axes.columnconfigure(0, weight=1)
-        self.frame_axes.rowconfigure(0, weight=1)
 
     def print_file_callback(self):
         if self.display_thread is not None:
@@ -483,10 +489,11 @@ class SliceFile(ttk.Frame):
         value = float(value)
         if self.z_value != value:
             self.z_value = round(value, 3)
-            self.entry_z.set(str(self.z_value))
+            self.entry_z.set(self.z_value)
             self.slice_geometry()
+            self.canvas_img.reaload_image()
 
-    def slice_geometry(self, save_temp_flag=False):
+    def slice_geometry(self):
         try:
             settings = read_settings()
             rotation, scale, translation = get_geometry_parameters(self.entries)
@@ -518,7 +525,7 @@ class SliceFile(ttk.Frame):
                 hatch_spacing=hatch_spacing,
                 stripe_width=stripe_width,
             )
-            current_z = float(self.entries[-1].get())
+            current_z = float(self.entry_z.get())
             if not (0 < current_z < self.z_max):
                 msg = "z value out of range"
                 messagebox.showerror("Error", msg)
@@ -539,16 +546,13 @@ class SliceFile(ttk.Frame):
             # Perform the hatching operations
             layer = my_hatcher.hatch(geom_slice)
             dpi = settings.get("dpi")
-            self.frame_axes.grid(row=0, column=1, sticky="nsew", padx=15, pady=15)
-            self.frame_plot.destroy() if self.frame_plot else None
-            self.frame_plot = PlotSTL(
-                self.frame_axes,
+            PlotSTL(
+                self,
                 layer=layer,
                 type_plot="layer",
                 dpi=dpi,
-                save_temp_flag=save_temp_flag,
+                save_temp_flag=True,
             )
-            self.frame_plot.grid(row=0, column=0, sticky="nsew")
             return layer
         except Exception as e:
             print("error at internal slicing: ", e)

@@ -42,8 +42,6 @@ def get_settings_printer():
     response = requests.get(
         url=f"{server_domain + base_url}/settings", headers=headers, verify=False
     )
-    print(f"{server_domain + base_url}/settings")
-    print(response.headers)
     if response.status_code == 200:
         data = response.json()
         return 200, data
@@ -98,6 +96,17 @@ def send_zip_file():
 def ask_status():
     response = requests.get(
         f"{server_domain + base_url}/status", data=json.dumps({}), headers=headers
+    )
+    if response.status_code == 200:
+        data = response.json()
+        return 200, data
+    else:
+        return response.status_code, None
+
+
+def test_connection():
+    response = requests.get(
+        f"{server_domain + base_url}/hello", data=json.dumps({}), headers=headers
     )
     if response.status_code == 200:
         data = response.json()

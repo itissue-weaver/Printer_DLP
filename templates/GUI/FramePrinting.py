@@ -5,10 +5,11 @@ __date__ = "$ 19/feb/2025  at 21:18 $"
 import os
 
 import ttkbootstrap as ttk
+from ttkbootstrap.dialogs import Messagebox
 
 from templates.AuxFunctionsPlots import read_stl
 from templates.AuxiliarFunctions import read_settings
-from templates.GUI.PlotFrame import PlotSTL
+from templates.GUI.PlotFrame import SolidViewer
 
 
 def create_widgets_status(master):
@@ -31,7 +32,7 @@ def create_widgets_status(master):
 def create_widgets_resume(master):
     settings = read_settings()
     widgets = []
-    ttk.Label(master, text="File name:").grid(
+    ttk.Label(master, text="File name:", font=("Arial", 16, "bold")).grid(
         row=0, column=0, sticky="w", padx=5, pady=5
     )
     filepath = settings.get("filepath", "Not filepath")
@@ -40,7 +41,7 @@ def create_widgets_resume(master):
         row=0, column=1, sticky="w", padx=5, pady=5
     )
     widgets.append(entry_file_name)
-    ttk.Label(master, text="Width <x>[mm]:").grid(
+    ttk.Label(master, text="Width <x>[mm]:", font=("Arial", 16, "bold")).grid(
         row=1, column=0, sticky="w", padx=5, pady=5
     )
     entry_width = ttk.StringVar(value=str(settings.get("width_part", "0.0")))
@@ -48,7 +49,7 @@ def create_widgets_resume(master):
         row=1, column=1, sticky="w", padx=5, pady=5
     )
     widgets.append(entry_width)
-    ttk.Label(master, text="Height <y>[mm]:").grid(
+    ttk.Label(master, text="Height <y>[mm]:", font=("Arial", 16, "bold")).grid(
         row=2, column=0, sticky="w", padx=5, pady=5
     )
     entry_height = ttk.StringVar(value=str(settings.get("height_part", "0.0")))
@@ -56,7 +57,7 @@ def create_widgets_resume(master):
         row=2, column=1, sticky="w", padx=5, pady=5
     )
     widgets.append(entry_height)
-    ttk.Label(master, text="Depth  <z>[mm]:").grid(
+    ttk.Label(master, text="Depth  <z>[mm]:", font=("Arial", 16, "bold")).grid(
         row=3, column=0, sticky="w", padx=5, pady=5
     )
     entry_length = ttk.StringVar(value=str(settings.get("length_part", "0.0")))
@@ -70,7 +71,7 @@ def create_widgets_resume(master):
     hours = int(estimated_time / 3600)
     minutes = int((estimated_time % 3600) / 60)
     seconds = int(estimated_time % 60)
-    ttk.Label(master, text="Estimated time:").grid(
+    ttk.Label(master, text="Estimated time:", font=("Arial", 16, "bold")).grid(
         row=4, column=0, sticky="w", padx=5, pady=5
     )
     entry_estimated_time = ttk.StringVar(
@@ -90,6 +91,7 @@ class FramePrinting(ttk.Frame):
         self.rowconfigure(0, weight=1)
         self.is_printing = False
         settings = read_settings()
+        self.is_settings_sent = False
         # ----------------------widgets----------------------
         self.frame_main_info = ttk.Frame(self)
         self.frame_main_info.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
@@ -98,8 +100,8 @@ class FramePrinting(ttk.Frame):
         solid_trimesh_part = read_stl(
             file_path=settings.get("filepath", "files/pyramid_test.stl"),
         )
-        self.frame_plot = PlotSTL(
-            self.frame_main_info, solid_trimesh_part=solid_trimesh_part
+        self.frame_plot = SolidViewer(
+            self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=4
         )
         self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
 
@@ -113,17 +115,17 @@ class FramePrinting(ttk.Frame):
         self.frame_tanks_and_plot.grid(row=0, column=2, sticky="nsew", padx=15, pady=15)
         self.frame_tanks_and_plot.columnconfigure(0, weight=1)
         self.frame_tanks_and_plot.rowconfigure((0, 1, 2, 3), weight=1)
-        ttk.Label(self.frame_tanks_and_plot, text="Status", font=("Arial", 22)).grid(
-            row=0, column=0, sticky="w", padx=5, pady=5
-        )
+        ttk.Label(
+            self.frame_tanks_and_plot, text="Status", font=("Arial", 22, "bold")
+        ).grid(row=0, column=0, sticky="w", padx=5, pady=5)
         self.frame_status = ttk.Frame(self.frame_tanks_and_plot)
         self.frame_status.grid(row=1, column=0, sticky="nsew", padx=15, pady=15)
         self.frame_status.columnconfigure(0, weight=1)
         self.frame_status.rowconfigure(0, weight=1)
         self.status_widgets = create_widgets_status(self.frame_status)
-        ttk.Label(self.frame_tanks_and_plot, text="Materials", font=("Arial", 22)).grid(
-            row=2, column=0, sticky="w", padx=5, pady=5
-        )
+        ttk.Label(
+            self.frame_tanks_and_plot, text="Materials", font=("Arial", 22, "bold")
+        ).grid(row=2, column=0, sticky="w", padx=5, pady=5)
         self.frame_tanks = SubFrameBars(self.frame_tanks_and_plot)
         self.frame_tanks.columnconfigure(0, weight=1)
         self.frame_tanks.rowconfigure((0, 1, 2, 3, 4, 5, 6, 7), weight=1)
@@ -133,21 +135,26 @@ class FramePrinting(ttk.Frame):
         self.frame_buttons = ttk.Frame(self)
         self.frame_buttons.grid(row=1, column=0, sticky="nsew", padx=15, pady=15)
         self.frame_buttons.columnconfigure((0, 1), weight=1)
-
+        my_style = ttk.Style()
+        my_style.configure("success.TButton", font=("Arial", 18))
+        my_style.configure("primary.TButton", font=("Arial", 18))
         ttk.Button(
             self.frame_buttons,
             text="Send settings",
             command=self.send_settings_callback,
+            style="primary.TButton",
         ).grid(row=0, column=0, sticky="n", padx=15, pady=15)
         self.print_button = ttk.Button(
             self.frame_buttons,
             text="Print",
             command=self.print_callback,
-            bootstyle="success",
+            style="success.TButton",
         )
         self.print_button.grid(row=0, column=1, sticky="n", padx=15, pady=15)
 
     def print_callback(self):
+        if not self.is_settings_sent:
+            Messagebox.show_error("Settings not sent", "Error")
         self.is_printing = not self.is_printing
         if self.is_printing:
             self.print_button.config(text="Stop printing")
@@ -157,8 +164,10 @@ class FramePrinting(ttk.Frame):
             self.print_button.config(bootstyle="success")
 
     def send_settings_callback(self):
-        print("Send settings")
-        pass
+        msg = "Se enviara las configuraciones a la impresora, ¿Desea proceder?"
+        if Messagebox.yesno(msg, "Send settings"):
+            print("Send settings")
+            self.is_settings_sent = True
 
 
 class SubFrameBars(ttk.Frame):

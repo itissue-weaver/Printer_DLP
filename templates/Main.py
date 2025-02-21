@@ -7,6 +7,7 @@ import ttkbootstrap as ttk
 from PIL import Image, ImageTk
 
 from templates.GUI.FrameBiomaterials import FrameBiomaterials
+from templates.GUI.FrameHome import HomePage
 from templates.GUI.FramePrinting import FramePrinting
 from templates.GUI.FrameSliceFile import SliceFile
 from templates.GUI.Frame_ReadFile import ReadFile
@@ -35,14 +36,17 @@ class MainGUI(ttk.Window):
         self.notebook.grid(row=0, column=0, sticky="nsew")
         self.notebook.columnconfigure(0, weight=1)
         self.notebook.rowconfigure(0, weight=1)
+        tab0 = HomePage(self.notebook)
+        self.notebook.add(tab0, text="Home")
+        tab1 = ReadFile(self.notebook)
+        self.notebook.add(tab1, text="Geometría")
         tab2 = SliceFile(self.notebook)
         self.notebook.add(tab2, text="Slicer")
         tab3 = FrameBiomaterials(self.notebook)
         self.notebook.add(tab3, text="Biomateriales")
         tab4 = FramePrinting(self.notebook)
         self.notebook.add(tab4, text="Impresion")
-        tab1 = ReadFile(self.notebook)
-        self.notebook.add(tab1, text="Geometría")
+
         # tab5 = FrameConfig(self.notebook)
         # self.notebook.add(tab5, text="Configuración")
         # --------------------footer-------------------

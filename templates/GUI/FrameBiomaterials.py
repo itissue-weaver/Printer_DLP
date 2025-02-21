@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 __author__ = "Edisson A. Naula"
 __date__ = "$ 18/feb/2025  at 22:16 $"
+
+
 from PIL import Image
 import ttkbootstrap as ttk
 
@@ -34,15 +36,19 @@ class FrameBiomaterials(ttk.Frame):
         self.frame_buttons.grid(row=1, column=1, sticky="nswe", padx=10, pady=10)
         self.frame_buttons.columnconfigure(0, weight=1)
         self.frame_buttons.rowconfigure((0, 1), weight=1)
+        my_style = ttk.Style()
+        my_style.configure("info.TButton", font=("Helvetica", 18))
         ttk.Button(
             self.frame_buttons,
             text="Customize materials",
             command=self.standard_formula_callback,
+            style="info.TButton",
         ).grid(row=0, column=0, padx=5, pady=5)
         ttk.Button(
             self.frame_buttons,
             text="Customize Tanks",
             command=self.customize_callback,
+            style="info.TButton",
         ).grid(row=1, column=0, padx=5, pady=5)
 
     def init_levels(self):
@@ -85,6 +91,10 @@ class SubFrameMeters(ttk.Frame):
             amountused=25,
             metertype="semi",
             subtext="Tank 1",
+            textright="ml",
+            metersize=300,
+            textfont=("Arial", 24, "bold"),
+            subtextfont=("Cambria", 18),
         )
         self.tank1.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
         self.tank2 = ttk.Meter(
@@ -93,6 +103,10 @@ class SubFrameMeters(ttk.Frame):
             amountused=50,
             metertype="semi",
             subtext="Tank 2",
+            textright="ml",
+            metersize=300,
+            textfont=("Arial", 24, "bold"),
+            subtextfont=("Cambria", 18),
         )
         self.tank2.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
         self.tank3 = ttk.Meter(
@@ -101,6 +115,10 @@ class SubFrameMeters(ttk.Frame):
             amountused=75,
             metertype="semi",
             subtext="Tank 3",
+            textright="ml",
+            metersize=300,
+            textfont=("Arial", 24, "bold"),
+            subtextfont=("Cambria", 18),
         )
         self.tank3.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
         self.tank4 = ttk.Meter(
@@ -109,6 +127,10 @@ class SubFrameMeters(ttk.Frame):
             amountused=100,
             metertype="semi",
             subtext="Tank 4",
+            textright="ml",
+            metersize=300,
+            textfont=("Arial", 24, "bold"),
+            subtextfont=("Cambria", 18),
         )
         self.tank4.grid(row=1, column=1, sticky="nsew", padx=10, pady=10)
         self.update_levels(25, 50, 75, 100)
