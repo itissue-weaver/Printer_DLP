@@ -3,6 +3,8 @@ __author__ = "Edisson A. Naula"
 __date__ = "$ 19/feb/2025  at 21:18 $"
 
 import os
+import threading
+import time
 
 import ttkbootstrap as ttk
 from ttkbootstrap.dialogs import Messagebox
@@ -20,7 +22,7 @@ def create_widgets_status(master):
         padding=5,
         amounttotal=100,
         amountused=0,
-        subtext="%",
+        subtext="Progress",
         interactive=False,
         textright="%",
     )
@@ -84,9 +86,27 @@ def create_widgets_resume(master):
     return widgets
 
 
+def simulate_printing(master):
+    settings = read_settings()
+    layers = settings.get("num_layers", 1)
+    delta_layer = settings.get("delta_layer", 0.5)  # seconds
+    for i in range(layers):
+        time.sleep(delta_layer)
+        progress = (i + 1) / layers * 100
+        master.status_widgets[0].configure(amountused=round(progress, 2))
+        master.update()
+    Messagebox.show_info("Printing completed", "Printing")
+    master.is_printing = False
+    master.is_settings_sent = False
+    master.status_widgets[0].configure(amountused=0)
+    master.update()
+    master.master.master.master.master.init_levels()
+
+
 class FramePrinting(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
+        self.thread_sim = None
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
         self.is_printing = False
@@ -155,13 +175,21 @@ class FramePrinting(ttk.Frame):
     def print_callback(self):
         if not self.is_settings_sent:
             Messagebox.show_error("Settings not sent", "Error")
+            return
         self.is_printing = not self.is_printing
         if self.is_printing:
             self.print_button.config(text="Stop printing")
             self.print_button.config(bootstyle="danger")
+            if self.thread_sim is not None:
+                self.thread_sim.join()
+            self.thread_sim = threading.Thread(target=simulate_printing, args=(self,))
+            self.thread_sim.start()
         else:
             self.print_button.config(text="Print")
             self.print_button.config(bootstyle="success")
+            if self.thread_sim is not None:
+                self.thread_sim.join()
+                self.is_settings_sent = False
 
     def send_settings_callback(self):
         msg = "Se enviara las configuraciones a la impresora, ¿Desea proceder?"
