@@ -144,12 +144,12 @@ def create_buttons(master, **kwargs):
         command=kwargs.get("callback_sliceFile", None),
         style="info.TButton",
     ).grid(row=0, column=0, sticky="n")
-    # ttk.Button(
-    #     master,
-    #     text="Print",
-    #     command=kwargs.get("callback_printFile", None),
-    #     style="info.TButton",
-    # ).grid(row=0, column=1, sticky="n")
+    ttk.Button(
+        master,
+        text="Save",
+        command=kwargs.get("callback_saveSettings", None),
+        style="info.TButton",
+    ).grid(row=0, column=1, sticky="n")
 
 
 def read_stl(**kwargs):
@@ -357,7 +357,7 @@ class SliceFile(ttk.Frame):
         create_buttons(
             self.frame_buttons,
             callback_sliceFile=self.slice_geometry,
-            callback_printFile=self.print_file_callback,
+            callback_saveSettings=self.print_file_callback,
         )
 
     def print_file_callback(self):
@@ -390,100 +390,6 @@ class SliceFile(ttk.Frame):
             hatch_spacing=hatch_spacing,
             stripe_width=stripe_width,
         )
-        return
-        # ---------------------calculate_layers--------------
-        settings = read_settings()
-        depth_part = settings.get("depth_part")
-        if depth_part is None:
-            msg = "No depth part found"
-            messagebox.showerror("Error", msg)
-            return None
-        depth_part_mm = depth_part * 10
-        num_layers = int(depth_part_mm / layer_depth)
-        msg = f"Number of layers: {num_layers}"
-        time_to_print = num_layers * delta_layer
-        hours = int(time_to_print // 3600)
-        minutes = int((time_to_print % 3600) // 60)
-        seconds = int(time_to_print % 60)
-        msg += f"\nTime to print: {hours}hours {minutes}mins {seconds}s"
-        msg += f"\nPlate: {plate}"
-        answer = messagebox.askyesno("Print", msg)
-        if answer == "No":
-            return None
-        update_settings(num_layers=num_layers)
-        code, data = send_settings_printer()
-        if code != 200:
-            messagebox.showerror("Error", f"{code}, {data}")
-            return None
-        print(f"{data}")
-        # ---------------------print file--------------------
-        # self.viewer.start_projecting()
-        # code, data = send_start_print()
-        # if code != 200:
-        #     messagebox.showerror("Error", data.get("msg"))
-        #     return None
-        # print(f"{data.get('msg')}")
-        layer_sliced = 1
-        layer_displayed = 1
-        for n_layer in range(1, num_layers + 1):
-            slice_geometry_for_print(
-                settings=settings,
-                master=self.frame_axes,
-                current_z=n_layer * layer_depth,
-                path_to_save=f"files/img/temp{n_layer}.png",
-            )
-            layer_sliced += 1
-        time.sleep(1)
-        start_time = perf_counter()
-        last_time = start_time
-        return
-        while True:
-            current_time = perf_counter()
-            # check for max layer
-            if layer_sliced != layer_displayed:
-                slice_geometry_for_print(
-                    settings=settings,
-                    master=self.frame_axes,
-                    current_z=layer_sliced * layer_depth,
-                )
-                code, data = send_next_layer_file(image_path_projector)
-                if code != 200:
-                    print(f"{data.get('msg')}")
-                    continue
-                layer_displayed = layer_sliced
-            elapsed_layer_time = current_time - last_time
-            print(
-                "printing: ",
-                layer_sliced,
-                layer_displayed,
-                elapsed_layer_time,
-                delta_layer,
-            )
-            if elapsed_layer_time < delta_layer:
-                time.sleep(
-                    delta_layer * 0.25
-                )  # Sleep for a short duration to avoid excessive CPU usage
-                continue
-            counter_try_reload = 0
-            while True:
-                counter_try_reload += 1
-                code, data = send_next_layer_file(image_path_projector)
-                if code == 200:
-                    break
-                if counter_try_reload > 10:
-                    break
-            # self.viewer.star_reload(image_path_projector)
-            layer_sliced += 1
-            print(f"layer sliced: {layer_sliced}")
-            last_time = current_time
-            code, data = ask_status()
-            if code != 200:
-                print("Error to conect server")
-                continue
-            else:
-                if data.get("data", False):
-                    print("Projector is not alive")
-                    break
 
     def scale_callback(self, value):
         value = float(value)

@@ -10,8 +10,10 @@ import ttkbootstrap as ttk
 from ttkbootstrap.dialogs import Messagebox
 
 from templates.AuxFunctionsPlots import read_stl
-from templates.AuxiliarFunctions import read_settings
+from templates.AuxiliarFunctions import read_settings, update_settings
 from templates.GUI.PlotFrame import SolidViewer
+from templates.GUI.SubFramePrinting import FramePrintingProcess
+from templates.midleware.MD_Printer import send_settings_printer
 
 
 def create_widgets_status(master):
@@ -83,6 +85,29 @@ def create_widgets_resume(master):
         row=4, column=1, sticky="w", padx=5, pady=5
     )
     widgets.append(entry_estimated_time)
+    # -----------------frame sequence--------------------------------
+    sequence = settings.get("sequence", [])
+    frame_sequence = ttk.Frame(master)
+    frame_sequence.grid(row=5, column=0, columnspan=2, sticky="nsew", padx=5, pady=5)
+    frame_sequence.columnconfigure(0, weight=1)
+    ttk.Label(frame_sequence, text="Sequence: ", font=("Arial", 16, "bold")).grid(
+        row=0, column=0, sticky="w", padx=5, pady=5
+    )
+    tree = ttk.Treeview(
+        frame_sequence,
+        columns=("Deposit", "Height Z"),
+        show="headings",
+        height=4,
+        style="info.Treeview",
+    )
+    tree.heading("Deposit", text="Deposit", anchor="center")
+    tree.heading("Height Z", text="Height Z [mm]", anchor="center")
+    tree.column("Deposit", width=80, anchor="center")
+    tree.column("Height Z", width=80, anchor="center")
+    tree.grid(row=1, column=0, sticky="n")
+    for step in sequence:
+        tree.insert("", "end", values=(step["deposit"], step["height_z"]))
+    widgets.append(tree)
     return widgets
 
 
@@ -112,6 +137,8 @@ class FramePrinting(ttk.Frame):
         self.is_printing = False
         settings = read_settings()
         self.is_settings_sent = False
+        self.frame_process_print = None
+        self.is_process_set = False
         # ----------------------widgets----------------------
         self.frame_main_info = ttk.Frame(self)
         self.frame_main_info.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
@@ -154,23 +181,29 @@ class FramePrinting(ttk.Frame):
         # ----------------------Button----------------------
         self.frame_buttons = ttk.Frame(self)
         self.frame_buttons.grid(row=1, column=0, sticky="nsew", padx=15, pady=15)
-        self.frame_buttons.columnconfigure((0, 1), weight=1)
+        self.frame_buttons.columnconfigure((0, 2), weight=1)
         my_style = ttk.Style()
         my_style.configure("success.TButton", font=("Arial", 18))
         my_style.configure("primary.TButton", font=("Arial", 18))
         ttk.Button(
             self.frame_buttons,
+            text="Set printing proccess",
+            command=self.callback_printProccess,
+            style="primary.TButton",
+        ).grid(row=0, column=0, sticky="n", padx=15, pady=15)
+        ttk.Button(
+            self.frame_buttons,
             text="Send settings",
             command=self.send_settings_callback,
             style="primary.TButton",
-        ).grid(row=0, column=0, sticky="n", padx=15, pady=15)
+        ).grid(row=0, column=1, sticky="n", padx=15, pady=15)
         self.print_button = ttk.Button(
             self.frame_buttons,
             text="Print",
             command=self.print_callback,
             style="success.TButton",
         )
-        self.print_button.grid(row=0, column=1, sticky="n", padx=15, pady=15)
+        self.print_button.grid(row=0, column=2, sticky="n", padx=15, pady=15)
 
     def print_callback(self):
         if not self.is_settings_sent:
@@ -191,11 +224,121 @@ class FramePrinting(ttk.Frame):
                 self.thread_sim.join()
                 self.is_settings_sent = False
 
+    def callback_printProccess(self):
+        if self.frame_process_print is None:
+            self.frame_process_print = FramePrintingProcess(self)
+
+    def on_close_printProccess(self):
+        self.frame_process_print = None
+        settings = read_settings()
+        secuence = settings.get("sequence", [])
+        self.resume_widgets[-1].delete(*self.resume_widgets[-1].get_children())
+        for step in secuence:
+            self.resume_widgets[-1].insert(
+                "", "end", values=(step["deposit"], step["height_z"])
+            )
+
     def send_settings_callback(self):
+        # ---------------------calculate_layers--------------
+        settings = read_settings()
+        depth_part = settings.get("depth_part")
+        layer_depth = settings.get("layer_depth")
+        delta_layer = settings.get("delta_layer")
+        if depth_part is None:
+            msg = "No depth part found"
+            Messagebox.show_error(msg, "Error")
+            return None
+        depth_part_mm = depth_part * 10
+        num_layers = int(depth_part_mm / layer_depth)
+        msg = f"Number of layers: {num_layers}"
+        time_to_print = num_layers * delta_layer
+        hours = int(time_to_print // 3600)
+        minutes = int((time_to_print % 3600) // 60)
+        seconds = int(time_to_print % 60)
+        # msg += f"\nTime to print: {hours}hours {minutes}mins {seconds}s"
+        # msg += f"\nPlate: {plate}"
+        # answer = messagebox.askyesno("Print", msg)
+        # if answer == "No":
+        #     return None
+        update_settings(num_layers=num_layers)
+        # # ---------------------print file--------------------
+        # # self.viewer.start_projecting()
+        # # code, data = send_start_print()
+        # # if code != 200:
+        # #     messagebox.showerror("Error", data.get("msg"))
+        # #     return None
+        # # print(f"{data.get('msg')}")
+        # layer_sliced = 1
+        # layer_displayed = 1
+        # for n_layer in range(1, num_layers + 1):
+        #     slice_geometry_for_print(
+        #         settings=settings,
+        #         master=self.frame_axes,
+        #         current_z=n_layer * layer_depth,
+        #         path_to_save=f"files/img/temp{n_layer}.png",
+        #     )
+        #     layer_sliced += 1
+        # time.sleep(1)
+        # start_time = perf_counter()
+        # last_time = start_time
+        # return
+        # while True:
+        #     current_time = perf_counter()
+        #     # check for max layer
+        #     if layer_sliced != layer_displayed:
+        #         slice_geometry_for_print(
+        #             settings=settings,
+        #             master=self.frame_axes,
+        #             current_z=layer_sliced * layer_depth,
+        #         )
+        #         code, data = send_next_layer_file(image_path_projector)
+        #         if code != 200:
+        #             print(f"{data.get('msg')}")
+        #             continue
+        #         layer_displayed = layer_sliced
+        #     elapsed_layer_time = current_time - last_time
+        #     print(
+        #         "printing: ",
+        #         layer_sliced,
+        #         layer_displayed,
+        #         elapsed_layer_time,
+        #         delta_layer,
+        #     )
+        #     if elapsed_layer_time < delta_layer:
+        #         time.sleep(
+        #             delta_layer * 0.25
+        #         )  # Sleep for a short duration to avoid excessive CPU usage
+        #         continue
+        #     counter_try_reload = 0
+        #     while True:
+        #         counter_try_reload += 1
+        #         code, data = send_next_layer_file(image_path_projector)
+        #         if code == 200:
+        #             break
+        #         if counter_try_reload > 10:
+        #             break
+        #     # self.viewer.star_reload(image_path_projector)
+        #     layer_sliced += 1
+        #     print(f"layer sliced: {layer_sliced}")
+        #     last_time = current_time
+        #     code, data = ask_status()
+        #     if code != 200:
+        #         print("Error to conect server")
+        #         continue
+        #     else:
+        #         if data.get("data", False):
+        #             print("Projector is not alive")
+        #             break
         msg = "Se enviara las configuraciones a la impresora, ¿Desea proceder?"
         if Messagebox.yesno(msg, "Send settings"):
             print("Send settings")
-            self.is_settings_sent = True
+            code, data = send_settings_printer()
+            if code == 200:
+                Messagebox.show_info("Settings sent", "Send settings")
+                self.is_settings_sent = True
+            else:
+                Messagebox.show_error(f"Error sending settings\n {data}", "Error")
+                self.is_settings_sent = False
 
 
 class SubFrameBars(ttk.Frame):

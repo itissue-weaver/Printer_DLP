@@ -42,11 +42,14 @@ def get_settings_printer():
     response = requests.get(
         url=f"{server_domain + base_url}/settings", headers=headers, verify=False
     )
-    if response.status_code == 200:
-        data = response.json()
-        return 200, data
-    else:
-        return response.status_code, None
+    try:
+        if response.status_code == 200:
+            data = response.json()
+            return 200, data
+        else:
+            return response.status_code, None
+    except Exception as e:
+        return response.status_code, str(e)
 
 
 def send_stop_print():
