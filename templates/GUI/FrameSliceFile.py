@@ -2,8 +2,6 @@
 __author__ = "Edisson A. Naula"
 __date__ = "$ 22/ene/2025  at 21:05 $"
 
-import time
-from time import perf_counter
 from tkinter import messagebox
 
 import pyslm
@@ -11,14 +9,8 @@ import pyslm.visualise
 import ttkbootstrap as ttk
 from PIL import ImageTk, Image
 
-from files.constants import image_path_projector
 from templates.AuxiliarFunctions import update_settings, read_settings
 from templates.GUI.PlotFrame import PlotSTL, ImageFrameApp
-from templates.midleware.MD_Printer import (
-    send_next_layer_file,
-    ask_status,
-    send_settings_printer,
-)
 from templates.static.AuxiliarHatcher import build_hatcher
 
 
@@ -152,13 +144,13 @@ def create_buttons(master, **kwargs):
     ).grid(row=0, column=1, sticky="n")
 
 
-def read_stl(**kwargs):
+def read_stl_frame(**kwargs):
     filepath = kwargs.get("file_path", None)
     if filepath is None:
         return None
     rotation = kwargs.get("rotation", [0, 0, 0])
     scale = kwargs.get("scale", [1, 1, 1])
-    translation = kwargs.get("translation", [0, -500, 0])
+    translation = kwargs.get("translation", [0, 0, 0])
     update_settings(rotation=rotation, scale=scale, translation=translation)
     solid_part = pyslm.Part("myFrameGuide")
     solid_part.setGeometry(kwargs.get("file_path", None))
@@ -212,61 +204,6 @@ def get_print_parameters(entries):
     return layer_depth, delta_layer, plate
 
 
-def slice_geometry_for_print(master, settings, current_z, path_to_save):
-    try:
-        file_path = settings.get("filepath")
-        rotation = settings.get("rotation")
-        scale = settings.get("scale")
-        translation = settings.get("translation")
-        depth_part = settings.get("depth_part")
-        hatcher_type = settings.get("hatcher_type")
-        hatch_angle = settings.get("hatch_angle")
-        volume_offset_hatch = settings.get("volume_offset_hatch")
-        spot_compensation = settings.get("spot_compensation")
-        num_inner_contours = settings.get("num_inner_contours")
-        num_outer_contours = settings.get("num_outer_contours")
-        hatch_spacing = settings.get("hatch_spacing")
-        stripe_width = settings.get("stripe_width")
-        dpi = settings.get("dpi")
-        solid_part = read_stl(
-            file_path=file_path,
-            rotation=rotation,
-            scale=scale,
-            translation=translation,
-        )
-        if solid_part is None:
-            return None
-        if not (0 < current_z < depth_part):
-            msg = "z value out of range"
-            messagebox.showerror("Error", msg)
-            return None
-        my_hatcher = build_hatcher(
-            hatcher_type=hatcher_type,
-            stripe_width=stripe_width,
-            hatch_angle=hatch_angle,
-            volume_offset_hatch=volume_offset_hatch,
-            spot_compensation=spot_compensation,
-            num_inner_contours=num_inner_contours,
-            num_outer_contours=num_outer_contours,
-            hatch_spacing=hatch_spacing,
-        )
-        # Slice the object at Z and get the boundaries
-        geom_slice = solid_part.getVectorSlice(current_z)
-        # Perform the hatching operations
-        layer = my_hatcher.hatch(geom_slice)
-        frame_plot = PlotSTL(
-            master,
-            layer=layer,
-            type_plot="layer",
-            dpi=dpi,
-            save_temp_flag=True,
-        )
-        return frame_plot
-    except Exception as e:
-        print(e)
-        return None
-
-
 def create_image_frame(master, canvas):
     if canvas is not None:
         canvas.destroy()
@@ -286,6 +223,7 @@ class SliceFile(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
 
+        self.ploter = None
         self.current_z = None
         self.display_thread = None
         self.columnconfigure(0, weight=1)
@@ -397,13 +335,12 @@ class SliceFile(ttk.Frame):
             self.z_value = round(value, 3)
             self.entry_z.set(self.z_value)
             self.slice_geometry()
-            self.canvas_img.reaload_image()
 
     def slice_geometry(self):
         try:
             settings = read_settings()
             rotation, scale, translation = get_geometry_parameters(self.entries)
-            solid_part = read_stl(
+            solid_part = read_stl_frame(
                 file_path=settings.get("filepath"),
                 rotation=rotation,
                 scale=rotation,
@@ -449,16 +386,35 @@ class SliceFile(ttk.Frame):
             )
             # Slice the object at Z and get the boundaries
             geom_slice = solid_part.getVectorSlice(current_z)
+            # print("slicing: ", settings.get("filepath"), " at z=", current_z)
             # Perform the hatching operations
             layer = my_hatcher.hatch(geom_slice)
             dpi = settings.get("dpi")
-            PlotSTL(
-                self,
-                layer=layer,
-                type_plot="layer",
-                dpi=dpi,
-                save_temp_flag=True,
+            if self.ploter is None:
+                self.ploter = PlotSTL(
+                    self,
+                    layer=None,
+                    type_plot="layer",
+                    dpi=dpi,
+                    save_temp_flag=True,
+                    path_to_save="files/img/temp.png",
+                )
+            projector_dimension = settings.get("projector_dimension")
+            centroide = settings.get("centroide", [0, 0, 0])
+            width = settings.get("width_part", 0.0)
+            height = settings.get("height_part", 0.0)
+            self.ploter.plotLayer(
+                dpi,
+                layer,
+                projector_dimension[0],
+                projector_dimension[1],
+                "files/img/temp.png",
+                centroide,
+                width,
+                height,
+                clean_plot=True,
             )
+            self.canvas_img.reaload_image()
             return layer
         except Exception as e:
             print("error at internal slicing: ", e)

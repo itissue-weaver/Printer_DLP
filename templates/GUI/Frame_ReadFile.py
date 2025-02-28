@@ -44,9 +44,6 @@ def create_buttons(master, **kwargs):
     ).grid(row=0, column=0, sticky="n")
 
 
-
-
-
 class ReadFile(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
@@ -82,7 +79,7 @@ class ReadFile(ttk.Frame):
             if filepath == "":
                 print("No file selected")
                 return None
-            solid_trimesh_part = read_stl(
+            solid_trimesh_part, solid_part = read_stl(
                 file_path=filepath,
             )
             self.frame_axes.destroy()

@@ -44,7 +44,7 @@
     "delta_layer": 0.5,
     "plate": 1,
     "HOST": "127.0.0.1",
-    "num_layers": 400,
+    "num_layers": 16,
     "material1": "Solucion1",
     "quantity1": 50.0,
     "material2": "Solution 2",
@@ -102,5 +102,11 @@
             "height_z": 30.0,
             "index": 2
         }
-    ]
+    ],
+    "min_x_part": 16.6114253998,
+    "min_y_part": 482.341949463,
+    "min_z_part": 0.0,
+    "max_x_part": 48.8028106689,
+    "max_y_part": 520.50994873,
+    "max_z_part": 8.150760173839998
 }

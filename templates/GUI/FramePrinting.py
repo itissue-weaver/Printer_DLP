@@ -11,9 +11,9 @@ from ttkbootstrap.dialogs import Messagebox
 
 from templates.AuxFunctionsPlots import read_stl
 from templates.AuxiliarFunctions import read_settings, update_settings
-from templates.GUI.PlotFrame import SolidViewer
+from templates.GUI.PlotFrame import SolidViewer, PlotSTL
 from templates.GUI.SubFramePrinting import FramePrintingProcess
-from templates.midleware.MD_Printer import send_settings_printer
+from templates.static.AuxiliarHatcher import build_hatcher
 
 
 def create_widgets_status(master):
@@ -64,7 +64,7 @@ def create_widgets_resume(master):
     ttk.Label(master, text="Depth  <z>[mm]:", font=("Arial", 16, "bold")).grid(
         row=3, column=0, sticky="w", padx=5, pady=5
     )
-    entry_length = ttk.StringVar(value=str(settings.get("length_part", "0.0")))
+    entry_length = ttk.StringVar(value=str(settings.get("depth_part", "0.0")))
     ttk.Entry(master, textvariable=entry_length, state="readonly").grid(
         row=3, column=1, sticky="w", padx=5, pady=5
     )
@@ -131,6 +131,7 @@ def simulate_printing(master):
 class FramePrinting(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
+        self.ploter = None
         self.thread_sim = None
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
@@ -144,8 +145,11 @@ class FramePrinting(ttk.Frame):
         self.frame_main_info.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
         self.frame_main_info.columnconfigure((0, 1, 2), weight=1)
         self.frame_main_info.rowconfigure(0, weight=1)
-        solid_trimesh_part = read_stl(
+        solid_trimesh_part, solid_part = read_stl(
             file_path=settings.get("filepath", "files/pyramid_test.stl"),
+            scale=settings.get("scale"),
+            rotation=settings.get("rotation"),
+            traslation=settings.get("traslation"),
         )
         self.frame_plot = SolidViewer(
             self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=4
@@ -244,41 +248,93 @@ class FramePrinting(ttk.Frame):
         depth_part = settings.get("depth_part")
         layer_depth = settings.get("layer_depth")
         delta_layer = settings.get("delta_layer")
+        max_z_part = settings.get("max_z_part")
+        min_z_part = settings.get("min_z_part")
         if depth_part is None:
             msg = "No depth part found"
             Messagebox.show_error(msg, "Error")
             return None
-        depth_part_mm = depth_part * 10
-        num_layers = int(depth_part_mm / layer_depth)
-        msg = f"Number of layers: {num_layers}"
-        time_to_print = num_layers * delta_layer
-        hours = int(time_to_print // 3600)
-        minutes = int((time_to_print % 3600) // 60)
-        seconds = int(time_to_print % 60)
-        # msg += f"\nTime to print: {hours}hours {minutes}mins {seconds}s"
-        # msg += f"\nPlate: {plate}"
+        total_z = max_z_part - min_z_part
+        num_layers = int(total_z / layer_depth)
+        print(total_z, num_layers, layer_depth)
         # answer = messagebox.askyesno("Print", msg)
         # if answer == "No":
         #     return None
         update_settings(num_layers=num_layers)
-        # # ---------------------print file--------------------
-        # # self.viewer.start_projecting()
-        # # code, data = send_start_print()
-        # # if code != 200:
-        # #     messagebox.showerror("Error", data.get("msg"))
-        # #     return None
-        # # print(f"{data.get('msg')}")
-        # layer_sliced = 1
-        # layer_displayed = 1
-        # for n_layer in range(1, num_layers + 1):
-        #     slice_geometry_for_print(
-        #         settings=settings,
-        #         master=self.frame_axes,
-        #         current_z=n_layer * layer_depth,
-        #         path_to_save=f"files/img/temp{n_layer}.png",
-        #     )
-        #     layer_sliced += 1
-        # time.sleep(1)
+        # ---------------------print file--------------------
+        settings = read_settings()
+        solid_trimesh_part, solid_part = read_stl(
+            file_path=settings.get("filepath"),
+            rotation=settings.get("rotation"),
+            scale=settings.get("scale"),
+            translation=settings.get("translation"),
+        )
+        hatcher_type = settings.get("hatcher_type")
+        hatch_angle = settings.get("hatch_angle")
+        volume_offset_hatch = settings.get("volume_offset_hatch")
+        spot_compensation = settings.get("spot_compensation")
+        num_inner_contours = settings.get("num_inner_contours")
+        num_outer_contours = settings.get("num_outer_contours")
+        hatch_spacing = settings.get("hatch_spacing")
+        stripe_width = settings.get("stripe_width")
+        dpi = settings.get("dpi")
+
+        my_hatcher = build_hatcher(
+            hatcher_type=hatcher_type,
+            stripe_width=stripe_width,
+            hatch_angle=hatch_angle,
+            volume_offset_hatch=volume_offset_hatch,
+            spot_compensation=spot_compensation,
+            num_inner_contours=num_inner_contours,
+            num_outer_contours=num_outer_contours,
+            hatch_spacing=hatch_spacing,
+        )
+        self.ploter = PlotSTL(
+            self,
+            layer=None,
+            type_plot="layer",
+            dpi=dpi,
+            save_temp_flag=True,
+            path_to_save="",
+        )
+        layer_sliced = 1
+
+        for n_layer in range(1, num_layers + 1):
+            current_z = n_layer * layer_depth
+            print(f"current_z: {current_z}")
+            geom_slice = solid_part.getVectorSlice(current_z)
+            # print("slicing: ", settings.get("filepath"), " at z=", current_z)
+            # Perform the hatching operations
+            layer = my_hatcher.hatch(geom_slice)
+            dpi = settings.get("dpi")
+            projector_dimension = settings.get("projector_dimension")
+            centroide = settings.get("centroide", [0, 0, 0])
+            width = settings.get("width_part", 0.0)
+            height = settings.get("height_part", 0.0)
+            self.ploter.plotLayer(
+                dpi,
+                layer,
+                projector_dimension[0],
+                projector_dimension[1],
+                f"files/img/temp{n_layer}.png",
+                centroide,
+                width,
+                height,
+                clean_plot=True,
+            )
+            # slice_geometry_for_print(
+            #     self,
+            #     solid_part=solid_part,
+            #     settings=settings,
+            #     current_z=current_z,
+            #     pathimage=f"files/img/temp{n_layer}.png",
+            #     dpi=dpi,
+            #     my_hatcher=my_hatcher,
+            #     ploter=self.ploter,
+            # )
+            print(f"files/img/temp{n_layer}.png")
+            layer_sliced += 1
+            time.sleep(0.1)
         # start_time = perf_counter()
         # last_time = start_time
         # return
@@ -329,16 +385,16 @@ class FramePrinting(ttk.Frame):
         #         if data.get("data", False):
         #             print("Projector is not alive")
         #             break
-        msg = "Se enviara las configuraciones a la impresora, ¿Desea proceder?"
-        if Messagebox.yesno(msg, "Send settings"):
-            print("Send settings")
-            code, data = send_settings_printer()
-            if code == 200:
-                Messagebox.show_info("Settings sent", "Send settings")
-                self.is_settings_sent = True
-            else:
-                Messagebox.show_error(f"Error sending settings\n {data}", "Error")
-                self.is_settings_sent = False
+        # msg = "Se enviara las configuraciones a la impresora, ¿Desea proceder?"
+        # if Messagebox.yesno(msg, "Send settings"):
+        #     print("Send settings")
+        #     code, data = send_settings_printer()
+        #     if code == 200:
+        #         Messagebox.show_info("Settings sent", "Send settings")
+        #         self.is_settings_sent = True
+        #     else:
+        #         Messagebox.show_error(f"Error sending settings\n {data}", "Error")
+        #         self.is_settings_sent = False
 
 
 class SubFrameBars(ttk.Frame):

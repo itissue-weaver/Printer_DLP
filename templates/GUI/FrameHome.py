@@ -58,7 +58,11 @@ class HomePage(ttk.Frame):
         self.test_connection()
 
     def test_connection(self):
-        code, data = get_settings_printer()
+        try:
+            code, data = get_settings_printer()
+        except Exception as e:
+            print(e)
+            code = 500
         if code == 200:
             self.connected.set(True)
             self.txt_connected.set("Connected")

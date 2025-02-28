@@ -2,7 +2,7 @@
 __author__ = "Edisson A. Naula"
 __date__ = "$ 22/ene/2025  at 21:03 $"
 
-import matplotlib
+
 import ttkbootstrap as ttk
 from matplotlib.backends._backend_tk import NavigationToolbar2Tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -11,7 +11,6 @@ import pyslm.visualise
 from PIL import Image, ImageTk
 
 from files.constants import image_path_projector
-from templates.AuxiliarFunctions import read_settings
 from templates.static.AuxiliarHatcher import divide_solid_in_z_parts
 
 
@@ -23,6 +22,9 @@ class PlotSTL(ttk.Frame):
         self.type_plot = kwargs.get("type_plot", "mesh_3d")
         self.save_temp_flag = kwargs.get("save_temp_flag", False)
         self.path_to_save = kwargs.get("path_to_save", image_path_projector)
+        self.dpi = kwargs.get("dpi", 300)
+        self.figure = Figure(figsize=(5, 5), dpi=self.dpi)
+        self.axes = self.figure.add_subplot(111)
         match self.type_plot:
             case "mesh_3d":
                 solid_trimesh_part = kwargs.get("solid_trimesh_part")
@@ -44,73 +46,78 @@ class PlotSTL(ttk.Frame):
                     self.axes.set_ylabel("Y")
                     self.axes.set_zlabel("Z")
                     self.axes.set_title("3D Part")
-            case "layer":
-                layer = kwargs.get("layer")
-                settings = read_settings()
-                if layer is None:
-                    return
-                self.dpi = kwargs.get(
-                    "dpi", 300
-                )  # Adjust as needed to achieve the scale
-                centroide = settings.get("centroide", [0, 0, 0])
-                width = settings.get("width_part", 0.0)
-                height = settings.get("height_part", 0.0)
-                if width == 0.0 or height == 0.0:
-                    print("No width or height found")
-                    return
-                matplotlib.pyplot.close("all")
-                self.figure = Figure(figsize=(5, 5), dpi=self.dpi)
-                self.axes = self.figure.add_subplot(111)
-                pyslm.visualise.plot(
-                    layer,
-                    plot3D=False,
-                    plotOrderLine=False,
-                    plotArrows=False,
-                    handle=(self.figure, self.axes),
-                )
-                self.axes.set_xlim(
-                    [centroide[0] - width * 1.5 / 2, centroide[0] + width * 1.5 / 2]
-                )
-                self.axes.set_ylim(
-                    [centroide[1] - height * 1.5 / 2, centroide[1] + height * 1.5 / 2]
-                )
-                self.axes.set_axis_off()
-                if self.save_temp_flag:
-                    # projector_width_cm = 15.0  # Width of the projected image at a 10 cm distance
-                    # projector_height_cm = 10.0  # Height of the projected image at a 10 cm distance
-                    projector_width_cm = kwargs.get("projector_width_cm", 10.0)
-                    projector_height_cm = kwargs.get("projector_height_cm", 10.0)
-                    # Convert cm to inches (1 inch = 2.54 cm)
-                    width_inch = projector_width_cm / 2.54
-                    height_inch = projector_height_cm / 2.54
-                    # Set the figure size
-                    self.figure.set_size_inches(width_inch, height_inch)
 
-                    # Set the background color of the figure and axes to black
-                    self.figure.patch.set_facecolor("black")
-                    self.figure.gca().patch.set_facecolor("black")
-                    self.figure.gca().tick_params(
-                        colors="white"
-                    )  # Optional: Set the tick color to white for better visibility
-                    # Turn off the axes
-                    self.figure.gca().axis("off")
-                    # Save the figure without axes lines at 1:1 scale
-                    self.figure.savefig(
-                        self.path_to_save,
-                        bbox_inches="tight",
-                        pad_inches=0,
-                        dpi=self.dpi,
-                        transparent=True,
-                    )
-                else:
-                    self.canvas = FigureCanvasTkAgg(self.figure, self)
-                    # toolbar = NavigationToolbar2Tk(self.canvas, self)
-                    # toolbar.update()
-                    self.canvas.get_tk_widget().pack(
-                        side=ttk.TOP, fill=ttk.BOTH, expand=1
-                    )
-            case _:
-                print("No type plot")
+    def plotLayer(
+        self,
+        dpi,
+        layer,
+        projector_width_cm,
+        projector_height_cm,
+        path_to_save,
+        centroide,
+        width,
+        height,
+        clean_plot=False,
+    ):
+        # print(
+        #     dpi,
+        #     layer,
+        #     projector_width_cm,
+        #     projector_height_cm,
+        #     path_to_save,
+        #     centroide,
+        #     width,
+        #     height,
+        # )
+        if layer is None:
+            print("No layer found")
+            return
+        if width == 0.0 or height == 0.0:
+            print("No width or height found")
+            return
+        if clean_plot:
+            self.axes.clear()
+            # self.figure.clf()
+        pyslm.visualise.plot(
+            layer,
+            plot3D=False,
+            plotOrderLine=False,
+            plotArrows=False,
+            handle=(self.figure, self.axes),
+        )
+        self.axes.set_xlim(
+            [centroide[0] - width * 1.5 / 2, centroide[0] + width * 1.5 / 2]
+        )
+        self.axes.set_ylim(
+            [centroide[1] - height * 1.5 / 2, centroide[1] + height * 1.5 / 2]
+        )
+        self.axes.set_axis_off()
+        if self.save_temp_flag:
+            # Convert cm to inches (1 inch = 2.54 cm)
+            width_inch = projector_width_cm / 2.54
+            height_inch = projector_height_cm / 2.54
+            # Set the figure size
+            self.figure.set_size_inches(width_inch, height_inch)
+            # Set the background color of the figure and axes to black
+            self.figure.patch.set_facecolor("black")
+            self.figure.gca().patch.set_facecolor("black")
+            self.figure.gca().tick_params(
+                colors="white"
+            )  # Optional: Set the tick color to white for better visibility
+            # Turn off the axes
+            self.figure.gca().axis("off")
+            # Save the figure without axes lines at 1:1 scale
+            self.figure.savefig(
+                path_to_save,
+                bbox_inches="tight",
+                pad_inches=0,
+                dpi=dpi,
+                transparent=True,
+            )
+            print("Image saved", path_to_save)
+        else:
+            self.canvas = FigureCanvasTkAgg(self.figure, self)
+            self.canvas.get_tk_widget().pack(side=ttk.TOP, fill=ttk.BOTH, expand=1)
 
 
 class SolidViewer(ttk.Frame):
@@ -175,8 +182,8 @@ class ImageFrameApp(ttk.Frame):
 
     def show_image(self):
         width, height = self.image.size
-        new_width = int(width / 1.5)
-        new_height = int(height / 1.5)
+        new_width = int(width / 2.5)
+        new_height = int(height / 2.5)
         resized_image = self.image.resize((new_width, new_height))
         self.image_start = ImageTk.PhotoImage(resized_image)
         self.canvas.config(width=new_width, height=new_height)
