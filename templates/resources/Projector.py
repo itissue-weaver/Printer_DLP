@@ -60,7 +60,7 @@ class LayerZip(Resource):
         # Validar que sea un archivo ZIP
         filename = secure_filename(file.filename)
         if not filename.lower().endswith(".zip"):
-            return {"msg": "El archivo no es un ZIP válido"}, 400
+            return {"msg": f"El archivo no es un ZIP válido {filename}"}, 400
 
         # Guardar el fragmento en un archivo temporal
         temp_file_path = os.path.join(path_extracted_data, f"temp_{filename}")
