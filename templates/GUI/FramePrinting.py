@@ -9,11 +9,12 @@ import time
 import ttkbootstrap as ttk
 from ttkbootstrap.dialogs import Messagebox
 
+from files.constants import zip_file_name
 from templates.AuxFunctionsPlots import read_stl
 from templates.AuxiliarFunctions import read_settings, update_settings
-from templates.GUI.PlotFrame import SolidViewer, PlotSTL
+from templates.GUI.PlotFrame import SolidViewer
 from templates.GUI.SubFramePrinting import FramePrintingProcess
-from templates.static.AuxiliarHatcher import build_hatcher
+from templates.daemons.TempFilesHandler import TempFilesHandler
 
 
 def create_widgets_status(master):
@@ -131,8 +132,10 @@ def simulate_printing(master):
 class FramePrinting(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
+        self.file_handler = None
         self.ploter = None
         self.thread_sim = None
+        self.is_sliced = False
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
         self.is_printing = False
@@ -208,6 +211,29 @@ class FramePrinting(ttk.Frame):
             style="success.TButton",
         )
         self.print_button.grid(row=0, column=2, sticky="n", padx=15, pady=15)
+        # ---------------------progress bar --------------------
+        self.frame_progress = ttk.Frame(self)
+        self.frame_progress.grid(row=2, column=0, sticky="nsew", padx=15, pady=15)
+        self.frame_progress.columnconfigure((0, 1, 2), weight=1)
+        ttk.Label(
+            self.frame_progress, text="Progress", font=("Arial", 22, "bold")
+        ).grid(row=0, column=0, sticky="w", padx=5, pady=5)
+        self.value_progress = ttk.DoubleVar(value=0)
+        self.progress_bar = ttk.Progressbar(
+            self.frame_progress,
+            orient="horizontal",
+            length=200,
+            variable=self.value_progress,
+        )
+        self.progress_bar.grid(row=0, column=1, sticky="nsew", padx=15, pady=15)
+        self.progress_bar["maximum"] = 100
+        self.value_progress.set(0)
+        self.text_progress = ttk.StringVar(value="0%")
+        ttk.Label(
+            self.frame_progress,
+            textvariable=self.text_progress,
+            font=("Arial", 22, "bold"),
+        ).grid(row=0, column=2, sticky="w", padx=5, pady=5)
 
     def print_callback(self):
         if not self.is_settings_sent:
@@ -242,6 +268,14 @@ class FramePrinting(ttk.Frame):
                 "", "end", values=(step["deposit"], step["height_z"])
             )
 
+    def on_update_progress(self, progress):
+        if progress > 100:
+            progress = 100
+            self.is_sliced = True
+            Messagebox.show_info("Se genero por completo las capas", "Slicing")
+        self.value_progress.set(progress)
+        self.text_progress.set(f"{progress}%")
+
     def send_settings_callback(self):
         # ---------------------calculate_layers--------------
         settings = read_settings()
@@ -261,80 +295,10 @@ class FramePrinting(ttk.Frame):
         # if answer == "No":
         #     return None
         update_settings(num_layers=num_layers)
-        # ---------------------print file--------------------
-        settings = read_settings()
-        solid_trimesh_part, solid_part = read_stl(
-            file_path=settings.get("filepath"),
-            rotation=settings.get("rotation"),
-            scale=settings.get("scale"),
-            translation=settings.get("translation"),
+        self.file_handler = TempFilesHandler(
+            "files/img", zip_file_name, self, "compress"
         )
-        hatcher_type = settings.get("hatcher_type")
-        hatch_angle = settings.get("hatch_angle")
-        volume_offset_hatch = settings.get("volume_offset_hatch")
-        spot_compensation = settings.get("spot_compensation")
-        num_inner_contours = settings.get("num_inner_contours")
-        num_outer_contours = settings.get("num_outer_contours")
-        hatch_spacing = settings.get("hatch_spacing")
-        stripe_width = settings.get("stripe_width")
-        dpi = settings.get("dpi")
-
-        my_hatcher = build_hatcher(
-            hatcher_type=hatcher_type,
-            stripe_width=stripe_width,
-            hatch_angle=hatch_angle,
-            volume_offset_hatch=volume_offset_hatch,
-            spot_compensation=spot_compensation,
-            num_inner_contours=num_inner_contours,
-            num_outer_contours=num_outer_contours,
-            hatch_spacing=hatch_spacing,
-        )
-        self.ploter = PlotSTL(
-            self,
-            layer=None,
-            type_plot="layer",
-            dpi=dpi,
-            save_temp_flag=True,
-            path_to_save="",
-        )
-        layer_sliced = 1
-
-        for n_layer in range(1, num_layers + 1):
-            current_z = n_layer * layer_depth
-            print(f"current_z: {current_z}")
-            geom_slice = solid_part.getVectorSlice(current_z)
-            # print("slicing: ", settings.get("filepath"), " at z=", current_z)
-            # Perform the hatching operations
-            layer = my_hatcher.hatch(geom_slice)
-            dpi = settings.get("dpi")
-            projector_dimension = settings.get("projector_dimension")
-            centroide = settings.get("centroide", [0, 0, 0])
-            width = settings.get("width_part", 0.0)
-            height = settings.get("height_part", 0.0)
-            self.ploter.plotLayer(
-                dpi,
-                layer,
-                projector_dimension[0],
-                projector_dimension[1],
-                f"files/img/temp{n_layer}.png",
-                centroide,
-                width,
-                height,
-                clean_plot=True,
-            )
-            # slice_geometry_for_print(
-            #     self,
-            #     solid_part=solid_part,
-            #     settings=settings,
-            #     current_z=current_z,
-            #     pathimage=f"files/img/temp{n_layer}.png",
-            #     dpi=dpi,
-            #     my_hatcher=my_hatcher,
-            #     ploter=self.ploter,
-            # )
-            print(f"files/img/temp{n_layer}.png")
-            layer_sliced += 1
-            time.sleep(0.1)
+        self.file_handler.start()
         # start_time = perf_counter()
         # last_time = start_time
         # return

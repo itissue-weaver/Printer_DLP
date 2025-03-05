@@ -85,8 +85,9 @@ def send_next_layer():
         return response.status_code, None
 
 
-def send_zip_file():
-    with open("files/img/temp.zip", "rb") as image_file:
+def send_zip_file(filepath=None):
+    filepath = "files/img/temp.zip" if filepath is None else filepath
+    with open(filepath, "rb") as image_file:
         files = {"file": image_file}
         response = requests.post(f"{server_domain + base_url}/layer/zip", files=files)
     if response.status_code == 200:

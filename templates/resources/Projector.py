@@ -7,7 +7,7 @@ from flask import request
 from flask_restx import Namespace, Resource
 from werkzeug.utils import secure_filename
 
-from files.constants import image_path_projector
+from files.constants import image_path_projector, zip_file_name
 from templates.AuxiliarFunctions import read_settings, update_settings
 from templates.models.printer_models import expected_files_almacen, post_settings_model
 from templates.static.constants import projector
@@ -23,11 +23,31 @@ class LayerFile(Resource):
         if file:
             filename = secure_filename(file.filename)
             # check if file is an image
-            if not filename.lower().endswith((".png", ".jpg", ".jpeg")):
+            if not filename.lower().endswith((".zip", ".jpg", ".jpeg")):
                 return {"msg": "File is not an image"}, 400
             try:
                 file.save(image_path_projector)
                 return {"msg": f"Ok with filaname: {expected_files_almacen}"}, 200
+            except Exception as e:
+                print(e)
+                return {"data": str(e), "msg": "Error at file structure"}, 400
+        else:
+            return {"msg": "No se subio el archivo"}, 400
+
+
+@ns.route("/layer/zip")
+class LayerZip(Resource):
+    @ns.expect(expected_files_almacen)
+    def post(self):
+        file = request.files["file"]
+        if file:
+            filename = secure_filename(file.filename)
+            # check if file is an image
+            if not filename.lower().endswith(".zip"):
+                return {"msg": "File is not a compresed zip file"}, 400
+            try:
+                file.save(f"files/img/{zip_file_name}")
+                return {"msg": f"Ok with filaname: {zip_file_name}"}, 200
             except Exception as e:
                 print(e)
                 return {"data": str(e), "msg": "Error at file structure"}, 400
