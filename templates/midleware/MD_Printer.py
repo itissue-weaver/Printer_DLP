@@ -94,10 +94,10 @@ def send_zip_file(filepath=None, chunk_size=1024 * 1024):
             chunk = f.read(chunk_size)
             response = requests.post(
                 f"{server_domain + base_url}/layer/zip",
-                data=chunk,
+                files={"file": chunk},
                 headers={
                     "Content-Range": f"bytes {chunk_start}-{chunk_start + len(chunk) - 1}/{file_size}"
-                }
+                },
             )
             if response.status_code != 200:
                 print(f"Error en la subida: {response.text}")

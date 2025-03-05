@@ -11,6 +11,7 @@ from templates.resources.Projector import ns as ns_printer
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 app.config["CORS_HEADERS"] = "Content-Type"
+app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024
 
 api.init_app(app)
 api.add_namespace(ns_printer)
