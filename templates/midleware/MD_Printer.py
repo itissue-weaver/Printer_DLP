@@ -3,6 +3,7 @@ __author__ = "Edisson A. Naula"
 __date__ = "$ 05/feb/2025  at 21:24 $"
 
 import json
+import os
 
 import requests
 
@@ -85,16 +86,23 @@ def send_next_layer():
         return response.status_code, None
 
 
-def send_zip_file(filepath=None):
+def send_zip_file(filepath=None, chunk_size=1024 * 1024):
     filepath = "files/img/temp.zip" if filepath is None else filepath
-    with open(filepath, "rb") as image_file:
-        files = {"file": image_file}
-        response = requests.post(f"{server_domain + base_url}/layer/zip", files=files)
-    if response.status_code == 200:
-        data = response.json()
-        return 200, data
-    else:
-        return response.status_code, None
+    file_size = os.path.getsize(filepath)
+    with open(filepath, "rb") as f:
+        for chunk_start in range(0, file_size, chunk_size):
+            chunk = f.read(chunk_size)
+            response = requests.post(
+                f"{server_domain + base_url}/layer/zip",
+                data=chunk,
+                headers={
+                    "Content-Range": f"bytes {chunk_start}-{chunk_start + len(chunk) - 1}/{file_size}"
+                }
+            )
+            if response.status_code != 200:
+                print(f"Error en la subida: {response.text}")
+                return response.status_code, f"Error en la subida: {response.text}"
+    return 200, response.json()
 
 
 def ask_status():
