@@ -4,10 +4,18 @@ __date__ = "$ 05/feb/2025  at 21:24 $"
 
 import json
 import os
+import shutil
+import zipfile
 
 import requests
 
-from files.constants import server_domain, base_url, headers
+from files.constants import (
+    server_domain,
+    base_url,
+    headers,
+    path_temp_zip,
+    zip_file_name,
+)
 from templates.AuxiliarFunctions import read_settings
 
 
@@ -103,6 +111,22 @@ def send_zip_file(filepath=None, chunk_size=1024 * 1024):
                 print(f"Error en la subida: {response.text}")
                 return response.status_code, f"Error en la subida: {response.text}"
     return 200, response.json()
+
+
+def uncompres_files_zip():
+    if os.path.exists(f"{path_temp_zip}/extracted"):
+        shutil.rmtree(f"{path_temp_zip}/extracted")
+        os.makedirs(f"{path_temp_zip}/extracted")
+    else:
+        os.makedirs(f"{path_temp_zip}/extracted")
+    try:
+        # Extrae todos los archivos del archivo ZIP
+        with zipfile.ZipFile(f"{path_temp_zip}/{zip_file_name}", "r") as zipf:
+            zipf.extractall(f"{path_temp_zip}/extracted")
+        return 200, "Ok"
+    except Exception as e:
+        print("Error al descomprimir el archivo:", e)
+        return 500, f"Error al descomprimir el archivo: {str(e)}"
 
 
 def ask_status():

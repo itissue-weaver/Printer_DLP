@@ -10,6 +10,7 @@ from werkzeug.utils import secure_filename
 
 from files.constants import image_path_projector, zip_file_name, path_temp_zip
 from templates.AuxiliarFunctions import read_settings, update_settings
+from templates.midleware.MD_Printer import uncompres_files_zip
 from templates.models.printer_models import expected_files_almacen, post_settings_model
 from templates.static.constants import projector
 
@@ -70,9 +71,12 @@ class LayerZip(Resource):
             final_file_path = os.path.join(path_temp_zip, zip_file_name)
             os.rename(temp_file_path, final_file_path)
             return {"msg": f"Archivo subido exitosamente: {zip_file_name}"}, 200
-
+        code, msg = uncompres_files_zip()
         # Responder si el fragmento fue recibido pero falta más
-        return ({"msg": "Fragmento recibido, esperando más datos"},)
+        if code == 200:
+            return {"msg": "Fragmento recibido, descomprimido, esperando más datos"}, 200
+        else:
+            return {"msg": msg}, 400
 
 
 @ns.route("/settings")
