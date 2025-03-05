@@ -8,7 +8,7 @@ from flask import request
 from flask_restx import Namespace, Resource
 from werkzeug.utils import secure_filename
 
-from files.constants import image_path_projector, path_extracted_data
+from files.constants import image_path_projector, zip_file_name, path_temp_zip
 from templates.AuxiliarFunctions import read_settings, update_settings
 from templates.models.printer_models import expected_files_almacen, post_settings_model
 from templates.static.constants import projector
@@ -57,13 +57,8 @@ class LayerZip(Resource):
         if not file:
             return {"msg": "No se subió el archivo"}, 400
 
-        # Validar que sea un archivo ZIP
-        filename = secure_filename(file.filename)
-        if not filename.lower().endswith(".zip"):
-            return {"msg": f"El archivo no es un ZIP válido {filename}"}, 400
-
         # Guardar el fragmento en un archivo temporal
-        temp_file_path = os.path.join(path_extracted_data, f"temp_{filename}")
+        temp_file_path = os.path.join(path_temp_zip, f"temp_{zip_file_name}")
         try:
             with open(temp_file_path, "ab") as temp_file:  # Append binary
                 temp_file.write(file.read())
@@ -72,9 +67,9 @@ class LayerZip(Resource):
 
         # Verificar si el archivo completo ha sido recibido
         if range_end + 1 == total_size:  # Todos los bytes recibidos
-            final_file_path = os.path.join(path_extracted_data, filename)
+            final_file_path = os.path.join(path_temp_zip, zip_file_name)
             os.rename(temp_file_path, final_file_path)
-            return {"msg": f"Archivo subido exitosamente: {filename}"}, 200
+            return {"msg": f"Archivo subido exitosamente: {zip_file_name}"}, 200
 
         # Responder si el fragmento fue recibido pero falta más
         return ({"msg": "Fragmento recibido, esperando más datos"},)
