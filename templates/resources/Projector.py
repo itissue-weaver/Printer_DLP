@@ -38,13 +38,11 @@ class LayerFile(Resource):
 
 @ns.route("/layer/zip")
 class LayerZip(Resource):
-    @ns.expect(expected_files_almacen)
     def post(self):
         # Comprobar si el encabezado Content-Range está presente
         content_range = request.headers.get("Content-Range")
         if not content_range:
             return {"msg": "Falta el encabezado Content-Range"}, 400
-
         # Validar y extraer información del rango
         try:
             _, range_data = content_range.split(" ")
