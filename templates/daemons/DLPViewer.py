@@ -3,6 +3,7 @@ __author__ = "Edisson A. Naula"
 __date__ = "$ 26/ene/2025  at 15:49 $"
 
 import threading
+import time
 from time import perf_counter
 
 import pygame
@@ -46,20 +47,22 @@ import json
 class DlpViewer(threading.Thread):
     def __init__(self, mode=60, image_path=image_path_projector):
         super().__init__()
-        self.delta_layer = 0.0
         self.flag_reload = False
         self.mode = mode
         self.image_path = image_path
         self.dlp = None
         self.texture = None
         self.running = False
+        self.paused = False
         self.start_time = 0.0
         self.last_time = 0.0
         self.settings = json.load(open(settings_path, "r"))
         self.delta_layer = self.settings["delta_layer"]
-        self.layer_count = 0
+        self.sequence = self.settings.get("sequence", [])  # Carga la secuencia
+        self.layer_depth = self.settings.get("layer_depth", 1.0)  # Espesor de la capa
+        self.layer_count = 0  # Contador de capas procesadas
 
-    def load_texture(self, n=0):
+    def load_texture(self):
         texture = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, texture)
         image = pygame.image.load(self.image_path).convert_alpha()
@@ -79,8 +82,6 @@ class DlpViewer(threading.Thread):
         )
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-        self.start_time = perf_counter()
-        self.last_time = perf_counter()
         return texture
 
     def init_display(self):
@@ -105,18 +106,31 @@ class DlpViewer(threading.Thread):
             # Enable blending and set the blend function
             glEnable(GL_BLEND)
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+            self.start_time = perf_counter()
+            self.last_time = perf_counter()
             while self.running:
-                if self.flag_reload:
-                    self.reload_image()
-                    self.flag_reload = False
+                # if self.flag_reload:
+                #     self.reload_image()
+                #     self.flag_reload = False
+                if self.paused:
+                    # Si está pausado, espera un momento antes de verificar de nuevo
+                    time.sleep(0.1)
+                    continue
+                # Calcular tiempo transcurrido
+                current_time = perf_counter()
+                elapsed_time = current_time - self.last_time
+                # Comprobar si ha pasado delta_layer
+                if elapsed_time >= self.delta_layer:
+                    self.reload_image()  # Recargar imagen poner el path aqui
+                    self.last_time = current_time  # Resetear el temporizador
+                    self.layer_count += 1
+                    print(f"Reloaded layer {self.layer_count}")
                 self.dlp.clear()
                 glClearColor(0.0, 0.0, 0.0, 1.0)  # Set the clear color to black
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)  #
                 glPushMatrix()
-
                 glEnable(GL_TEXTURE_2D)
                 glBindTexture(GL_TEXTURE_2D, self.texture)
-
                 glBegin(GL_QUADS)
                 glTexCoord2f(0, 0)
                 glVertex2f(-0.1, -0.1)
@@ -127,14 +141,24 @@ class DlpViewer(threading.Thread):
                 glTexCoord2f(0, 1)
                 glVertex2f(-0.1, +0.1)
                 glEnd()
-
                 glDisable(GL_TEXTURE_2D)
                 glPopMatrix()
-
                 self.dlp.show()
         finally:
             self.cleanup()
             pygame.quit()
+
+    def process_sequence(self):
+        """Controla el proceso basado en la secuencia."""
+        for step in self.sequence:
+            target_layers = int(step["height_z"] / self.layer_depth)  # Capas objetivo
+            if self.layer_count == target_layers:
+                print(
+                    f"Procesando depósito {step['deposit']} en capa {self.layer_count}"
+                )
+                self.pause()
+                time.sleep(2)  # Simula el tiempo muerto para reubicar depósito
+                self.resume()
 
     def is_alive_projector(self):
         return self.running
@@ -146,6 +170,14 @@ class DlpViewer(threading.Thread):
     def stop_projecting(self):
         self.running = False
         self.layer_count = 0
+
+    def pause(self):
+        """Pausa el proceso."""
+        self.paused = True
+
+    def resume(self):
+        """Reanuda el proceso."""
+        self.paused = False
 
     def reload_image(self, image_path=None):
         if image_path:

@@ -124,6 +124,7 @@ def simulate_printing(master):
     Messagebox.show_info("Printing completed", "Printing")
     master.is_printing = False
     master.is_settings_sent = False
+
     master.status_widgets[0].configure(amountused=0)
     master.update()
     master.master.master.master.master.init_levels()
@@ -141,6 +142,7 @@ class FramePrinting(ttk.Frame):
         self.is_printing = False
         settings = read_settings()
         self.is_settings_sent = False
+        self.is_sending = False
         self.frame_process_print = None
         self.is_process_set = False
         # ----------------------widgets----------------------
@@ -234,9 +236,10 @@ class FramePrinting(ttk.Frame):
             textvariable=self.text_progress,
             font=("Arial", 22, "bold"),
         ).grid(row=0, column=2, sticky="w", padx=5, pady=5)
+        self.frame_progress.grid_forget()
 
     def print_callback(self):
-        if not self.is_settings_sent:
+        if not self.is_sliced:
             Messagebox.show_error("Settings not sent", "Error")
             return
         self.is_printing = not self.is_printing
@@ -269,19 +272,22 @@ class FramePrinting(ttk.Frame):
             )
 
     def on_update_progress(self, progress):
-        if progress > 100:
-            progress = 100
-            self.is_sliced = True
-            Messagebox.show_info("Se genero por completo las capas", "Slicing")
+        if not self.is_sending:
+            self.frame_progress.grid(row=2, column=0, sticky="nsew", padx=15, pady=15)
+            self.is_sending = True
         self.value_progress.set(progress)
         self.text_progress.set(f"{progress}%")
+        if progress >= 100:
+            self.is_sliced = True
+            self.is_sending = False
+            self.frame_progress.grid_forget()
 
     def send_settings_callback(self):
         # ---------------------calculate_layers--------------
+        self.is_sliced = False
         settings = read_settings()
         depth_part = settings.get("depth_part")
         layer_depth = settings.get("layer_depth")
-        delta_layer = settings.get("delta_layer")
         max_z_part = settings.get("max_z_part")
         min_z_part = settings.get("min_z_part")
         if depth_part is None:
@@ -290,75 +296,11 @@ class FramePrinting(ttk.Frame):
             return None
         total_z = max_z_part - min_z_part
         num_layers = int(total_z / layer_depth)
-        print(total_z, num_layers, layer_depth)
-        # answer = messagebox.askyesno("Print", msg)
-        # if answer == "No":
-        #     return None
         update_settings(num_layers=num_layers)
         self.file_handler = TempFilesHandler(
             "files/img", zip_file_name, self, "compress"
         )
         self.file_handler.start()
-        # start_time = perf_counter()
-        # last_time = start_time
-        # return
-        # while True:
-        #     current_time = perf_counter()
-        #     # check for max layer
-        #     if layer_sliced != layer_displayed:
-        #         slice_geometry_for_print(
-        #             settings=settings,
-        #             master=self.frame_axes,
-        #             current_z=layer_sliced * layer_depth,
-        #         )
-        #         code, data = send_next_layer_file(image_path_projector)
-        #         if code != 200:
-        #             print(f"{data.get('msg')}")
-        #             continue
-        #         layer_displayed = layer_sliced
-        #     elapsed_layer_time = current_time - last_time
-        #     print(
-        #         "printing: ",
-        #         layer_sliced,
-        #         layer_displayed,
-        #         elapsed_layer_time,
-        #         delta_layer,
-        #     )
-        #     if elapsed_layer_time < delta_layer:
-        #         time.sleep(
-        #             delta_layer * 0.25
-        #         )  # Sleep for a short duration to avoid excessive CPU usage
-        #         continue
-        #     counter_try_reload = 0
-        #     while True:
-        #         counter_try_reload += 1
-        #         code, data = send_next_layer_file(image_path_projector)
-        #         if code == 200:
-        #             break
-        #         if counter_try_reload > 10:
-        #             break
-        #     # self.viewer.star_reload(image_path_projector)
-        #     layer_sliced += 1
-        #     print(f"layer sliced: {layer_sliced}")
-        #     last_time = current_time
-        #     code, data = ask_status()
-        #     if code != 200:
-        #         print("Error to conect server")
-        #         continue
-        #     else:
-        #         if data.get("data", False):
-        #             print("Projector is not alive")
-        #             break
-        # msg = "Se enviara las configuraciones a la impresora, ¿Desea proceder?"
-        # if Messagebox.yesno(msg, "Send settings"):
-        #     print("Send settings")
-        #     code, data = send_settings_printer()
-        #     if code == 200:
-        #         Messagebox.show_info("Settings sent", "Send settings")
-        #         self.is_settings_sent = True
-        #     else:
-        #         Messagebox.show_error(f"Error sending settings\n {data}", "Error")
-        #         self.is_settings_sent = False
 
 
 class SubFrameBars(ttk.Frame):

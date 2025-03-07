@@ -51,7 +51,6 @@ class TempFilesHandler(threading.Thread):
         min_z_part = settings.get("min_z_part")
         total_z = max_z_part - min_z_part
         num_layers = int(total_z / layer_depth)
-        print(total_z, num_layers, layer_depth)
         # read the stl file and calculate the layers
         # the geometry is placed(rotate and translate) against the platform XY
         solid_trimesh_part, solid_part = read_stl(

@@ -59,16 +59,6 @@ class PlotSTL(ttk.Frame):
         height,
         clean_plot=False,
     ):
-        # print(
-        #     dpi,
-        #     layer,
-        #     projector_width_cm,
-        #     projector_height_cm,
-        #     path_to_save,
-        #     centroide,
-        #     width,
-        #     height,
-        # )
         if layer is None:
             print("No layer found")
             return
@@ -114,7 +104,6 @@ class PlotSTL(ttk.Frame):
                 dpi=dpi,
                 transparent=True,
             )
-            print("Image saved", path_to_save)
         else:
             self.canvas = FigureCanvasTkAgg(self.figure, self)
             self.canvas.get_tk_widget().pack(side=ttk.TOP, fill=ttk.BOTH, expand=1)
