@@ -11,7 +11,7 @@ import pyslm.visualise
 from PIL import Image, ImageTk
 
 from files.constants import image_path_projector
-from templates.static.AuxiliarHatcher import divide_solid_in_z_parts
+from templates.AuxiliarHatcher import divide_solid_in_z_parts
 
 
 class PlotSTL(ttk.Frame):

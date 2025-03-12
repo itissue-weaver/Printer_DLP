@@ -11,7 +11,7 @@ from PIL import ImageTk, Image
 
 from templates.AuxiliarFunctions import update_settings, read_settings
 from templates.GUI.PlotFrame import PlotSTL, ImageFrameApp
-from templates.static.AuxiliarHatcher import build_hatcher
+from templates.AuxiliarHatcher import build_hatcher
 
 
 def create_input_widgets(master, **kwargs):

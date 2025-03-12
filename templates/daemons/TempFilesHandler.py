@@ -12,7 +12,7 @@ from templates.AuxFunctionsPlots import read_stl
 from templates.AuxiliarFunctions import read_settings
 from templates.GUI.PlotFrame import PlotSTL
 from templates.midleware.MD_Printer import send_settings_printer, send_zip_file
-from templates.static.AuxiliarHatcher import build_hatcher
+from templates.AuxiliarHatcher import build_hatcher
 
 
 class TempFilesHandler(threading.Thread):
