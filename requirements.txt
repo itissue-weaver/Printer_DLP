@@ -16,3 +16,4 @@ pyglet
 pyglet<2
 PythonSLM
 ttkbootstrap
+requests

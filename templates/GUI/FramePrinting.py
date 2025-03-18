@@ -150,17 +150,22 @@ class FramePrinting(ttk.Frame):
         self.frame_main_info.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
         self.frame_main_info.columnconfigure((0, 1, 2), weight=1)
         self.frame_main_info.rowconfigure(0, weight=1)
-        solid_trimesh_part, solid_part = read_stl(
-            file_path=settings.get("filepath", "files/pyramid_test.stl"),
-            scale=settings.get("scale"),
-            rotation=settings.get("rotation"),
-            traslation=settings.get("traslation"),
-        )
-        self.frame_plot = SolidViewer(
-            self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=4
-        )
-        self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
-
+        try:
+            filepath_stl = settings.get("filepath", "files/pyramid_test.stl")
+            os.path.exists(filepath_stl)
+            solid_trimesh_part, solid_part = read_stl(
+                file_path=settings.get("filepath", "files/pyramid_test.stl"),
+                scale=settings.get("scale"),
+                rotation=settings.get("rotation"),
+                traslation=settings.get("traslation"),
+            )
+            self.frame_plot = SolidViewer(
+                self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=4
+            )
+            self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+        except Exception as e:
+            print(e)
+            return
         self.frame_resume = ttk.Frame(self.frame_main_info)
         self.frame_resume.grid(row=0, column=1, sticky="nsew", padx=15, pady=15)
         self.frame_resume.columnconfigure((0, 1), weight=1)
