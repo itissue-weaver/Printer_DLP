@@ -1,5 +1,5 @@
 {
-    "filepath": "D:/Pycharm_Projects/Printer_DLP/files/meniscus-flat.stl",
+    "filepath": "C:/Users/Weaver4/PycharmProjects/Printer_DLP/files/meniscus-flat.stl",
     "rotation": [
         0.0,
         0.0,
@@ -94,7 +94,7 @@
         },
         {
             "deposit": "3",
-            "height_z": 20.0,
+            "height_z": 15.0,
             "index": 1
         },
         {

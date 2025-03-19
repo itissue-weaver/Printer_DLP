@@ -164,8 +164,13 @@ class FramePrinting(ttk.Frame):
             )
             self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
         except Exception as e:
+            self.button_refresh = ttk.Button(
+                self.frame_main_info,
+                text="Read STL",
+                command=self.import_file_stl
+            )
+            self.button_refresh.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
             print(e)
-            return
         self.frame_resume = ttk.Frame(self.frame_main_info)
         self.frame_resume.grid(row=0, column=1, sticky="nsew", padx=15, pady=15)
         self.frame_resume.columnconfigure((0, 1), weight=1)
@@ -306,6 +311,33 @@ class FramePrinting(ttk.Frame):
             "files/img", zip_file_name, self, "compress"
         )
         self.file_handler.start()
+
+    def import_file_stl(self):
+        settings = read_settings()
+        try:
+            filepath_stl = settings.get("filepath", "files/pyramid_test.stl")
+            os.path.exists(filepath_stl)
+            solid_trimesh_part, solid_part = read_stl(
+                file_path=settings.get("filepath", "files/pyramid_test.stl"),
+                scale=settings.get("scale"),
+                rotation=settings.get("rotation"),
+                traslation=settings.get("traslation"),
+            )
+            self.frame_plot = SolidViewer(
+                self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=4
+            )
+            self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+            if self.button_refresh is not None:
+                self.button_refresh.destroy()
+        except Exception as e:
+            if self.button_refresh is not None:
+                return
+            self.button_refresh = ttk.Button(
+                self.frame_main_info,
+                text="Read STL",
+                command=self.import_file_stl
+            )
+            print(e)
 
 
 class SubFrameBars(ttk.Frame):

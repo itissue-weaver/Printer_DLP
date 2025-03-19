@@ -16,9 +16,9 @@ def read_stl(**kwargs):
     update_settings(filepath=filepath)
     solid_part = pyslm.Part("myFrameGuide")
     solid_part.setGeometry(filepath)
-    solid_part.rotation = kwargs.get("rotation")
-    solid_part.translation = kwargs.get("translation")
-    solid_part.scale = kwargs.get("scale")
+    solid_part.rotation = kwargs.get("rotation",  [0, 0, 0])
+    solid_part.translation = kwargs.get("translation", [0, 0, 0])
+    solid_part.scale = kwargs.get("scale",  1)
     solid_part.dropToPlatform()
     solid_trimesh_part = trimesh.load_mesh(filepath)
     # Get the bounding box dimensions

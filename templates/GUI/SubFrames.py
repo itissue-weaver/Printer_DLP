@@ -10,7 +10,7 @@ from templates.AuxiliarFunctions import update_settings, read_settings
 def create_input_widgets_biomaterial(master):
     settings = read_settings()
     entries = []
-    frame_inputs = ttk.LabelFrame(master, text="Parameters")
+    frame_inputs = ttk.LabelFrame(master, text="Parameters Biomaterials")
     frame_inputs.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
     frame_inputs.columnconfigure(0, weight=1)
 
@@ -86,14 +86,9 @@ class SubFrameFormulaBiomaterial(ttk.Toplevel):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
         self.title("Biomaterials")
-        self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=1)
         self.master = master
-        # ----------------------widgets----------------------
-        self.frame_inputs = ttk.Frame(self)
-        self.frame_inputs.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
-        self.frame_inputs.columnconfigure(0, weight=1)
-        self.entries = create_input_widgets_biomaterial(self.frame_inputs)
+        self.frame = SubFrameFormulaBiomaterialNormal(self)
+        self.frame.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
         #  ----------------------buttons----------------------
         self.frame_buttons = ttk.Frame(self)
         self.frame_buttons.grid(row=1, column=0, sticky="nsew", padx=15, pady=15)
@@ -105,6 +100,23 @@ class SubFrameFormulaBiomaterial(ttk.Toplevel):
         ).grid(row=0, column=0, sticky="n", padx=15, pady=15)
         # Interceptar el evento de cierre de la ventana
         self.protocol("WM_DELETE_WINDOW", self.on_close)
+
+    def on_close(self):
+        self.frame.on_close()
+        self.master.init_levels()
+        self.destroy()
+
+class SubFrameFormulaBiomaterialNormal(ttk.Frame):
+    def __init__(self, master, *args, **kwargs):
+        super().__init__(master)
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+        self.master = master
+        # ----------------------widgets----------------------
+        self.frame_inputs = ttk.Frame(self)
+        self.frame_inputs.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+        self.frame_inputs.columnconfigure(0, weight=1)
+        self.entries = create_input_widgets_biomaterial(self.frame_inputs)
 
     def on_close(self):
         # Obtener los valores de las entradas
@@ -126,14 +138,12 @@ class SubFrameFormulaBiomaterial(ttk.Toplevel):
             material4=material4,
             quantity4=quantity4,
         )
-        self.master.init_levels()
-        self.destroy()
 
 
 def create_input_widgets_tanks_properties(master):
     settings = read_settings()
     entries = []
-    frame_inputs = ttk.LabelFrame(master, text="Parameters")
+    frame_inputs = ttk.LabelFrame(master, text="Parameters Tanks")
     frame_inputs.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
     frame_inputs.columnconfigure(0, weight=1)
     # ----------------------parameters Tanks--------------------
@@ -280,6 +290,30 @@ class SubFrameConfigTanks(ttk.Toplevel):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
         self.title("Tanks")
+        self.master = master
+        self.frame = SubFrameConfigTanksNormal(self)
+        self.frame.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+        #  ----------------------buttons----------------------
+        self.frame_buttons = ttk.Frame(self)
+        self.frame_buttons.grid(row=1, column=0, sticky="nsew", padx=15, pady=15)
+        self.frame_buttons.columnconfigure(0, weight=1)
+        ttk.Button(
+            self.frame_buttons,
+            text="Aceptar",
+            command=lambda: self.on_close(),
+        ).grid(row=0, column=0, sticky="n", padx=15, pady=15)
+        # Interceptar el evento de cierre de la ventana
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
+
+    def on_close(self):
+        self.frame.on_close()
+        self.master.init_levels()
+        self.destroy()
+
+
+class SubFrameConfigTanksNormal(ttk.Frame):
+    def __init__(self, master, *args, **kwargs):
+        super().__init__(master)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
         self.master = master
@@ -300,17 +334,7 @@ class SubFrameConfigTanks(ttk.Toplevel):
         self.entries[13].trace_add(
             "write", callback=lambda *args: self.on_selected_shape(*args, lindex=4)
         )
-        #  ----------------------buttons----------------------
-        self.frame_buttons = ttk.Frame(self)
-        self.frame_buttons.grid(row=1, column=0, sticky="nsew", padx=15, pady=15)
-        self.frame_buttons.columnconfigure(0, weight=1)
-        ttk.Button(
-            self.frame_buttons,
-            text="Aceptar",
-            command=lambda: self.on_close(),
-        ).grid(row=0, column=0, sticky="n", padx=15, pady=15)
-        # Interceptar el evento de cierre de la ventana
-        self.protocol("WM_DELETE_WINDOW", self.on_close)
+
 
     def on_selected_shape(self, *args, lindex):
         options = {
@@ -356,5 +380,3 @@ class SubFrameConfigTanks(ttk.Toplevel):
             shape4=shape4,
             dimensions4=dimensions4,
         )
-        self.master.init_levels()
-        self.destroy()

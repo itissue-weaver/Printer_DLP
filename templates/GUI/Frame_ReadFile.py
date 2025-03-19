@@ -74,18 +74,18 @@ class ReadFile(ttk.Frame):
         self.frame_axes.grid(row=2, column=0, sticky="nsew")
 
     def set_geometry_from_file(self):
-        try:
-            filepath = self.file_path.get()
-            if filepath == "":
-                print("No file selected")
-                return None
-            solid_trimesh_part, solid_part = read_stl(
-                file_path=filepath,
-            )
-            self.frame_axes.destroy()
-            self.frame_axes = PlotSTL(self, solid_trimesh_part=solid_trimesh_part)
-            self.frame_axes.grid(row=2, column=0, sticky="nsew")
-            return solid_trimesh_part
-        except Exception as e:
-            print("error setting geometry:", e)
+        # try:
+        filepath = self.file_path.get()
+        if filepath == "":
+            print("No file selected")
             return None
+        solid_trimesh_part, solid_part = read_stl(
+            file_path=filepath,
+        )
+        self.frame_axes.destroy()
+        self.frame_axes = PlotSTL(self, solid_trimesh_part=solid_trimesh_part)
+        self.frame_axes.grid(row=2, column=0, sticky="nsew")
+        return solid_trimesh_part
+        # except Exception as e:
+        #     print("error setting geometry:", e)
+        #     return None
