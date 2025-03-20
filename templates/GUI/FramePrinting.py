@@ -127,7 +127,7 @@ def simulate_printing(master):
 
     master.status_widgets[0].configure(amountused=0)
     master.update()
-    master.master.master.master.master.init_levels()
+
 
 
 class FramePrinting(ttk.Frame):
@@ -259,7 +259,7 @@ class FramePrinting(ttk.Frame):
             if self.thread_sim is not None:
                 self.thread_sim.join()
             self.thread_sim = threading.Thread(target=simulate_printing, args=(self,))
-            self.thread_sim.start()
+            # self.thread_sim.start()
         else:
             self.print_button.config(text="Print")
             self.print_button.config(bootstyle="success")

@@ -2,12 +2,12 @@
 __author__ = "Edisson A. Naula"
 __date__ = "$ 22/ene/2025  at 21:07 $"
 
-from files.constants import settings_path
+import json
+
+from files.constants import settings_path, materials_path
 
 
 def update_settings(**kwargs):
-    import json
-
     with open(settings_path, "r", encoding="utf-8") as f:
         settings = json.load(f)
     for key, value in kwargs.items():
@@ -17,7 +17,14 @@ def update_settings(**kwargs):
 
 
 def read_settings():
-    import json
-
     settings = json.load(open(settings_path, "r"))
     return settings
+
+
+def read_materials():
+    materials = json.load(open(materials_path, "r"))
+    return materials
+
+def update_materials(materials):
+    with open(materials_path, "w") as f:
+        json.dump(materials, f, indent=4)

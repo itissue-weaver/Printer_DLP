@@ -5,8 +5,10 @@ __date__ = "$ 22/ene/2025  at 21:05 $"
 import os
 
 settings_path = "files/settings.json"
+materials_path = "files/materials.json"
 flags_path = "files/flags.json"
 image_path_projector = "files/img/temp.png"
+image_path_plates = "files/img/plates.png"
 zip_file_name = "temp.zip"
 path_extracted_data = "files/img/extracted_data"
 path_temp_zip = "files/img"
@@ -24,3 +26,5 @@ headers = {
     # "Accept-Encoding": "gzip",
     # "Referer": "http://raspberrypi.local",
 }
+font_title=("Arial", 26, "bold")
+font_text=("Arial", 12, "normal")
