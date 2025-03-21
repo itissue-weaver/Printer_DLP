@@ -50,7 +50,7 @@ class MainGUI(ttk.Window):
         self.icon_config = ImageTk.PhotoImage(image)
         self.frame_config = None
         # --------------------Start Animation -------------------
-        # self.show_gif_toplevel()
+        self.show_gif_toplevel()
         # --------------------notebook-------------------
         self.frame_content = ttk.Frame(self)
         self.frame_content.grid(
