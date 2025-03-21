@@ -5,11 +5,14 @@ __date__ = "$ 18/feb/2025  at 22:16 $"
 
 from PIL import Image
 import ttkbootstrap as ttk
-from scipy.stats import alpha
 
+from files.constants import font_title
 from templates.AuxiliarFunctions import read_settings, read_materials
 from templates.GUI.SubFramePlates import FrameImage
-from templates.GUI.SubFrames import SubFrameFormulaBiomaterial, SubFrameConfigTanks, SubFrameConfigBiomaterials
+from templates.GUI.SubFrames import (
+    SubFrameFormulaBiomaterial,
+    SubFrameConfigBiomaterials,
+)
 
 Image.CUBIC = Image.BICUBIC
 
@@ -17,12 +20,13 @@ Image.CUBIC = Image.BICUBIC
 class FrameBiomaterials(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
+        self.frame_custom = None
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
         self.master = master
         # ----------------------buttons----------------------
         # Load biomaterials label
-        ttk.Label(self, text="Load biomaterials", font=("Arial", 26)).grid(
+        ttk.Label(self, text="Load biomaterials", font=font_title).grid(
             row=0, column=0, padx=10, pady=10, sticky="n"
         )
         self.frame_workspace = ttk.Frame(self)
@@ -37,8 +41,6 @@ class FrameBiomaterials(ttk.Frame):
         self.frame_buttons = ttk.Frame(self.frame_workspace)
         self.frame_buttons.grid(row=1, column=1, sticky="nswe", padx=10, pady=10)
         self.frame_buttons.columnconfigure(0, weight=1)
-        my_style = ttk.Style()
-        my_style.configure("info.TButton", font=("Helvetica", 18))
         ttk.Button(
             self.frame_buttons,
             text="Cartilage I",
@@ -75,6 +77,7 @@ class FrameBiomaterials(ttk.Frame):
         #     command=self.customize_callback,
         #     style="info.TButton",
         # ).grid(row=1, column=0, padx=5, pady=5)
+
     def load_biomaterial(self, bioink):
         materials = read_materials()
         bio_1 = materials.get("bioink_1", {})
@@ -86,39 +89,84 @@ class FrameBiomaterials(ttk.Frame):
             case "mode_1":
                 if self.frame_plates is not None:
                     self.frame_plates.destroy()
+                texts = [
+                    f"{item.get('layer')}\n"
+                    + " "
+                    + "\n ".join(item.get("components", []))
+                    for item in [bio_1, bio_2, bio_3, bio_4]
+                ]
                 self.frame_plates = FrameImage(
                     self.frame_workspace,
-                    [bio_1.get("layer"), bio_2.get("layer"), bio_3.get("layer"), bio_4.get("layer")],
-                    [(255, 0, 0, alpha_b), (0, 255, 0, alpha_b), (0, 0, 255, alpha_b), (155, 155, 0, alpha_b)]
+                    texts,
+                    [
+                        (255, 0, 0, alpha_b),
+                        (0, 255, 0, alpha_b),
+                        (0, 0, 255, alpha_b),
+                        (155, 155, 0, alpha_b),
+                    ],
                 )
                 self.frame_plates.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
             case "mode_2":
                 if self.frame_plates is not None:
                     self.frame_plates.destroy()
+                texts = [
+                    f"{item.get('layer')}\n"
+                    + " "
+                    + "\n ".join(item.get("components", []))
+                    for item in [bio_2, bio_3, bio_4, bio_1]
+                ]
                 self.frame_plates = FrameImage(
                     self.frame_workspace,
-                    [bio_2.get("layer"), bio_3.get("layer"), bio_4.get("layer"), bio_1.get("layer")],
-                    [(0, 255, 0, alpha_b), (0, 0, 255, alpha_b), (155, 155, 0, alpha_b), (255, 0, 0, alpha_b)]
+                    texts,
+                    [
+                        (0, 255, 0, alpha_b),
+                        (0, 0, 255, alpha_b),
+                        (155, 155, 0, alpha_b),
+                        (255, 0, 0, alpha_b),
+                    ],
                 )
                 self.frame_plates.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
             case "mode_3":
                 if self.frame_plates is not None:
                     self.frame_plates.destroy()
+                texts = [
+                    f"{item.get('layer')}\n"
+                    + " "
+                    + "\n ".join(item.get("components", []))
+                    for item in [bio_3, bio_4, bio_1, bio_2]
+                ]
                 self.frame_plates = FrameImage(
                     self.frame_workspace,
-                    [bio_3.get("layer"), bio_4.get("layer"), bio_1.get("layer"), bio_2.get("layer")],
-                    [(0, 0, 255, alpha_b), (155, 155, 0, alpha_b), (255, 0, 0, alpha_b), (0, 255, 0, alpha_b)]
+                    texts,
+                    [
+                        (0, 0, 255, alpha_b),
+                        (155, 155, 0, alpha_b),
+                        (255, 0, 0, alpha_b),
+                        (0, 255, 0, alpha_b),
+                    ],
                 )
                 self.frame_plates.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
             case "mode_4":
                 if self.frame_plates is not None:
                     self.frame_plates.destroy()
+                texts = [
+                    f"{item.get('layer')}\n"
+                    + " "
+                    + "\n ".join(item.get("components", []))
+                    for item in [bio_4, bio_1, bio_2, bio_3]
+                ]
                 self.frame_plates = FrameImage(
                     self.frame_workspace,
-                    [bio_4.get("layer"), bio_1.get("layer"), bio_2.get("layer"), bio_3.get("layer")],
-                    [(155, 155, 0, alpha_b), (255, 0, 0, alpha_b), (0, 255, 0, alpha_b), (0, 0, 255, alpha_b)]
+                    texts,
+                    [
+                        (155, 155, 0, alpha_b),
+                        (255, 0, 0, alpha_b),
+                        (0, 255, 0, alpha_b),
+                        (0, 0, 255, alpha_b),
+                    ],
                 )
                 self.frame_plates.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+
     # def init_levels(self):
     #     settings = read_settings()
     #     self.frame_plates.update_max_level(
@@ -144,7 +192,11 @@ class FrameBiomaterials(ttk.Frame):
         SubFrameFormulaBiomaterial(self)
 
     def customize_callback(self):
-        SubFrameConfigBiomaterials(self)
+        if self.frame_custom is not None:
+            self.frame_custom.destroy()
+        self.frame_custom = SubFrameConfigBiomaterials(self)
+        # allow it to be resizable
+        self.frame_custom.attributes("-topmost", True)
 
 
 class SubFrameMeters(ttk.Frame):

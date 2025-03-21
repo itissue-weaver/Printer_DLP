@@ -9,6 +9,7 @@ import pyslm.visualise
 import ttkbootstrap as ttk
 from PIL import ImageTk, Image
 
+from files.constants import font_entry
 from templates.AuxiliarFunctions import update_settings, read_settings
 from templates.GUI.PlotFrame import PlotSTL, ImageFrameApp
 from templates.AuxiliarHatcher import build_hatcher
@@ -20,36 +21,38 @@ def create_input_widgets(master, **kwargs):
     frame_inputs = ttk.LabelFrame(master, text="Parameters")
     frame_inputs.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
     frame_inputs.columnconfigure((0, 1, 2, 3), weight=1)
+    frame_inputs.configure(style="Custom.TLabelframe")
     frame_geometry = ttk.LabelFrame(frame_inputs, text="Geometry")
     frame_geometry.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
     frame_geometry.columnconfigure(1, weight=1)
-    ttk.Label(frame_geometry, text="File:").grid(
+    frame_geometry.configure(style="Custom.TLabelframe")
+    ttk.Label(frame_geometry, text="File:", style="Custom.TLabel").grid(
         row=0, column=0, sticky="w", padx=5, pady=5
     )
-    ttk.Label(frame_geometry, textvariable=kwargs.get("var_path")).grid(
-        row=0, column=1, sticky="ew", columnspan=2, padx=5, pady=5
-    )
-    ttk.Label(frame_geometry, text="Rotation[x,y,z]:").grid(
+    ttk.Label(
+        frame_geometry, textvariable=kwargs.get("var_path"), style="Custom.TLabel"
+    ).grid(row=0, column=1, sticky="ew", columnspan=2, padx=5, pady=5)
+    ttk.Label(frame_geometry, text="Rotation[x,y,z]:", style="Custom.TLabel").grid(
         row=2, column=0, sticky="w", padx=5, pady=5
     )
     entry_rotation = ttk.StringVar(value="0.0, 0.0, 0.0")
-    ttk.Entry(frame_geometry, textvariable=entry_rotation).grid(
+    ttk.Entry(frame_geometry, textvariable=entry_rotation, font=font_entry).grid(
         row=2, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_rotation)
-    ttk.Label(frame_geometry, text="Scale[x,y,z]:").grid(
+    ttk.Label(frame_geometry, text="Scale[x,y,z]:", style="Custom.TLabel").grid(
         row=3, column=0, sticky="w", padx=5, pady=5
     )
     entry_scale = ttk.StringVar(value="1.0, 1.0, 1.0")
-    ttk.Entry(frame_geometry, textvariable=entry_scale).grid(
+    ttk.Entry(frame_geometry, textvariable=entry_scale, font=font_entry).grid(
         row=3, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_scale)
-    ttk.Label(frame_geometry, text="Translation[x,y,z]:").grid(
+    ttk.Label(frame_geometry, text="Translation[x,y,z]:", style="Custom.TLabel").grid(
         row=4, column=0, sticky="w", padx=5, pady=5
     )
     entry_translation = ttk.StringVar(value="0.0, 0.0, 0.0")
-    ttk.Entry(frame_geometry, textvariable=entry_translation).grid(
+    ttk.Entry(frame_geometry, textvariable=entry_translation, font=font_entry).grid(
         row=4, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_translation)
@@ -57,7 +60,8 @@ def create_input_widgets(master, **kwargs):
     frame_hatching = ttk.LabelFrame(frame_inputs, text="Hatching")
     frame_hatching.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
     frame_hatching.columnconfigure(1, weight=1)
-    ttk.Label(frame_hatching, text="Hatcher type:").grid(
+    frame_hatching.configure(style="Custom.TLabelframe")
+    ttk.Label(frame_hatching, text="Hatcher type:", style="Custom.TLabel").grid(
         row=0, column=0, sticky="w", padx=10, pady=10
     )
     entry_hatcher_type = ttk.StringVar(value="Base")
@@ -66,61 +70,62 @@ def create_input_widgets(master, **kwargs):
         values=["Base", "Island", "Stripe"],
         textvariable=entry_hatcher_type,
         state="readonly",
+        style="Custom.TCombobox",
     ).grid(row=0, column=1, sticky="w", padx=5, pady=5)
     entries.append(entry_hatcher_type)
-    ttk.Label(frame_hatching, text="Hatch angle [º]:").grid(
+    ttk.Label(frame_hatching, text="Hatch angle [º]:", style="Custom.TLabel").grid(
         row=1, column=0, sticky="w", padx=10, pady=10
     )
     entry_hatch_angle = ttk.StringVar(value="10.0")
-    ttk.Entry(frame_hatching, textvariable=entry_hatch_angle).grid(
+    ttk.Entry(frame_hatching, textvariable=entry_hatch_angle, font=font_entry).grid(
         row=1, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_hatch_angle)
-    ttk.Label(frame_hatching, text="Volume offset hatch [mm]:").grid(
-        row=2, column=0, sticky="w", padx=10, pady=10
-    )
+    ttk.Label(
+        frame_hatching, text="Volume offset hatch [mm]:", style="Custom.TLabel"
+    ).grid(row=2, column=0, sticky="w", padx=10, pady=10)
     entry_volume_offset = ttk.StringVar(value="0.0")
-    ttk.Entry(frame_hatching, textvariable=entry_volume_offset).grid(
+    ttk.Entry(frame_hatching, textvariable=entry_volume_offset, font=font_entry).grid(
         row=2, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_volume_offset)
-    ttk.Label(frame_hatching, text="Spot compensation [mm]:").grid(
-        row=3, column=0, sticky="w", padx=10, pady=10
-    )
+    ttk.Label(
+        frame_hatching, text="Spot compensation [mm]:", style="Custom.TLabel"
+    ).grid(row=3, column=0, sticky="w", padx=10, pady=10)
     entry_spot_compensation = ttk.StringVar(value="0.0")
-    ttk.Entry(frame_hatching, textvariable=entry_spot_compensation).grid(
-        row=3, column=1, sticky="w", padx=5, pady=5
-    )
+    ttk.Entry(
+        frame_hatching, textvariable=entry_spot_compensation, font=font_entry
+    ).grid(row=3, column=1, sticky="w", padx=5, pady=5)
     entries.append(entry_spot_compensation)
-    ttk.Label(frame_hatching, text="Inner contours:").grid(
+    ttk.Label(frame_hatching, text="Inner contours:", style="Custom.TLabel").grid(
         row=4, column=0, sticky="w", padx=10, pady=10
     )
     entry_inner_contours = ttk.StringVar(value="2")
-    ttk.Entry(frame_hatching, textvariable=entry_inner_contours).grid(
+    ttk.Entry(frame_hatching, textvariable=entry_inner_contours, font=font_entry).grid(
         row=4, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_inner_contours)
-    ttk.Label(frame_hatching, text="Outer contours:").grid(
+    ttk.Label(frame_hatching, text="Outer contours:", style="Custom.TLabel").grid(
         row=5, column=0, sticky="w", padx=10, pady=10
     )
     entry_outer_contours = ttk.StringVar(value="1")
-    ttk.Entry(frame_hatching, textvariable=entry_outer_contours).grid(
+    ttk.Entry(frame_hatching, textvariable=entry_outer_contours, font=font_entry).grid(
         row=5, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_outer_contours)
-    ttk.Label(frame_hatching, text="Hatch spacing [mm]:").grid(
+    ttk.Label(frame_hatching, text="Hatch spacing [mm]:", style="Custom.TLabel").grid(
         row=6, column=0, sticky="w", padx=10, pady=10
     )
     entry_hatch_spacing = ttk.StringVar(value="0.5")
-    ttk.Entry(frame_hatching, textvariable=entry_hatch_spacing).grid(
+    ttk.Entry(frame_hatching, textvariable=entry_hatch_spacing, font=font_entry).grid(
         row=6, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_hatch_spacing)
-    ttk.Label(frame_hatching, text="Stripe width [mm]:").grid(
+    ttk.Label(frame_hatching, text="Stripe width [mm]:", style="Custom.TLabel").grid(
         row=7, column=0, sticky="w", padx=10, pady=10
     )
     entry_stripe_width = ttk.StringVar(value="0.5")
-    ttk.Entry(frame_hatching, textvariable=entry_stripe_width).grid(
+    ttk.Entry(frame_hatching, textvariable=entry_stripe_width, font=font_entry).grid(
         row=7, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_stripe_width)
@@ -222,7 +227,6 @@ def create_image_frame(master, canvas):
 class SliceFile(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
-
         self.ploter = None
         self.current_z = None
         self.display_thread = None
@@ -258,21 +262,23 @@ class SliceFile(ttk.Frame):
         self.frame_axes.grid(row=0, column=1, sticky="nsew", padx=15, pady=15)
         self.frame_axes.columnconfigure(0, weight=1)
         self.frame_axes.rowconfigure(0, weight=1)
+        self.frame_axes.configure(style="Custom.TLabelframe")
         self.canvas_img = ImageFrameApp(self.frame_axes)
         self.canvas_img.grid(row=0, column=0, sticky="nsew")
         # ----------------------parameters visual--------------------
         frame_visual = ttk.LabelFrame(self, text="Visualization")
         frame_visual.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
         frame_visual.columnconfigure(3, weight=1)
-        ttk.Label(frame_visual, text="z:").grid(
+        frame_visual.configure(style="Custom.TLabelframe")
+        ttk.Label(frame_visual, text="z:", style="Custom.TLabel").grid(
             row=0, column=0, sticky="w", padx=10, pady=10
         )
         entry_z = ttk.DoubleVar(value=0.0)
-        ttk.Entry(frame_visual, textvariable=entry_z).grid(
+        ttk.Entry(frame_visual, textvariable=entry_z, font=font_entry).grid(
             row=0, column=1, sticky="w", padx=5, pady=5
         )
         self.min_value = ttk.StringVar(value="Min: 0.0")
-        ttk.Label(frame_visual, textvariable=self.min_value).grid(
+        ttk.Label(frame_visual, textvariable=self.min_value, style="Custom.TLabel").grid(
             row=0, column=2, sticky="w", padx=5, pady=5
         )
         ttk.Scale(
@@ -285,7 +291,7 @@ class SliceFile(ttk.Frame):
         ).grid(row=0, column=3, sticky="ew", padx=15, pady=5)
         self.entry_z = entry_z
         self.max_value = ttk.StringVar(value=f"Max: {self.z_max}")
-        ttk.Label(frame_visual, textvariable=self.max_value).grid(
+        ttk.Label(frame_visual, textvariable=self.max_value, style="Custom.TLabel").grid(
             row=0, column=4, sticky="w", padx=5, pady=5
         )
         # ----------------------buttons----------------------

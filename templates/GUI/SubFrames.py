@@ -4,7 +4,7 @@ __date__ = "$ 18/feb/2025  at 22:11 $"
 
 import ttkbootstrap as ttk
 
-from files.constants import font_title
+from files.constants import font_title, font_entry
 from templates.AuxiliarFunctions import update_settings, read_settings
 
 
@@ -106,6 +106,7 @@ class SubFrameFormulaBiomaterial(ttk.Toplevel):
         self.frame.on_close()
         self.master.init_levels()
         self.destroy()
+
 
 class SubFrameFormulaBiomaterialNormal(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
@@ -336,7 +337,6 @@ class SubFrameConfigTanksNormal(ttk.Frame):
             "write", callback=lambda *args: self.on_selected_shape(*args, lindex=4)
         )
 
-
     def on_selected_shape(self, *args, lindex):
         options = {
             "Cylinder": "Dimensions <None, radius, Height>[cm]:",
@@ -388,8 +388,11 @@ class SubFrameConfigBiomaterials(ttk.Toplevel):
         super().__init__(master)
         self.title("Tanks")
         self.master = master
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
         self.frame = SubFrameConfigBiomaterialsNormal(self)
         self.frame.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+        self.frame.columnconfigure(0, weight=1)
         #  ----------------------buttons----------------------
         self.frame_buttons = ttk.Frame(self)
         self.frame_buttons.grid(row=1, column=0, sticky="nsew", padx=15, pady=15)
@@ -398,6 +401,7 @@ class SubFrameConfigBiomaterials(ttk.Toplevel):
             self.frame_buttons,
             text="Aceptar",
             command=lambda: self.on_close(),
+            style="Custom.TButton",
         ).grid(row=0, column=0, sticky="n", padx=15, pady=15)
         # Interceptar el evento de cierre de la ventana
         self.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -410,119 +414,163 @@ class SubFrameConfigBiomaterials(ttk.Toplevel):
 def create_widgets_biomaterials(master):
     entries = []
     entries_layer = []
-    frame_ink1 = ttk.LabelFrame(master, text="Tank 1")
+    frame_ink1 = ttk.LabelFrame(master, text="Tank 1", style="Custom.TLabelframe")
     frame_ink1.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
-    ttk.Label(frame_ink1, text="Layer:").grid(row=0, column=0, sticky="w", padx=10, pady=10)
+    frame_ink1.configure(style="Custom.TLabelframe")
+    frame_ink1.columnconfigure((0, 1), weight=1)
+    ttk.Label(frame_ink1, text="Layer:", style="Custom.TLabel").grid(
+        row=0, column=0, sticky="w", padx=10, pady=10
+    )
     entry_layer1 = ttk.StringVar(value="Layer 1")
-    ttk.Entry(frame_ink1, textvariable=entry_layer1).grid(
-        row=0, column=1, sticky="w", padx=5, pady=5
+    ttk.Entry(frame_ink1, textvariable=entry_layer1, font=font_entry).grid(
+        row=0, column=1, sticky="we", padx=5, pady=5
     )
     entries_layer.append(entry_layer1)
-    ttk.Label(frame_ink1, text="Components [item1, item2, ...]").grid(row=1, column=0, sticky="w", padx=10, pady=10)
+    ttk.Label(
+        frame_ink1, text="Components [item1, item2, ...]", style="Custom.TLabel"
+    ).grid(row=1, column=0, sticky="w", padx=10, pady=10)
     entry_components1 = ttk.StringVar(value="Component 1, Component 2")
-    ttk.Entry(frame_ink1, textvariable=entry_components1).grid(
-        row=1, column=1, sticky="w", padx=5, pady=5
+    ttk.Entry(frame_ink1, textvariable=entry_components1, font=font_entry).grid(
+        row=1, column=1, sticky="we", padx=5, pady=5
     )
     entries_layer.append(entry_components1)
-    ttk.Label(frame_ink1, text="Layer Thickness [mm]:").grid(row=2, column=0, sticky="w", padx=10, pady=10)
+    ttk.Label(frame_ink1, text="Layer Thickness [mm]:", style="Custom.TLabel").grid(
+        row=2, column=0, sticky="w", padx=10, pady=10
+    )
     entry_layer_depth1 = ttk.StringVar(value="0.5")
-    ttk.Entry(frame_ink1, textvariable=entry_layer_depth1).grid(
-        row=2, column=1, sticky="w", padx=5, pady=5
+    ttk.Entry(frame_ink1, textvariable=entry_layer_depth1, font=font_entry).grid(
+        row=2, column=1, sticky="we", padx=5, pady=5
     )
     entries_layer.append(entry_layer_depth1)
-    ttk.Label(frame_ink1, text="Layer exposure [s]:").grid(row=3, column=0, sticky="w", padx=10, pady=10)
+    ttk.Label(frame_ink1, text="Layer exposure [s]:", style="Custom.TLabel").grid(
+        row=3, column=0, sticky="w", padx=10, pady=10
+    )
     entry_layer_exposure1 = ttk.StringVar(value="10")
-    ttk.Entry(frame_ink1, textvariable=entry_layer_exposure1).grid(
-        row=3, column=1, sticky="w", padx=5, pady=5
+    ttk.Entry(frame_ink1, textvariable=entry_layer_exposure1, font=font_entry).grid(
+        row=3, column=1, sticky="we", padx=5, pady=5
     )
     entries_layer.append(entry_layer_exposure1)
     entries.append(entries_layer)
+
     entries_layer = []
-    frame_ink2 = ttk.LabelFrame(master, text="Tank 2")
-    frame_ink2.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
-    ttk.Label(frame_ink2, text="Layer:").grid(row=0, column=0, sticky="w", padx=10, pady=10)
+    frame_ink2 = ttk.LabelFrame(master, text="Tank 2", style="Custom.TLabelframe")
+    frame_ink2.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
+    frame_ink2.columnconfigure((0, 1), weight=1)
+    frame_ink2.configure(style="Custom.TLabelframe")
+    ttk.Label(frame_ink2, text="Layer:", style="Custom.TLabel").grid(
+        row=0, column=0, sticky="w", padx=10, pady=10
+    )
     entry_layer2 = ttk.StringVar(value="Layer 2")
-    ttk.Entry(frame_ink2, textvariable=entry_layer2).grid(
-        row=0, column=1, sticky="w", padx=5, pady=5
+    ttk.Entry(frame_ink2, textvariable=entry_layer2, font=font_entry).grid(
+        row=0, column=1, sticky="we", padx=5, pady=5
     )
     entries_layer.append(entry_layer2)
-    ttk.Label(frame_ink2, text="Components [item1, item2, ...]").grid(row=1, column=0, sticky="w", padx=10, pady=10)
+    ttk.Label(
+        frame_ink2, text="Components [item1, item2, ...]", style="Custom.TLabel"
+    ).grid(row=1, column=0, sticky="w", padx=10, pady=10)
     entry_components2 = ttk.StringVar(value="Component 3, Component 4")
-    ttk.Entry(frame_ink2, textvariable=entry_components2).grid(
-        row=1, column=1, sticky="w", padx=5, pady=5
+    ttk.Entry(frame_ink2, textvariable=entry_components2, font=font_entry).grid(
+        row=1, column=1, sticky="we", padx=5, pady=5
     )
     entries_layer.append(entry_components2)
-    ttk.Label(frame_ink2, text="Layer Thickness [mm]:").grid(row=2, column=0, sticky="w", padx=10, pady=10)
+    ttk.Label(frame_ink2, text="Layer Thickness [mm]:", style="Custom.TLabel").grid(
+        row=2, column=0, sticky="w", padx=10, pady=10
+    )
     entry_layer_depth2 = ttk.StringVar(value="0.5")
-    ttk.Entry(frame_ink2, textvariable=entry_layer_depth2).grid(
-        row=2, column=1, sticky="w", padx=5, pady=5
+    ttk.Entry(frame_ink2, textvariable=entry_layer_depth2, font=font_entry).grid(
+        row=2, column=1, sticky="we", padx=5, pady=5
     )
     entries_layer.append(entry_layer_depth2)
-    ttk.Label(frame_ink2, text="Layer exposure [s]:").grid(row=3, column=0, sticky="w", padx=10, pady=10)
+    ttk.Label(frame_ink2, text="Layer exposure [s]:", style="Custom.TLabel").grid(
+        row=3, column=0, sticky="w", padx=10, pady=10
+    )
     entry_layer_exposure2 = ttk.StringVar(value="10")
-    ttk.Entry(frame_ink2, textvariable=entry_layer_exposure2).grid(
-        row=3, column=1, sticky="w", padx=5, pady=5
+    ttk.Entry(frame_ink2, textvariable=entry_layer_exposure2, font=font_entry).grid(
+        row=3, column=1, sticky="we", padx=5, pady=5
     )
     entries_layer.append(entry_layer_exposure2)
     entries.append(entries_layer)
+
     entries_layer = []
-    frame_ink3 = ttk.LabelFrame(master, text="Tank 3")
-    frame_ink3.grid(row=2, column=0, sticky="nsew", padx=10, pady=10)
-    ttk.Label(frame_ink3, text="Layer:").grid(row=0, column=0, sticky="w", padx=10, pady=10)
+    frame_ink3 = ttk.LabelFrame(master, text="Tank 3", style="Custom.TLabelframe")
+    frame_ink3.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+    frame_ink3.columnconfigure((0, 1), weight=1)
+    frame_ink3.configure(style="Custom.TLabelframe")
+    ttk.Label(frame_ink3, text="Layer:", style="Custom.TLabel").grid(
+        row=0, column=0, sticky="w", padx=10, pady=10
+    )
     entry_layer3 = ttk.StringVar(value="Layer 3")
-    ttk.Entry(frame_ink3, textvariable=entry_layer3).grid(
-        row=0, column=1, sticky="w", padx=5, pady=5
+    ttk.Entry(frame_ink3, textvariable=entry_layer3, font=font_entry).grid(
+        row=0, column=1, sticky="we", padx=5, pady=5
     )
     entries_layer.append(entry_layer3)
-    ttk.Label(frame_ink3, text="Components [item1, item2, ...]").grid(row=1, column=0, sticky="w", padx=10, pady=10)
+    ttk.Label(
+        frame_ink3, text="Components [item1, item2, ...]", style="Custom.TLabel"
+    ).grid(row=1, column=0, sticky="w", padx=10, pady=10)
     entry_components3 = ttk.StringVar(value="Component 5, Component 6")
-    ttk.Entry(frame_ink3, textvariable=entry_components3).grid(
-        row=1, column=1, sticky="w", padx=5, pady=5
+    ttk.Entry(frame_ink3, textvariable=entry_components3, font=font_entry).grid(
+        row=1, column=1, sticky="we", padx=5, pady=5
     )
     entries_layer.append(entry_components3)
-    ttk.Label(frame_ink3, text="Layer Thickness [mm]:").grid(row=2, column=0, sticky="w", padx=10, pady=10)
+    ttk.Label(frame_ink3, text="Layer Thickness [mm]:", style="Custom.TLabel").grid(
+        row=2, column=0, sticky="w", padx=10, pady=10
+    )
     entry_layer_depth3 = ttk.StringVar(value="0.5")
-    ttk.Entry(frame_ink3, textvariable=entry_layer_depth3).grid(
-        row=2, column=1, sticky="w", padx=5, pady=5
+    ttk.Entry(frame_ink3, textvariable=entry_layer_depth3, font=font_entry).grid(
+        row=2, column=1, sticky="we", padx=5, pady=5
     )
     entries_layer.append(entry_layer_depth3)
-    ttk.Label(frame_ink3, text="Layer exposure [s]:").grid(row=3, column=0, sticky="w", padx=10, pady=10)
+    ttk.Label(frame_ink3, text="Layer exposure [s]:", style="Custom.TLabel").grid(
+        row=3, column=0, sticky="we", padx=10, pady=10
+    )
     entry_layer_exposure3 = ttk.StringVar(value="10")
-    ttk.Entry(frame_ink3, textvariable=entry_layer_exposure3).grid(
-        row=3, column=1, sticky="w", padx=5, pady=5
+    ttk.Entry(frame_ink3, textvariable=entry_layer_exposure3, font=font_entry).grid(
+        row=3, column=1, sticky="we", padx=5, pady=5
     )
     entries_layer.append(entry_layer_exposure3)
     entries.append(entries_layer)
+
     entries_layer = []
-    frame_ink4 = ttk.LabelFrame(master, text="Tank 4")
-    frame_ink4.grid(row=3, column=0, sticky="nsew", padx=10, pady=10)
-    ttk.Label(frame_ink4, text="Layer:").grid(row=0, column=0, sticky="w", padx=10, pady=10)
+    frame_ink4 = ttk.LabelFrame(master, text="Tank 4", style="Custom.TLabelframe")
+    frame_ink4.grid(row=1, column=1, sticky="nsew", padx=10, pady=10)
+    frame_ink4.configure(style="Custom.TLabelframe")
+    frame_ink4.columnconfigure(1, weight=1)
+    ttk.Label(frame_ink4, text="Layer:", style="Custom.TLabel").grid(
+        row=0, column=0, sticky="w", padx=10, pady=10
+    )
     entry_layer4 = ttk.StringVar(value="Layer 4")
-    ttk.Entry(frame_ink4, textvariable=entry_layer4).grid(
-        row=0, column=1, sticky="w", padx=5, pady=5
+    ttk.Entry(frame_ink4, textvariable=entry_layer4, font=font_entry).grid(
+        row=0, column=1, sticky="we", padx=5, pady=5
     )
     entries_layer.append(entry_layer4)
-    ttk.Label(frame_ink4, text="Components [item1, item2, ...]").grid(row=1, column=0, sticky="w", padx=10, pady=10)
+    ttk.Label(
+        frame_ink4, text="Components [item1, item2, ...]", style="Custom.TLabel"
+    ).grid(row=1, column=0, sticky="w", padx=10, pady=10)
     entry_components4 = ttk.StringVar(value="Component 7, Component 8")
-    ttk.Entry(frame_ink4, textvariable=entry_components4).grid(
-        row=1, column=1, sticky="w", padx=5, pady=5
+    ttk.Entry(frame_ink4, textvariable=entry_components4, font=font_entry).grid(
+        row=1, column=1, sticky="we", padx=5, pady=5
     )
     entries_layer.append(entry_components4)
-    ttk.Label(frame_ink4, text="Layer Thickness [mm]:").grid(row=2, column=0, sticky="w", padx=10, pady=10)
+    ttk.Label(
+        frame_ink4,
+        text="Layer Thickness [mm]:",
+        style="Custom.TLabel",
+    ).grid(row=2, column=0, sticky="w", padx=10, pady=10)
     entry_layer_depth4 = ttk.StringVar(value="0.5")
-    ttk.Entry(frame_ink4, textvariable=entry_layer_depth4).grid(
-        row=2, column=1, sticky="w", padx=5, pady=5
+    ttk.Entry(frame_ink4, textvariable=entry_layer_depth4, font=font_entry).grid(
+        row=2, column=1, sticky="we", padx=5, pady=5
     )
     entries_layer.append(entry_layer_depth4)
-    ttk.Label(frame_ink4, text="Layer exposure [s]:").grid(row=3, column=0, sticky="w", padx=10, pady=10)
+    ttk.Label(frame_ink4, text="Layer exposure [s]:", style="Custom.TLabel").grid(
+        row=3, column=0, sticky="w", padx=10, pady=10
+    )
     entry_layer_exposure4 = ttk.StringVar(value="10")
-    ttk.Entry(frame_ink4, textvariable=entry_layer_exposure4).grid(
-        row=3, column=1, sticky="w", padx=5, pady=5
+    ttk.Entry(frame_ink4, textvariable=entry_layer_exposure4, font=font_entry).grid(
+        row=3, column=1, sticky="we", padx=5, pady=5
     )
     entries_layer.append(entry_layer_exposure4)
     entries.append(entries_layer)
     return entries
-
 
 
 class SubFrameConfigBiomaterialsNormal(ttk.Frame):
@@ -538,6 +586,7 @@ class SubFrameConfigBiomaterialsNormal(ttk.Frame):
         )
         self.frame_inputs = ttk.Frame(self)
         self.frame_inputs.grid(row=1, column=0, sticky="nsew", padx=15, pady=15)
+        self.frame_inputs.columnconfigure((0, 1), weight=1)
         self.entries = create_widgets_biomaterials(self.frame_inputs)
 
     def on_close(self):

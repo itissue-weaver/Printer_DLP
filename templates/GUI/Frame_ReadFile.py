@@ -12,14 +12,19 @@ from templates.GUI.PlotFrame import PlotSTL
 
 def create_input_widgets(master, **kwargs):
     entries = []
-    ttk.Label(master, text="Path: ").grid(row=0, column=1, sticky="w", padx=3, pady=5)
+    ttk.Label(master, text="Path: ", style="Custom.TLabel").grid(
+        row=0, column=1, sticky="w", padx=3, pady=5
+    )
     entry_path = kwargs.get("var_path")
-    ttk.Label(master, textvariable=entry_path).grid(
+    ttk.Label(master, textvariable=entry_path, style="Custom.TLabel").grid(
         row=0, column=2, sticky="ew", padx=3, pady=5
     )
     entries.append(entry_path)
     ttk.Button(
-        master, text="Buscar archivo", command=kwargs.get("callback_searchFile", None)
+        master,
+        text="Buscar archivo",
+        command=kwargs.get("callback_searchFile", None),
+        style="Custom.TButton",
     ).grid(row=0, column=0, sticky="ew", padx=3, pady=5)
     return entries
 
@@ -41,13 +46,13 @@ def create_buttons(master, **kwargs):
         master,
         text="Establecer Geometria",
         command=kwargs.get("callback_setGeometry", None),
+        style="Custom.TButton",
     ).grid(row=0, column=0, sticky="n")
 
 
 class ReadFile(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
-
         self.columnconfigure(0, weight=1)
         # ----------------------variables--------------------
         self.file_path = ttk.StringVar()
@@ -56,6 +61,7 @@ class ReadFile(ttk.Frame):
         self.frame_inputs = ttk.LabelFrame(self, text="3D")
         self.frame_inputs.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
         self.frame_inputs.columnconfigure(2, weight=1)
+        self.frame_inputs.configure(style="Custom.TLabelframe")
         self.entries = create_input_widgets(
             self.frame_inputs,
             callback_searchFile=lambda: import_file_stl(self.file_path),

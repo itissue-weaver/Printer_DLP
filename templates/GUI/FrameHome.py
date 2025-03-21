@@ -5,6 +5,8 @@ __date__ = "$ 20/feb/2025  at 14:21 $"
 import ttkbootstrap as ttk
 from PIL import ImageTk, Image
 
+from files.constants import font_buttons
+from templates.GUI.SubFrameInit import GifFrameApp
 from templates.midleware.MD_Printer import get_settings_printer
 
 
@@ -16,11 +18,12 @@ class HomePage(ttk.Frame):
         self.master = master
         self.connected = ttk.BooleanVar(value=False)
         # ----------------------widgets----------------------
-        ttk.Label(
-            self,
-            text="Welcome to the Biomaterials Printer Software",
-            font=("Arial", 36),
-        ).grid(row=0, column=0, padx=10, pady=10)
+        # ttk.Label(
+        #     self,
+        #     text="Welcome to the Biomaterials Printer Software",
+        #     font=("Arial", 36),
+        # ).grid(row=0, column=0, padx=10, pady=10)
+
         # ------------------------images----------------------
         image = Image.open(r"files/img/start.jpg")
         width, height = image.size
@@ -41,8 +44,6 @@ class HomePage(ttk.Frame):
         self.frame_footer = ttk.Frame(self)
         self.frame_footer.grid(row=2, column=0, sticky="wes", padx=10, pady=10)
         self.txt_connected = ttk.StringVar(value="Disconnected")
-        my_style = ttk.Style()
-        my_style.configure("success.TButton", font=("Arial", 18))
         self.button_test = ttk.Button(
             self.frame_footer,
             text="Test Connection",
@@ -54,6 +55,7 @@ class HomePage(ttk.Frame):
             self.frame_footer,
             textvariable=self.txt_connected,
             font=("Arial", 18),
+            style="Custom.TLabel",
         ).grid(row=0, column=1, sticky="w", padx=10, pady=10)
         self.test_connection()
 
@@ -66,8 +68,10 @@ class HomePage(ttk.Frame):
         if code == 200:
             self.connected.set(True)
             self.txt_connected.set("Connected")
-            self.button_test.configure(bootstyle="success")
+            self.button_test.configure(style="success.TButton")
         else:
             self.connected.set(False)
             self.txt_connected.set("Disconnected")
-            self.button_test.configure(bootstyle="danger")
+            self.button_test.configure(style="danger.TButton")
+
+
