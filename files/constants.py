@@ -4,6 +4,7 @@ __date__ = "$ 22/ene/2025  at 21:05 $"
 
 settings_path = "files/settings.json"
 materials_path = "files/materials.json"
+projects_path = "files/projects.json"
 flags_path = "files/flags.json"
 image_path_projector = "files/img/temp.png"
 image_path_plates = "files/img/plates.png"

@@ -6,6 +6,7 @@ import ttkbootstrap as ttk
 from PIL import ImageTk, Image
 
 from files.constants import font_buttons
+from templates.AuxiliarFunctions import read_projects
 from templates.GUI.SubFrameInit import GifFrameApp
 from templates.midleware.MD_Printer import get_settings_printer
 
@@ -14,7 +15,7 @@ class HomePage(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
         self.columnconfigure(0, weight=1)
-        self.rowconfigure(1, weight=1)
+        self.rowconfigure(0, weight=1)
         self.master = master
         self.connected = ttk.BooleanVar(value=False)
         # ----------------------widgets----------------------
@@ -24,22 +25,36 @@ class HomePage(ttk.Frame):
         #     font=("Arial", 36),
         # ).grid(row=0, column=0, padx=10, pady=10)
 
-        # ------------------------images----------------------
-        image = Image.open(r"files/img/start.jpg")
-        width, height = image.size
-        new_width = int(width / 7)
-        new_height = int(height / 7)
-        image = image.resize((new_width, new_height))
-        # image = image.resize((4624, 3472))
-        self.image_start = ImageTk.PhotoImage(image)
-        self.frame_image = ttk.Frame(self)
-        self.frame_image.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
-        self.frame_image.columnconfigure(0, weight=1)
-        self.frame_image.rowconfigure(0, weight=1)
+        # ------------------------ProjectFilesSelector----------------------
+        self.frame_new =  ttk.Frame(self)
+        self.frame_new.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+        ttk.Button(
+            self.frame_new,
+            text="New Project",
+            command=self.new_project_callback,
+            style="success.TButton",
+        ).grid(row=0, column=0, sticky="ew", padx=10, pady=10)
 
-        canvas = ttk.Canvas(self.frame_image, width=new_width, height=new_height)
-        canvas.grid(row=0, column=0, sticky="n", padx=10, pady=10)
-        canvas.create_image(0, 0, anchor="nw", image=self.image_start)
+        self.frame_previous = ttk.Frame(self)
+        self.frame_previous.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
+        projects = read_projects()
+        data_lists = [[k, v.get("name"), v.get("timestamp"), v] for k,v in projects.items()]
+        self.tv_projects = ttk.Treeview(
+            self.frame_previous,
+            columns=("name", "timestamp"),
+            show="headings",
+            style="Custom.Treeview",
+        )
+        self.tv_projects.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+        self.tv_projects.configure(columns=("key", "name", "timestamp", "data"))
+        for col in self.tv_projects['columns']:
+            self.tv_projects.heading(col, text=col.title(), anchor="w")
+        # hide data column
+        self.tv_projects.column("data", stretch=False, width=0)
+        # insert data
+        for item in data_lists:
+            self.tv_projects.insert("", "end", values=item)
+
         # -----------------------footer----------------------
         self.frame_footer = ttk.Frame(self)
         self.frame_footer.grid(row=2, column=0, sticky="wes", padx=10, pady=10)
@@ -58,6 +73,9 @@ class HomePage(ttk.Frame):
             style="Custom.TLabel",
         ).grid(row=0, column=1, sticky="w", padx=10, pady=10)
         self.test_connection()
+
+    def new_project_callback(self):
+        self.master.change_title("New Project")
 
     def test_connection(self):
         try:

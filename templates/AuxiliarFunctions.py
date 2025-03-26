@@ -4,7 +4,7 @@ __date__ = "$ 22/ene/2025  at 21:07 $"
 
 import json
 
-from files.constants import settings_path, materials_path
+from files.constants import settings_path, materials_path, projects_path
 
 
 def update_settings(**kwargs):
@@ -28,3 +28,8 @@ def read_materials():
 def update_materials(materials):
     with open(materials_path, "w") as f:
         json.dump(materials, f, indent=4)
+
+
+def read_projects():
+    projects = json.load(open(projects_path, "r"))
+    return projects

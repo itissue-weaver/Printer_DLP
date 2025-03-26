@@ -50,7 +50,7 @@ class MainGUI(ttk.Window):
         self.icon_config = ImageTk.PhotoImage(image)
         self.frame_config = None
         # --------------------Start Animation -------------------
-        self.show_gif_toplevel()
+        # self.show_gif_toplevel()
         # --------------------notebook-------------------
         self.frame_content = ttk.Frame(self)
         self.frame_content.grid(
@@ -63,17 +63,16 @@ class MainGUI(ttk.Window):
         self.notebook.grid(row=0, column=0, sticky="nsew")
         self.notebook.columnconfigure(0, weight=1)
         self.notebook.rowconfigure(0, weight=1)
-        tab0 = HomePage(self.notebook)
-        self.notebook.add(tab0, text="Home")
-        tab3 = FrameBiomaterials(self.notebook)
-        self.notebook.add(tab3, text="Biomateriales")
-        tab1 = ReadFile(self.notebook)
-        self.notebook.add(tab1, text="Geometría")
-        tab2 = SliceFile(self.notebook)
-        self.notebook.add(tab2, text="Slicer")
-        tab4 = FramePrinting(self.notebook)
-        self.notebook.add(tab4, text="Impresion")
-
+        self.tab0 = HomePage(self.notebook)
+        self.notebook.add(self.tab0, text="Home")
+        self.tab3 = FrameBiomaterials(self.notebook)
+        self.notebook.add(self.tab3, text="Biomaterials")
+        self.tab1 = ReadFile(self.notebook)
+        self.notebook.add(self.tab1, text="Geometry")
+        self.tab2 = SliceFile(self.notebook)
+        self.notebook.add(self.tab2, text="Slicer")
+        self.tab4 = FramePrinting(self.notebook)
+        self.notebook.add(self.tab4, text="Printing")
         # tab5 = FrameConfig(self.notebook)
         # self.notebook.add(tab5, text="Configuración")
         # --------------------footer-------------------
@@ -97,3 +96,9 @@ class MainGUI(ttk.Window):
 
     def show_gif_toplevel(self):
         GifFrameApp(self)
+
+    def change_tab_text(self, tab_index, new_text):
+        self.notebook.tab(tab_index, text=new_text)
+
+    def change_title(self, new_title):
+        self.title(new_title)
