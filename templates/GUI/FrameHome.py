@@ -8,7 +8,7 @@ import ttkbootstrap as ttk
 from PIL import ImageTk, Image
 
 from files.constants import font_buttons, font_title
-from templates.AuxiliarFunctions import read_projects, update_settings
+from templates.AuxiliarFunctions import read_projects, update_settings, create_new_project
 from templates.GUI.SubFrameInit import GifFrameApp
 from templates.midleware.MD_Printer import get_settings_printer
 
@@ -16,6 +16,7 @@ from templates.midleware.MD_Printer import get_settings_printer
 class HomePage(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
+        self.frame_new_project = None
         self.columnconfigure((0, 1), weight=1)
         self.rowconfigure(0, weight=1)
         self.master = master
@@ -73,7 +74,9 @@ class HomePage(ttk.Frame):
 
     def new_project_callback(self):
         # recieve new project data
-        self.callbacks["change_title"]("Project New")
+        if self.frame_new_project is None:
+            self.frame_new_project = NewProjectWindow(self)
+
 
     def item_selected_treeview(self, event):
         values = event.widget.item(event.widget.selection()[0], "values")
@@ -93,7 +96,12 @@ class NewProjectWindow(ttk.Toplevel):
         self.rowconfigure(0, weight=1)
         self.frame = NewProjectForm(self)
         self.frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
 
+
+    def on_close(self):
+        self.frame.on_close(from_parent=True)
+        self.destroy()
 
 def create_widgets_form_new_project(master):
     ttk.Label(master, text="Project Data", font=font_title).grid(row=0, column=0, sticky="n", padx=10, pady=10)
@@ -113,7 +121,6 @@ def create_widgets_form_new_project(master):
     ttk.Entry(frame_widgets, textvariable=entry_user, style="Custom.TEntry").grid(row=3, column=0, sticky="n", padx=10, pady=10)
     entries.append(entry_user)
 
-
     return entries
 
 
@@ -127,12 +134,27 @@ class NewProjectForm(ttk.Frame):
 
         self.frame_widgets = ttk.Frame(self)
         self.frame_widgets.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
-        self.frame_widgets.columnconfigure(0, weight=1)
 
-        ttk.Label(self.frame_widgets, text="Project Name", style="Custom.TLabel").grid(row=0, column=0, sticky="n", padx=10, pady=10)
-        self.entry_name = ttk.StringVar()
-        self.entry_name = ttk.Entry(self.frame_widgets, textvariable=self.entry_name, style="Custom.TEntry")
-        self.entry_name.grid(row=1, column=0, sticky="n", padx=10, pady=10)
+        self.entries = create_widgets_form_new_project(self.frame_widgets)
+
+        self.frame_buttons = ttk.Frame(self)
+        self.frame_buttons.grid(row=2, column=0, sticky="nsew", padx=10, pady=10)
+        self.frame_buttons.columnconfigure(0, weight=1)
+        ttk.Button(self.frame_buttons, text="Create", command=self.on_close, style="success.TButton").grid(row=0, column=0, sticky="e", padx=10, pady=10)
+
+
+    def on_close(self, from_parent=False):
+        data =  [entry.get() for entry in self.entries]
+        print(data)
+        create_new_project({
+            "name": data[0],
+            "user": data[1],
+            "status": 0,
+        })
+        if not from_parent:
+            self.master.destroy()
+
+
 
 
 

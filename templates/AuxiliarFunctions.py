@@ -3,8 +3,9 @@ __author__ = "Edisson A. Naula"
 __date__ = "$ 22/ene/2025  at 21:07 $"
 
 import json
+from datetime import datetime
 
-from files.constants import settings_path, materials_path, projects_path
+from files.constants import settings_path, materials_path, projects_path, format_timestamp
 
 
 def update_settings(**kwargs):
@@ -33,3 +34,13 @@ def update_materials(materials):
 def read_projects():
     projects = json.load(open(projects_path, "r"))
     return projects
+
+def create_new_project(data):
+    projects = read_projects()
+    key = data.get("name").replace(" ", "").lower()
+    timestamp =  datetime.now().strftime(format_timestamp)
+    data["timestamp"] = timestamp
+    data["settings"] = {}
+    projects[key] = data
+    with open(projects_path, "w") as f:
+        json.dump(projects, f, indent=4)
