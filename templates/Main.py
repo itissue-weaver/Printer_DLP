@@ -20,6 +20,7 @@ from templates.GUI.FrameSliceFile import SliceFile
 from templates.GUI.Frame_ReadFile import ReadFile
 from templates.GUI.FrameConfig import FrameConfig
 from templates.GUI.SubFrameInit import GifFrameApp
+from templates.midleware.MD_Printer import get_settings_printer
 
 
 def configure_styles():
@@ -33,6 +34,8 @@ def configure_styles():
     style.configure("info.TButton", font=font_buttons)
     style.configure("success.TButton", font=("Arial", 18))
     style.configure("danger.TButton", font=("Arial", 18))
+    style.configure("Custom.Treeview", font=("Arial", 18),  rowheight=30)
+    style.configure("Custom.Treeview.Heading", font=("Arial", 18, "bold"))
 
     return style
 
@@ -49,6 +52,7 @@ class MainGUI(ttk.Window):
         image = image.resize((50, 50))
         self.icon_config = ImageTk.PhotoImage(image)
         self.frame_config = None
+        self.connected = ttk.BooleanVar(value=False)
         # --------------------Start Animation -------------------
         # self.show_gif_toplevel()
         # --------------------notebook-------------------
@@ -63,7 +67,10 @@ class MainGUI(ttk.Window):
         self.notebook.grid(row=0, column=0, sticky="nsew")
         self.notebook.columnconfigure(0, weight=1)
         self.notebook.rowconfigure(0, weight=1)
-        self.tab0 = HomePage(self.notebook)
+        self.tab0 = HomePage(self.notebook, callbacks={
+            "change_tab_text": self.change_tab_text,
+            "change_title": self.change_title
+        })
         self.notebook.add(self.tab0, text="Home")
         self.tab3 = FrameBiomaterials(self.notebook)
         self.notebook.add(self.tab3, text="Biomaterials")
@@ -78,6 +85,7 @@ class MainGUI(ttk.Window):
         # --------------------footer-------------------
         self.frame_footer = ttk.Frame(self)
         self.frame_footer.grid(row=1, column=0, sticky="nsew", padx=15, pady=15)
+        self.frame_footer.columnconfigure((0, 1, 2), weight=1)
         ttk.Button(
             self.frame_footer,
             text="Configuración",
@@ -85,7 +93,23 @@ class MainGUI(ttk.Window):
             compound="left",
             command=self.click_coonfig,
             style="Custom.TButton",
-        ).grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+        ).grid(row=0, column=0, sticky="w", padx=15, pady=15)
+        self.button_test = ttk.Button(
+            self.frame_footer,
+            text="Test Connection",
+            command=self.test_connection,
+            style="success.TButton",
+            compound="right",
+        )
+        self.button_test.grid(row=0, column=1, sticky="e", padx=15, pady=15)
+        self.txt_connected = ttk.StringVar(value="Disconnected")
+        ttk.Label(
+            self.frame_footer,
+            textvariable=self.txt_connected,
+            font=("Arial", 18),
+            style="Custom.TLabel",
+        ).grid(row=0, column=2, sticky="w", padx=15, pady=15)
+        self.test_connection()
 
     def click_coonfig(self):
         if self.frame_config is None:
@@ -102,3 +126,18 @@ class MainGUI(ttk.Window):
 
     def change_title(self, new_title):
         self.title(new_title)
+
+    def test_connection(self):
+        try:
+            code, data = get_settings_printer()
+        except Exception as e:
+            print(e)
+            code = 500
+        if code == 200:
+            self.connected.set(True)
+            self.txt_connected.set("Connected")
+            self.button_test.configure(style="success.TButton")
+        else:
+            self.connected.set(False)
+            self.txt_connected.set("Disconnected")
+            self.button_test.configure(style="danger.TButton")
