@@ -34,7 +34,7 @@ def configure_styles():
     style.configure("info.TButton", font=font_buttons)
     style.configure("success.TButton", font=("Arial", 18))
     style.configure("danger.TButton", font=("Arial", 18))
-    style.configure("Custom.Treeview", font=("Arial", 18),  rowheight=30)
+    style.configure("Custom.Treeview", font=("Arial", 18), rowheight=30)
     style.configure("Custom.Treeview.Heading", font=("Arial", 18, "bold"))
 
     return style
@@ -67,10 +67,13 @@ class MainGUI(ttk.Window):
         self.notebook.grid(row=0, column=0, sticky="nsew")
         self.notebook.columnconfigure(0, weight=1)
         self.notebook.rowconfigure(0, weight=1)
-        self.tab0 = HomePage(self.notebook, callbacks={
-            "change_tab_text": self.change_tab_text,
-            "change_title": self.change_title
-        })
+        self.tab0 = HomePage(
+            self.notebook,
+            callbacks={
+                "change_tab_text": self.change_tab_text,
+                "change_title": self.change_title,
+            },
+        )
         self.notebook.add(self.tab0, text="Home")
         self.tab3 = FrameBiomaterials(self.notebook)
         self.notebook.add(self.tab3, text="Biomaterials")
@@ -121,8 +124,21 @@ class MainGUI(ttk.Window):
     def show_gif_toplevel(self):
         GifFrameApp(self)
 
-    def change_tab_text(self, tab_index, new_text):
-        self.notebook.tab(tab_index, text=new_text)
+    def change_tab_text(self, status_frame):
+        for tab_index, status in enumerate(status_frame):
+            match tab_index + 1:
+                case 1:
+                    new_text = "Biomaterials ❎" if status == 0 else "Biomaterials ✅"
+                case 2:
+                    new_text = "Geometry  ❎" if status == 0 else "Geometry ✅"
+                case 3:
+                    new_text = "Slicer  ❎" if status == 0 else "Slicer ✅"
+                case 4:
+                    new_text = "Printing  ❎" if status == 0 else "Printing ✅"
+                case _:
+                    print("No se encontro el tab")
+                    continue
+            self.notebook.tab(tab_index + 1, text=new_text)
 
     def change_title(self, new_title):
         self.title(new_title)

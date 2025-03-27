@@ -26,6 +26,7 @@ def read_materials():
     materials = json.load(open(materials_path, "r"))
     return materials
 
+
 def update_materials(materials):
     with open(materials_path, "w") as f:
         json.dump(materials, f, indent=4)
@@ -35,10 +36,11 @@ def read_projects():
     projects = json.load(open(projects_path, "r"))
     return projects
 
+
 def create_new_project(data):
     projects = read_projects()
     key = data.get("name").replace(" ", "").lower()
-    timestamp =  datetime.now().strftime(format_timestamp)
+    timestamp = datetime.now().strftime(format_timestamp)
     data["timestamp"] = timestamp
     data["settings"] = {}
     projects[key] = data

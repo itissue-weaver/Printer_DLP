@@ -116,7 +116,8 @@
     },
     "timestamp": "2025-03-26 09:48:00",
     "user": "user 1",
-    "status": 1
+    "status": 1,
+    "status_frames": [1, 1, 1, 1]
   },
   "one": {
     "name": "one",
@@ -235,6 +236,7 @@
     },
     "timestamp": "2025-03-27 09:48:00",
     "user": "user 1",
-    "status": 0
+    "status": 0,
+    "status_frames": [0, 0, 0, 0]
   }
 }
