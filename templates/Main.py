@@ -144,6 +144,7 @@ class MainGUI(ttk.Window):
 
     def init_tabs(self):
         self.tab3.load_biomaterial(None, True)
+        self.tab1.set_geometry_from_file(True)
 
     def test_connection(self):
         try:

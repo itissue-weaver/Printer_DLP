@@ -95,6 +95,7 @@ class FrameBiomaterials(ttk.Frame):
         bio_4 = materials.get("bioink_4", {})
         alpha_b = 50
         is_found = True
+        status_frames = settings.get("status_frames")
         match bioink:
             case "mode_1":
                 if self.frame_plates is not None:
@@ -184,12 +185,8 @@ class FrameBiomaterials(ttk.Frame):
                 print("No se encontro el modo")
                 is_found = False
                 materials_seq = [bio_1, bio_2, bio_3, bio_4]
-        if not is_found:
-            self.callbacks["change_tab_text"]([0, 0, 0, 0])
-        else:
-            status_frames = settings.get("status_frames", [0, 0, 0, 0])
-            status_frames[0] = 1
-            self.callbacks["change_tab_text"](status_frames)
+        status_frames[0] = 0 if not is_found else 1
+        self.callbacks["change_tab_text"](status_frames)
         if not is_init:
             update_settings(materials=materials_seq, mode_biomaterial=bioink)
 
