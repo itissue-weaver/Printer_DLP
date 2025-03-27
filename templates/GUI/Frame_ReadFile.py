@@ -106,11 +106,9 @@ class ReadFile(ttk.Frame):
             print("error setting geometry in frame read file:", e)
             status_frames[1] = 0
             flag_error = True
-        self.callbacks["change_tab_text"](status_rames)
-        if not is_init or flag_error:
-            settings["status_frames"] = status_frames
-            update_settings(**settings)
-        return None
+        self.callbacks["change_tab_text"](status_frames)
+        update_settings(status_frames=status_frames)
+        return solid_trimesh_part
 
     def init_frame_from_settings(self):
         settings = read_settings()

@@ -227,7 +227,7 @@ def create_image_frame(master, canvas):
 class SliceFile(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
-        self.ploter = None
+        self.plotter = None
         self.current_z = None
         self.display_thread = None
         self.columnconfigure(0, weight=1)
@@ -235,7 +235,9 @@ class SliceFile(ttk.Frame):
         # ----------------------variables--------------------
         self.entry_z = None
         self.frame_plot = None
+        self.callbacks = kwargs.get("callbacks", {})
         settings = read_settings()
+        # self.check_parameter_settings(settings)
         filepath = settings.get("filepath")
         self.z_value = 0.0
         self.show_path = ttk.StringVar(
@@ -304,6 +306,37 @@ class SliceFile(ttk.Frame):
             callback_saveSettings=self.print_file_callback,
         )
 
+    def check_parameter_settings(self, settings=None):
+        settings = read_settings() if settings is None else settings
+        param_list = [
+            "rotation",
+            "scale",
+            "translation",
+            "hatcher_type",
+            "hatch_angle",
+            "volume_offset_hatch",
+            "spot_compensation",
+            "num_inner_contours",
+            "num_outer_contours",
+            "hatch_spacing",
+            "stripe_width",
+            "projector_dimension",
+            "projector_resolution",
+            "projector_offset",
+            "dpi",
+            "layer_depth",
+            "delta_layer",
+            "plate",
+        ]
+        status_frames = settings.get("status_frames", [0, 0, 0, 0])
+        status_frames[2] = 1
+        for param in param_list:
+            if param not in settings.keys():
+                status_frames[2] = 0
+                break
+        self.callbacks["change_tab_text"](status_frames)
+        update_settings(status_frames=status_frames)
+
     def print_file_callback(self):
         if self.display_thread is not None:
             # kill the thread
@@ -334,6 +367,10 @@ class SliceFile(ttk.Frame):
             hatch_spacing=hatch_spacing,
             stripe_width=stripe_width,
         )
+        settings = read_settings()
+        status_frames = settings.get("status_frames")
+        status_frames[2] = 1
+        self.callbacks["change_tab_text"](status_frames)
 
     def scale_callback(self, value):
         value = float(value)
@@ -396,8 +433,8 @@ class SliceFile(ttk.Frame):
             # Perform the hatching operations
             layer = my_hatcher.hatch(geom_slice)
             dpi = settings.get("dpi")
-            if self.ploter is None:
-                self.ploter = PlotSTL(
+            if self.plotter is None:
+                self.plotter = PlotSTL(
                     self,
                     layer=None,
                     type_plot="layer",
@@ -409,7 +446,7 @@ class SliceFile(ttk.Frame):
             centroide = settings.get("centroide", [0, 0, 0])
             width = settings.get("width_part", 0.0)
             height = settings.get("height_part", 0.0)
-            self.ploter.plotLayer(
+            self.plotter.plotLayer(
                 dpi,
                 layer,
                 projector_dimension[0],

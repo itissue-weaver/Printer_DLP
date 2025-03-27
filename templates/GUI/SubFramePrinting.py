@@ -152,6 +152,6 @@ class FramePrintingProcess(ttk.Toplevel):
 
     def on_close_subframe(self):
         self.save_sequence_process()
-        self.master.on_close_printProccess()
+        self.master.on_close_print_process()
         self.master.is_process_set = True
         self.destroy()

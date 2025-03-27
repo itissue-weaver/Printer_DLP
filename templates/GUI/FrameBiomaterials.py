@@ -187,29 +187,7 @@ class FrameBiomaterials(ttk.Frame):
                 materials_seq = [bio_1, bio_2, bio_3, bio_4]
         status_frames[0] = 0 if not is_found else 1
         self.callbacks["change_tab_text"](status_frames)
-        if not is_init:
-            update_settings(materials=materials_seq, mode_biomaterial=bioink)
-
-    # def init_levels(self):
-    #     settings = read_settings()
-    #     self.frame_plates.update_max_level(
-    #         settings.get("max_level1", 100.0),
-    #         settings.get("max_level2", 100.0),
-    #         settings.get("max_level3", 100.0),
-    #         settings.get("max_level4", 100.0),
-    #     )
-    #     self.frame_plates.update_levels(
-    #         settings.get("quantity1", 0.0),
-    #         settings.get("quantity2", 0.0),
-    #         settings.get("quantity3", 0.0),
-    #         settings.get("quantity4", 0.0),
-    #     )
-    #     self.frame_plates.update_subtext_meters(
-    #         settings.get("material1", "Default 1"),
-    #         settings.get("material2", "Default 2"),
-    #         settings.get("material3", "Default 3"),
-    #         settings.get("material4", "Default 4"),
-    #     )
+        update_settings(materials=materials_seq, mode_biomaterial=bioink)
 
     def standard_formula_callback(self):
         SubFrameFormulaBiomaterial(self)

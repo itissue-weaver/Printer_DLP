@@ -102,6 +102,7 @@ class HomePage(ttk.Frame):
             data.get("settings", {"status_frames"}).get("status_frames", [0, 0, 0, 0])
         )
         self.callbacks["init_tabs"]()
+        self.callbacks["change_project"](self.current_project_key)
 
 
 class NewProjectWindow(ttk.Toplevel):
@@ -178,11 +179,14 @@ class NewProjectForm(ttk.Frame):
 
     def on_close(self, from_parent=False):
         data = [entry.get() for entry in self.entries]
-        print(data)
+        for item in data:
+            if item == "":
+                return
         create_new_project(
             {
                 "name": data[0],
                 "user": data[1],
+                "thumbnail": "",
                 "status": 0,
             }
         )

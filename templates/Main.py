@@ -13,6 +13,7 @@ from files.constants import (
     font_entry,
     font_tabs,
 )
+from templates.AuxiliarFunctions import read_settings, save_settings_to_project
 from templates.GUI.FrameBiomaterials import FrameBiomaterials
 from templates.GUI.FrameHome import HomePage
 from templates.GUI.FramePrinting import FramePrinting
@@ -43,14 +44,18 @@ def configure_styles():
 class MainGUI(ttk.Window):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.project_key = None
         self.title("DLP Slice")
         self.style_gui = configure_styles()
         self.after(0, lambda: self.state("zoomed"))
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
-        image = Image.open(r"files/img/config.png")
-        image = image.resize((50, 50))
-        self.icon_config = ImageTk.PhotoImage(image)
+        image_config = Image.open(r"files/img/config.png")
+        image_config = image_config.resize((50, 50))
+        image_save = Image.open(r"files/img/save_btn.png")
+        image_save = image_save.resize((50, 50))
+        self.icon_config = ImageTk.PhotoImage(image_config)
+        self.icon_save = ImageTk.PhotoImage(image_save)
         self.frame_config = None
         self.connected = ttk.BooleanVar(value=False)
         # --------------------Start Animation -------------------
@@ -71,6 +76,7 @@ class MainGUI(ttk.Window):
                 "change_tab_text": self.change_tab_text,
                 "change_title": self.change_title,
                 "init_tabs": self.init_tabs,
+                "change_project": self.change_project_key,
             }
         self.tab0 = HomePage(self.notebook, callbacks=callbacks)
         self.notebook.add(self.tab0, text="Home")
@@ -87,13 +93,13 @@ class MainGUI(ttk.Window):
         # --------------------footer-------------------
         self.frame_footer = ttk.Frame(self)
         self.frame_footer.grid(row=1, column=0, sticky="nsew", padx=15, pady=15)
-        self.frame_footer.columnconfigure((0, 1, 2), weight=1)
+        self.frame_footer.columnconfigure((0, 1, 2, 3), weight=1)
         ttk.Button(
             self.frame_footer,
             text="Configuración",
             image=self.icon_config,
             compound="left",
-            command=self.click_coonfig,
+            command=self.click_config,
             style="Custom.TButton",
         ).grid(row=0, column=0, sticky="w", padx=15, pady=15)
         self.button_test = ttk.Button(
@@ -111,9 +117,26 @@ class MainGUI(ttk.Window):
             font=("Arial", 18),
             style="Custom.TLabel",
         ).grid(row=0, column=2, sticky="w", padx=15, pady=15)
+        self.button_save = ttk.Button(
+            self.frame_footer,
+            text="Save project",
+            image=self.icon_save,
+            command=self.save_project,
+            style="success.TButton",
+            compound="right",
+        )
+        self.button_save.grid(row=0, column=3, sticky="e", padx=15, pady=15)
         self.test_connection()
 
-    def click_coonfig(self):
+    def change_project_key(self, project_key):
+        self.project_key = project_key
+
+    def save_project(self):
+        settings = read_settings()
+        save_settings_to_project(self.project_key, settings)
+
+
+    def click_config(self):
         if self.frame_config is None:
             self.frame_config = FrameConfig(self)
 
@@ -145,6 +168,8 @@ class MainGUI(ttk.Window):
     def init_tabs(self):
         self.tab3.load_biomaterial(None, True)
         self.tab1.set_geometry_from_file(True)
+        self.tab2.check_parameter_settings()
+        self.tab4.check_parameter_settings()
 
     def test_connection(self):
         try:
