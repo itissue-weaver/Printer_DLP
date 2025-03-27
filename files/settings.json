@@ -108,5 +108,57 @@
     "min_z_part": 0.0,
     "max_x_part": 48.8028106689,
     "max_y_part": 520.50994873,
-    "max_z_part": 8.150760173839998
+    "max_z_part": 8.150760173839998,
+    "status_frames": [
+        1,
+        1,
+        1,
+        1
+    ],
+    "materials": [
+        {
+            "layer": "Superficial",
+            "components": [
+                "PEGDA + (5-10)% Bioglass",
+                "Condrocyte",
+                "TGF-\beta 0.1 ng/ml"
+            ],
+            "layer_depth": 0.5,
+            "layer_delta": 1,
+            "max_volume": 100
+        },
+        {
+            "layer": "Intermediate",
+            "components": [
+                "PEGDA + (10-15)% Bioglass",
+                "TGF-\beta 0.5 ng/ml"
+            ],
+            "layer_depth": 0.5,
+            "layer_delta": 1,
+            "max_volume": 100
+        },
+        {
+            "layer": "Deep",
+            "components": [
+                "PEGDA + (15-20)% Bioglass",
+                "Condrocyte",
+                "TGF-\beta (1-5) ng/ml / BMP (1-10) ng/ml"
+            ],
+            "layer_depth": 0.5,
+            "layer_delta": 1,
+            "max_volume": 100
+        },
+        {
+            "layer": "Interphase (osteochondrial)",
+            "components": [
+                "PEGDA + (20-30)% Bioglass",
+                "Inorganic salts (calcium or phosphorus)",
+                "TGF-\beta 0.1 ng/ml"
+            ],
+            "layer_depth": 0.5,
+            "layer_delta": 1,
+            "max_volume": 100
+        }
+    ],
+    "mode_biomaterial": "mode_1"
 }

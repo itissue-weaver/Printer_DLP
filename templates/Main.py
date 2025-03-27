@@ -67,21 +67,20 @@ class MainGUI(ttk.Window):
         self.notebook.grid(row=0, column=0, sticky="nsew")
         self.notebook.columnconfigure(0, weight=1)
         self.notebook.rowconfigure(0, weight=1)
-        self.tab0 = HomePage(
-            self.notebook,
-            callbacks={
+        callbacks = {
                 "change_tab_text": self.change_tab_text,
                 "change_title": self.change_title,
-            },
-        )
+                "init_tabs": self.init_tabs,
+            }
+        self.tab0 = HomePage(self.notebook, callbacks=callbacks)
         self.notebook.add(self.tab0, text="Home")
-        self.tab3 = FrameBiomaterials(self.notebook)
+        self.tab3 = FrameBiomaterials(self.notebook,  callbacks=callbacks)
         self.notebook.add(self.tab3, text="Biomaterials")
-        self.tab1 = ReadFile(self.notebook)
+        self.tab1 = ReadFile(self.notebook,  callbacks=callbacks)
         self.notebook.add(self.tab1, text="Geometry")
-        self.tab2 = SliceFile(self.notebook)
+        self.tab2 = SliceFile(self.notebook,  callbacks=callbacks)
         self.notebook.add(self.tab2, text="Slicer")
-        self.tab4 = FramePrinting(self.notebook)
+        self.tab4 = FramePrinting(self.notebook, callbacks=callbacks)
         self.notebook.add(self.tab4, text="Printing")
         # tab5 = FrameConfig(self.notebook)
         # self.notebook.add(tab5, text="Configuración")
@@ -142,6 +141,9 @@ class MainGUI(ttk.Window):
 
     def change_title(self, new_title):
         self.title(new_title)
+
+    def init_tabs(self):
+        self.tab3.load_biomaterial(None, True)
 
     def test_connection(self):
         try:

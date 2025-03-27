@@ -98,7 +98,10 @@ class HomePage(ttk.Frame):
         self.callbacks["change_title"](f"Project: {data.get('name')}")
         update_settings(**data.get("settings", {}))
         self.current_data_p = data
-        self.callbacks["change_tab_text"](data.get("status_frames"))
+        self.callbacks["change_tab_text"](
+            data.get("settings", {"status_frames"}).get("status_frames", [0, 0, 0, 0])
+        )
+        self.callbacks["init_tabs"]()
 
 
 class NewProjectWindow(ttk.Toplevel):

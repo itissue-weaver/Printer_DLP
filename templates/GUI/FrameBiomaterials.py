@@ -7,7 +7,7 @@ from PIL import Image
 import ttkbootstrap as ttk
 
 from files.constants import font_title
-from templates.AuxiliarFunctions import read_settings, read_materials
+from templates.AuxiliarFunctions import read_settings, read_materials, update_settings
 from templates.GUI.SubFramePlates import FrameImage
 from templates.GUI.SubFrames import (
     SubFrameFormulaBiomaterial,
@@ -24,6 +24,7 @@ class FrameBiomaterials(ttk.Frame):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
         self.master = master
+        self.callbacks = kwargs.get("callbacks", {})
         # ----------------------buttons----------------------
         # Load biomaterials label
         ttk.Label(self, text="Load biomaterials", font=font_title).grid(
@@ -37,6 +38,7 @@ class FrameBiomaterials(ttk.Frame):
         self.frame_plates = FrameImage(self.frame_workspace)
         self.frame_plates.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
         # self.init_levels()
+        # self.load_biomaterial(None, True)
         # ----------------------buttons----------------------
         self.frame_buttons = ttk.Frame(self.frame_workspace)
         self.frame_buttons.grid(row=1, column=1, sticky="nswe", padx=10, pady=10)
@@ -46,30 +48,35 @@ class FrameBiomaterials(ttk.Frame):
             text="Cartilage I",
             command=lambda: self.load_biomaterial("mode_1"),
             style="info.TButton",
+            width=20,
         ).grid(row=0, column=0, padx=5, pady=5)
         ttk.Button(
             self.frame_buttons,
             text="Cartilage II",
             command=lambda: self.load_biomaterial("mode_2"),
             style="info.TButton",
+            width=20,
         ).grid(row=1, column=0, padx=5, pady=5)
         ttk.Button(
             self.frame_buttons,
             text="Muscoskeletal I",
             command=lambda: self.load_biomaterial("mode_3"),
             style="info.TButton",
+            width=20,
         ).grid(row=2, column=0, padx=5, pady=5)
         ttk.Button(
             self.frame_buttons,
             text="Muscoskeletal II",
             command=lambda: self.load_biomaterial("mode_4"),
             style="info.TButton",
+            width=20,
         ).grid(row=3, column=0, padx=5, pady=5)
         ttk.Button(
             self.frame_buttons,
             text="Custom",
             command=self.customize_callback,
             style="info.TButton",
+            width=20,
         ).grid(row=4, column=0, padx=5, pady=5)
         # ttk.Button(
         #     self.frame_buttons,
@@ -78,22 +85,26 @@ class FrameBiomaterials(ttk.Frame):
         #     style="info.TButton",
         # ).grid(row=1, column=0, padx=5, pady=5)
 
-    def load_biomaterial(self, bioink):
+    def load_biomaterial(self, bioink, is_init=False):
         materials = read_materials()
+        settings = read_settings()
+        bioink = settings.get("mode_biomaterial", "mode_a") if is_init else bioink
         bio_1 = materials.get("bioink_1", {})
         bio_2 = materials.get("bioink_2", {})
         bio_3 = materials.get("bioink_3", {})
         bio_4 = materials.get("bioink_4", {})
         alpha_b = 50
+        is_found = True
         match bioink:
             case "mode_1":
                 if self.frame_plates is not None:
                     self.frame_plates.destroy()
+                materials_seq = [bio_1, bio_2, bio_3, bio_4]
                 texts = [
                     f"{item.get('layer')}\n"
                     + " "
                     + "\n ".join(item.get("components", []))
-                    for item in [bio_1, bio_2, bio_3, bio_4]
+                    for item in materials_seq
                 ]
                 self.frame_plates = FrameImage(
                     self.frame_workspace,
@@ -109,11 +120,12 @@ class FrameBiomaterials(ttk.Frame):
             case "mode_2":
                 if self.frame_plates is not None:
                     self.frame_plates.destroy()
+                materials_seq = [bio_2, bio_3, bio_4, bio_1]
                 texts = [
                     f"{item.get('layer')}\n"
                     + " "
                     + "\n ".join(item.get("components", []))
-                    for item in [bio_2, bio_3, bio_4, bio_1]
+                    for item in materials_seq
                 ]
                 self.frame_plates = FrameImage(
                     self.frame_workspace,
@@ -129,11 +141,12 @@ class FrameBiomaterials(ttk.Frame):
             case "mode_3":
                 if self.frame_plates is not None:
                     self.frame_plates.destroy()
+                materials_seq = [bio_3, bio_4, bio_1, bio_2]
                 texts = [
                     f"{item.get('layer')}\n"
                     + " "
                     + "\n ".join(item.get("components", []))
-                    for item in [bio_3, bio_4, bio_1, bio_2]
+                    for item in materials_seq
                 ]
                 self.frame_plates = FrameImage(
                     self.frame_workspace,
@@ -149,11 +162,12 @@ class FrameBiomaterials(ttk.Frame):
             case "mode_4":
                 if self.frame_plates is not None:
                     self.frame_plates.destroy()
+                materials_seq = [bio_4, bio_1, bio_2, bio_3]
                 texts = [
                     f"{item.get('layer')}\n"
                     + " "
                     + "\n ".join(item.get("components", []))
-                    for item in [bio_4, bio_1, bio_2, bio_3]
+                    for item in materials_seq
                 ]
                 self.frame_plates = FrameImage(
                     self.frame_workspace,
@@ -166,6 +180,18 @@ class FrameBiomaterials(ttk.Frame):
                     ],
                 )
                 self.frame_plates.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+            case _:
+                print("No se encontro el modo")
+                is_found = False
+                materials_seq = [bio_1, bio_2, bio_3, bio_4]
+        if not is_found:
+            self.callbacks["change_tab_text"]([0, 0, 0, 0])
+        else:
+            status_frames = settings.get("status_frames", [0, 0, 0, 0])
+            status_frames[0] = 1
+            self.callbacks["change_tab_text"](status_frames)
+        if not is_init:
+            update_settings(materials=materials_seq, mode_biomaterial=bioink)
 
     # def init_levels(self):
     #     settings = read_settings()

@@ -42,7 +42,7 @@ def create_new_project(data):
     key = data.get("name").replace(" ", "").lower()
     timestamp = datetime.now().strftime(format_timestamp)
     data["timestamp"] = timestamp
-    data["settings"] = {}
+    data["settings"] = {"status_frames": [0, 0, 0, 0]}
     projects[key] = data
     with open(projects_path, "w") as f:
         json.dump(projects, f, indent=4)

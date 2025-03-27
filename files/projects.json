@@ -112,12 +112,13 @@
       "min_z_part": 0.0,
       "max_x_part": 48.8028106689,
       "max_y_part": 520.50994873,
-      "max_z_part": 8.150760173839998
+      "max_z_part": 8.150760173839998,
+      "status_frames": [1, 1, 1, 1],
+      "mode_biomaterial": "mode_1"
     },
     "timestamp": "2025-03-26 09:48:00",
     "user": "user 1",
-    "status": 1,
-    "status_frames": [1, 1, 1, 1]
+    "status": 1
   },
   "one": {
     "name": "one",
@@ -232,11 +233,11 @@
       "min_z_part": 0.0,
       "max_x_part": 48.8028106689,
       "max_y_part": 520.50994873,
-      "max_z_part": 8.150760173839998
+      "max_z_part": 8.150760173839998,
+      "status_frames": [0, 0, 0, 0]
     },
     "timestamp": "2025-03-27 09:48:00",
     "user": "user 1",
-    "status": 0,
-    "status_frames": [0, 0, 0, 0]
+    "status": 0
   }
 }
