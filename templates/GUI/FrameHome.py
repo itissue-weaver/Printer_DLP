@@ -5,6 +5,7 @@ __date__ = "$ 20/feb/2025  at 14:21 $"
 import json
 
 import ttkbootstrap as ttk
+from PIL import Image, ImageTk
 
 from files.constants import font_buttons, font_title
 from templates.AuxiliarFunctions import (
@@ -14,12 +15,23 @@ from templates.AuxiliarFunctions import (
 )
 
 
+def render_thumbnails(frame_thumbnails, filepath):
+    for child in frame_thumbnails.winfo_children():
+        child.destroy()
+    image_thumbnail = Image.open(filepath)
+    image_thumbnail = image_thumbnail.resize((50, 50))
+    image_thumbnail = ImageTk.PhotoImage(image_thumbnail)
+    ttk.Label(frame_thumbnails, image=image_thumbnail).grid(
+        row=0, column=0, sticky="w", padx=10, pady=10
+    )
+
+
 class HomePage(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
         self.current_data_p = None
         self.frame_new_project = None
-        self.columnconfigure((0, 1), weight=1)
+        self.columnconfigure((0, 1, 2), weight=1)
         self.rowconfigure(0, weight=1)
         self.master = master
         self.callbacks = kwargs.get("callbacks")
@@ -85,6 +97,11 @@ class HomePage(ttk.Frame):
         for item in data_lists:
             self.tv_projects.insert("", "end", values=item)
         self.tv_projects.bind("<Double-1>", self.item_selected_treeview)
+        self.frame_thumbnails = ttk.Frame(self)
+        self.frame_thumbnails.grid(row=0, column=2, columnspan=2, sticky="nsew", padx=10, pady=10)
+        self.frame_thumbnails.columnconfigure(0, weight=1)
+        render_thumbnails(self.frame_thumbnails, filepath)
+
 
     def new_project_callback(self):
         if self.frame_new_project is None:

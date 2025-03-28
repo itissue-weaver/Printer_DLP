@@ -35,3 +35,4 @@ font_entry = ("Arial", 14, "normal")
 font_labels_frame = ("Arial", 14, "bold")
 font_labels_plates = ("Arial", 10, "bold")
 format_timestamp = "%Y-%m-%d %H:%M:%S"
+path_no_image = "files/img/no_image.png"
