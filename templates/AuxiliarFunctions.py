@@ -46,3 +46,15 @@ def create_new_project(data):
     projects[key] = data
     with open(projects_path, "w") as f:
         json.dump(projects, f, indent=4)
+
+
+def save_settings_to_project(project_key, settings):
+    if  project_key is None:
+        print("No project selected")
+        return
+    projects = read_projects()
+    project = projects.get(project_key)
+    project["settings"] = settings
+    projects[project_key] = project
+    with open(projects_path, "w") as f:
+        json.dump(projects, f, indent=4)

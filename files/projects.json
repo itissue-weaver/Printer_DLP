@@ -1,243 +1,314 @@
 {
-  "zero": {
-    "name": "zero",
-    "settings":
-    {
-      "filepath": "C:/Users/Weaver4/PycharmProjects/Printer_DLP/files/meniscus-flat.stl",
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-          0.0,
-          0.0,
-          0.0
-      ],
-      "translation": [
-          0.0,
-          0.0,
-          0.0
-      ],
-      "width_part": 32.191,
-      "height_part": 38.168,
-      "depth_part": 8.151,
-      "hatcher_type": "Base",
-      "hatch_angle": 10.0,
-      "volume_offset_hatch": 0.0,
-      "spot_compensation": 0.0,
-      "num_inner_contours": 2,
-      "num_outer_contours": 1,
-      "hatch_spacing": 0.5,
-      "stripe_width": 0.5,
-      "projector_dimension": [
-          30.0,
-          20.0
-      ],
-      "projector_resolution": [
-          1920,
-          1080
-      ],
-      "projector_offset": [
-          0.0,
-          0.0,
-          10.0
-      ],
-      "dpi": 300,
-      "layer_depth": 0.1,
-      "delta_layer": 5.0,
-      "plate": 1,
-      "HOST": "127.0.0.1",
-      "num_layers": 81,
-      "material1": "Solucion1",
-      "quantity1": 50.0,
-      "material2": "Solution 2",
-      "quantity2": 70.0,
-      "material3": "Water",
-      "quantity3": 100.0,
-      "material4": "Water",
-      "quantity4": 100.0,
-      "max_level1": 100.0,
-      "shape1": "Cylinder",
-      "dimensions1": [
-          0.0,
-          1.0,
-          1.0
-      ],
-      "max_level2": 100.0,
-      "shape2": "Cylinder",
-      "dimensions2": [
-          0.0,
-          1.0,
-          1.0
-      ],
-      "max_level3": 100.0,
-      "shape3": "Rectangle",
-      "dimensions3": [
-          0.0,
-          1.0,
-          1.0
-      ],
-      "max_level4": 100.0,
-      "shape4": "Cylinder",
-      "dimensions4": [
-          0.0,
-          1.0,
-          1.0
-      ],
-      "centroide": [
-          36.423681095072496,
-          499.38455215701515,
-          9.719475415641815
-      ],
-      "sequence": [
-          {
-              "deposit": "1",
-              "height_z": 10.0,
-              "index": 0
-          },
-          {
-              "deposit": "3",
-              "height_z": 15.0,
-              "index": 1
-          },
-          {
-              "deposit": "1",
-              "height_z": 30.0,
-              "index": 2
-          }
-      ],
-      "min_x_part": 16.6114253998,
-      "min_y_part": 482.341949463,
-      "min_z_part": 0.0,
-      "max_x_part": 48.8028106689,
-      "max_y_part": 520.50994873,
-      "max_z_part": 8.150760173839998,
-      "status_frames": [1, 1, 1, 1],
-      "mode_biomaterial": "mode_1"
+    "zero": {
+        "name": "zero",
+        "thumbnail": "/files/img/temp.png",
+        "settings": {
+            "filepath": "C:/Users/Weaver4/PycharmProjects/Printer_DLP/files/meniscus-flat.stl",
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "width_part": 32.191,
+            "height_part": 38.168,
+            "depth_part": 8.151,
+            "hatcher_type": "Base",
+            "hatch_angle": 10.0,
+            "volume_offset_hatch": 0.0,
+            "spot_compensation": 0.0,
+            "num_inner_contours": 2,
+            "num_outer_contours": 1,
+            "hatch_spacing": 0.5,
+            "stripe_width": 0.5,
+            "projector_dimension": [
+                30.0,
+                20.0
+            ],
+            "projector_resolution": [
+                1920,
+                1080
+            ],
+            "projector_offset": [
+                0.0,
+                0.0,
+                10.0
+            ],
+            "dpi": 300,
+            "layer_depth": 0.1,
+            "delta_layer": 5.0,
+            "plate": 1,
+            "HOST": "127.0.0.1",
+            "num_layers": 81,
+            "material1": "Solucion1",
+            "quantity1": 50.0,
+            "material2": "Solution 2",
+            "quantity2": 70.0,
+            "material3": "Water",
+            "quantity3": 100.0,
+            "material4": "Water",
+            "quantity4": 100.0,
+            "max_level1": 100.0,
+            "shape1": "Cylinder",
+            "dimensions1": [
+                0.0,
+                1.0,
+                1.0
+            ],
+            "max_level2": 100.0,
+            "shape2": "Cylinder",
+            "dimensions2": [
+                0.0,
+                1.0,
+                1.0
+            ],
+            "max_level3": 100.0,
+            "shape3": "Rectangle",
+            "dimensions3": [
+                0.0,
+                1.0,
+                1.0
+            ],
+            "max_level4": 100.0,
+            "shape4": "Cylinder",
+            "dimensions4": [
+                0.0,
+                1.0,
+                1.0
+            ],
+            "centroide": [
+                36.423681095072496,
+                499.38455215701515,
+                9.719475415641815
+            ],
+            "sequence": [
+                {
+                    "deposit": "1",
+                    "height_z": 10.0,
+                    "index": 0
+                },
+                {
+                    "deposit": "3",
+                    "height_z": 15.0,
+                    "index": 1
+                },
+                {
+                    "deposit": "1",
+                    "height_z": 30.0,
+                    "index": 2
+                }
+            ],
+            "min_x_part": 16.6114253998,
+            "min_y_part": 482.341949463,
+            "min_z_part": 0.0,
+            "max_x_part": 48.8028106689,
+            "max_y_part": 520.50994873,
+            "max_z_part": 8.150760173839998,
+            "status_frames": [
+                1,
+                1,
+                1,
+                1
+            ],
+            "mode_biomaterial": "mode_1"
+        },
+        "timestamp": "2025-03-26 09:48:00",
+        "user": "user 1",
+        "status": 1
     },
-    "timestamp": "2025-03-26 09:48:00",
-    "user": "user 1",
-    "status": 1
-  },
-  "one": {
-    "name": "one",
-    "settings":
-            {
-      "filepath": "C:/Users/Weaver4/PycharmProjects/Printer_DLP/files/meniscus-flat.stl",
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-          0.0,
-          0.0,
-          0.0
-      ],
-      "translation": [
-          0.0,
-          0.0,
-          0.0
-      ],
-      "width_part": 32.191,
-      "height_part": 38.168,
-      "depth_part": 8.151,
-      "hatcher_type": "Base",
-      "hatch_angle": 10.0,
-      "volume_offset_hatch": 0.0,
-      "spot_compensation": 0.0,
-      "num_inner_contours": 2,
-      "num_outer_contours": 1,
-      "hatch_spacing": 0.5,
-      "stripe_width": 0.5,
-      "projector_dimension": [
-          30.0,
-          20.0
-      ],
-      "projector_resolution": [
-          1920,
-          1080
-      ],
-      "projector_offset": [
-          0.0,
-          0.0,
-          10.0
-      ],
-      "dpi": 300,
-      "layer_depth": 0.1,
-      "delta_layer": 5.0,
-      "plate": 1,
-      "HOST": "127.0.0.1",
-      "num_layers": 81,
-      "material1": "Solucion1",
-      "quantity1": 50.0,
-      "material2": "Solution 2",
-      "quantity2": 70.0,
-      "material3": "Water",
-      "quantity3": 100.0,
-      "material4": "Water",
-      "quantity4": 100.0,
-      "max_level1": 100.0,
-      "shape1": "Cylinder",
-      "dimensions1": [
-          0.0,
-          1.0,
-          1.0
-      ],
-      "max_level2": 100.0,
-      "shape2": "Cylinder",
-      "dimensions2": [
-          0.0,
-          1.0,
-          1.0
-      ],
-      "max_level3": 100.0,
-      "shape3": "Rectangle",
-      "dimensions3": [
-          0.0,
-          1.0,
-          1.0
-      ],
-      "max_level4": 100.0,
-      "shape4": "Cylinder",
-      "dimensions4": [
-          0.0,
-          1.0,
-          1.0
-      ],
-      "centroide": [
-          36.423681095072496,
-          499.38455215701515,
-          9.719475415641815
-      ],
-      "sequence": [
-          {
-              "deposit": "1",
-              "height_z": 10.0,
-              "index": 0
-          },
-          {
-              "deposit": "3",
-              "height_z": 15.0,
-              "index": 1
-          },
-          {
-              "deposit": "1",
-              "height_z": 30.0,
-              "index": 2
-          }
-      ],
-      "min_x_part": 16.6114253998,
-      "min_y_part": 482.341949463,
-      "min_z_part": 0.0,
-      "max_x_part": 48.8028106689,
-      "max_y_part": 520.50994873,
-      "max_z_part": 8.150760173839998,
-      "status_frames": [0, 0, 0, 0]
+    "one": {
+        "name": "one",
+        "thumbnail": "/files/img/temp.png",
+        "settings": {
+            "filepath": "C:/Users/Weaver4/PycharmProjects/Printer_DLP/files/meniscus-flat.stl",
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "width_part": 32.191,
+            "height_part": 38.168,
+            "depth_part": 8.151,
+            "hatcher_type": "Base",
+            "hatch_angle": 10.0,
+            "volume_offset_hatch": 0.0,
+            "spot_compensation": 0.0,
+            "num_inner_contours": 2,
+            "num_outer_contours": 1,
+            "hatch_spacing": 0.5,
+            "stripe_width": 0.5,
+            "projector_dimension": [
+                30.0,
+                20.0
+            ],
+            "projector_resolution": [
+                1920,
+                1080
+            ],
+            "projector_offset": [
+                0.0,
+                0.0,
+                10.0
+            ],
+            "dpi": 300,
+            "layer_depth": 0.1,
+            "delta_layer": 5.0,
+            "plate": 1,
+            "HOST": "127.0.0.1",
+            "num_layers": 81,
+            "material1": "Solucion1",
+            "quantity1": 50.0,
+            "material2": "Solution 2",
+            "quantity2": 70.0,
+            "material3": "Water",
+            "quantity3": 100.0,
+            "material4": "Water",
+            "quantity4": 100.0,
+            "max_level1": 100.0,
+            "shape1": "Cylinder",
+            "dimensions1": [
+                0.0,
+                1.0,
+                1.0
+            ],
+            "max_level2": 100.0,
+            "shape2": "Cylinder",
+            "dimensions2": [
+                0.0,
+                1.0,
+                1.0
+            ],
+            "max_level3": 100.0,
+            "shape3": "Rectangle",
+            "dimensions3": [
+                0.0,
+                1.0,
+                1.0
+            ],
+            "max_level4": 100.0,
+            "shape4": "Cylinder",
+            "dimensions4": [
+                0.0,
+                1.0,
+                1.0
+            ],
+            "centroide": [
+                36.423681095072496,
+                499.38455215701515,
+                9.719475415641815
+            ],
+            "sequence": [
+                {
+                    "deposit": "1",
+                    "height_z": 10.0,
+                    "index": 0
+                },
+                {
+                    "deposit": "3",
+                    "height_z": 15.0,
+                    "index": 1
+                },
+                {
+                    "deposit": "1",
+                    "height_z": 30.0,
+                    "index": 2
+                }
+            ],
+            "min_x_part": 16.6114253998,
+            "min_y_part": 482.341949463,
+            "min_z_part": 0.0,
+            "max_x_part": 48.8028106689,
+            "max_y_part": 520.50994873,
+            "max_z_part": 8.150760173839998,
+            "status_frames": [
+                0,
+                1,
+                1,
+                0
+            ],
+            "materials": [
+                {
+                    "layer": "Superficial",
+                    "components": [
+                        "PEGDA + (5-10)% Bioglass",
+                        "Condrocyte",
+                        "TGF-\beta 0.1 ng/ml"
+                    ],
+                    "layer_depth": 0.5,
+                    "layer_delta": 1,
+                    "max_volume": 100
+                },
+                {
+                    "layer": "Intermediate",
+                    "components": [
+                        "PEGDA + (10-15)% Bioglass",
+                        "TGF-\beta 0.5 ng/ml"
+                    ],
+                    "layer_depth": 0.5,
+                    "layer_delta": 1,
+                    "max_volume": 100
+                },
+                {
+                    "layer": "Deep",
+                    "components": [
+                        "PEGDA + (15-20)% Bioglass",
+                        "Condrocyte",
+                        "TGF-\beta (1-5) ng/ml / BMP (1-10) ng/ml"
+                    ],
+                    "layer_depth": 0.5,
+                    "layer_delta": 1,
+                    "max_volume": 100
+                },
+                {
+                    "layer": "Interphase (osteochondrial)",
+                    "components": [
+                        "PEGDA + (20-30)% Bioglass",
+                        "Inorganic salts (calcium or phosphorus)",
+                        "TGF-\beta 0.1 ng/ml"
+                    ],
+                    "layer_depth": 0.5,
+                    "layer_delta": 1,
+                    "max_volume": 100
+                }
+            ],
+            "mode_biomaterial": "mode_1"
+        },
+        "timestamp": "2025-03-27 09:48:00",
+        "user": "user 1",
+        "status": 0
     },
-    "timestamp": "2025-03-27 09:48:00",
-    "user": "user 1",
-    "status": 0
-  }
+    "": {
+        "name": "",
+        "thumbnail": "/files/img/temp.png",
+        "user": "",
+        "status": 0,
+        "timestamp": "2025-03-27 10:17:16",
+        "settings": {
+            "status_frames": [
+                0,
+                0,
+                0,
+                0
+            ]
+        }
+    }
 }

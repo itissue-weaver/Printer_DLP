@@ -133,8 +133,9 @@ def simulate_printing(master):
 class FramePrinting(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
+        self.callbacks = kwargs.get("callbacks", {})
         self.file_handler = None
-        self.ploter = None
+        self.plotter = None
         self.thread_sim = None
         self.is_sliced = False
         self.columnconfigure(0, weight=1)
@@ -206,8 +207,8 @@ class FramePrinting(ttk.Frame):
         my_style.configure("primary.TButton", font=("Arial", 18))
         ttk.Button(
             self.frame_buttons,
-            text="Set printing proccess",
-            command=self.callback_printProccess,
+            text="Set Printing Process",
+            command=self.callback_print_process,
             style="primary.TButton",
         ).grid(row=0, column=0, sticky="n", padx=15, pady=15)
         ttk.Button(
@@ -248,6 +249,20 @@ class FramePrinting(ttk.Frame):
         ).grid(row=0, column=2, sticky="w", padx=5, pady=5)
         self.frame_progress.grid_forget()
 
+    def check_parameter_settings(self, settings=None):
+        settings = read_settings() if settings is None else settings
+        param_list = [
+            "sequence"
+        ]
+        status_frames = settings.get("status_frames", [0, 0, 0, 0])
+        status_frames[2] = 1
+        for param in param_list:
+            if param not in settings.keys():
+                status_frames[2] = 0
+                break
+        self.callbacks["change_tab_text"](status_frames)
+        update_settings(status_frames=status_frames)
+
     def print_callback(self):
         if not self.is_sliced:
             Messagebox.show_error("Settings not sent", "Error")
@@ -267,19 +282,22 @@ class FramePrinting(ttk.Frame):
                 self.thread_sim.join()
                 self.is_settings_sent = False
 
-    def callback_printProccess(self):
+    def callback_print_process(self):
         if self.frame_process_print is None:
             self.frame_process_print = FramePrintingProcess(self)
 
-    def on_close_printProccess(self):
+    def on_close_print_process(self):
         self.frame_process_print = None
         settings = read_settings()
-        secuence = settings.get("sequence", [])
+        sequence = settings.get("sequence", [])
         self.resume_widgets[-1].delete(*self.resume_widgets[-1].get_children())
-        for step in secuence:
+        for step in sequence:
             self.resume_widgets[-1].insert(
                 "", "end", values=(step["deposit"], step["height_z"])
             )
+        status_frames = settings.get("status_frames")
+        status_frames[3] = 1
+        self.callbacks["change_tab_text"](status_frames)
 
     def on_update_progress(self, progress):
         if not self.is_sending:
