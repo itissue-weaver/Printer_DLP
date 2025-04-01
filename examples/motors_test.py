@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 __author__ = "Edisson A. Naula"
-__date__ = "$ 24/feb/2025  at 21:15 $"
+__date__ = "$ 24/feb/2025 at 21:15 $"
 
 from time import sleep
 import RPi.GPIO as GPIO
@@ -29,23 +29,56 @@ PINS = {
     "SLEEP": 16,
 }
 
+# Suppress GPIO warnings
+GPIO.setwarnings(False)
+
+# Set BCM mode
 GPIO.setmode(GPIO.BCM)
+
+# Setup individual pins
 GPIO.setup(PINS.get("DIR_PLATE"), GPIO.OUT)
 GPIO.setup(PINS.get("STEP_PLATE"), GPIO.OUT)
 GPIO.setup(PINS.get("DIR_Z"), GPIO.OUT)
 GPIO.setup(PINS.get("STEP_Z"), GPIO.OUT)
 GPIO.output(PINS.get("DIR_PLATE"), CW)
 GPIO.output(PINS.get("DIR_Z"), CW)
-GPIO.setup(PINS.get("MODE"), GPIO.OUT)
-GPIO.setup(PINS.get("EN"), GPIO.OUT)
-GPIO.output(PINS.get("MODE"), RESOLUTION.get("Full"))
-GPIO.output(PINS.get("EN"), GPIO.LOW)
 
+# Setup MODE pins
+GPIO.setup(PINS.get("MODE"), GPIO.OUT)
+for pin, value in zip(PINS.get("MODE"), RESOLUTION.get("Full")):
+    GPIO.setup(pin, GPIO.OUT)
+    GPIO.output(pin, value)
+
+# Setup EN pins
+GPIO.setup(PINS.get("EN"), GPIO.OUT)
+for pin in PINS.get("EN"):
+    GPIO.setup(pin, GPIO.OUT)
+    GPIO.output(pin, GPIO.LOW)
 
 if __name__ == "__main__":
     step_count = SPR.get("Full")
-    GPIO.output(PINS.get("EN"), GPIO.HIGH)
+    GPIO.setup(1, GPIO.OUT)
+    # Enable motor
+    for pin in PINS.get("EN"):
+        GPIO.output(pin, GPIO.HIGH)
+    GPIO.output(1, GPIO.HIGH)
+
     delay = 0.05
+    # Step forward
+    for x in range(step_count):
+        GPIO.output(PINS.get("STEP_PLATE"), GPIO.HIGH)
+        GPIO.output(PINS.get("STEP_Z"), GPIO.HIGH)
+        sleep(delay)
+        GPIO.output(PINS.get("STEP_PLATE"), GPIO.LOW)
+        GPIO.output(PINS.get("STEP_Z"), GPIO.LOW)
+        sleep(delay)
+        print(f"step {x}")
+
+    sleep(1)
+    # Change direction
+    GPIO.output(PINS.get("DIR_PLATE"), CCW)
+    GPIO.output(PINS.get("DIR_Z"), CCW)
+    # Step backward
     for x in range(step_count):
         GPIO.output(PINS.get("STEP_PLATE"), GPIO.HIGH)
         GPIO.output(PINS.get("STEP_Z"), GPIO.HIGH)
@@ -54,14 +87,4 @@ if __name__ == "__main__":
         GPIO.output(PINS.get("STEP_Z"), GPIO.LOW)
         sleep(delay)
 
-    sleep(1)
-    GPIO.output(PINS.get("DIR_PLATE"), CCW)
-    GPIO.output(PINS.get("DIR_Z"), CCW)
-    for x in range(step_count):
-        GPIO.output(PINS.get("STEP_PLATE"), GPIO.HIGH)
-        GPIO.output(PINS.get("STEP_Z"), GPIO.HIGH)
-        sleep(delay)
-        GPIO.output(PINS.get("STEP_PLATE"), GPIO.LOW)
-        GPIO.output(PINS.get("STEP_Z"), GPIO.LOW)
-        sleep(delay)
     GPIO.cleanup()

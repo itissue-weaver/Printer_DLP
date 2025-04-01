@@ -7,23 +7,12 @@ import json
 import ttkbootstrap as ttk
 from PIL import Image, ImageTk
 
-from files.constants import font_buttons, font_title
+from files.constants import font_buttons, font_title, path_no_image
 from templates.AuxiliarFunctions import (
     read_projects,
     update_settings,
     create_new_project,
 )
-
-
-def render_thumbnails(frame_thumbnails, filepath):
-    for child in frame_thumbnails.winfo_children():
-        child.destroy()
-    image_thumbnail = Image.open(filepath)
-    image_thumbnail = image_thumbnail.resize((50, 50))
-    image_thumbnail = ImageTk.PhotoImage(image_thumbnail)
-    ttk.Label(frame_thumbnails, image=image_thumbnail).grid(
-        row=0, column=0, sticky="w", padx=10, pady=10
-    )
 
 
 class HomePage(ttk.Frame):
@@ -44,7 +33,7 @@ class HomePage(ttk.Frame):
             text="New Project",
             command=self.new_project_callback,
             style="success.TButton",
-        ).grid(row=0, column=0, sticky="e", padx=10, pady=10)
+        ).grid(row=0, column=0, padx=10, pady=10)
 
         self.frame_previous = ttk.Frame(self)
         self.frame_previous.grid(row=0, column=1, sticky="ew", padx=10, pady=10)
@@ -84,7 +73,7 @@ class HomePage(ttk.Frame):
             show="headings",
             style="Custom.Treeview",
         )
-        self.tv_projects.grid(row=2, column=0, sticky="w", padx=10, pady=10)
+        self.tv_projects.grid(row=2, column=0, padx=10, pady=10)
         self.tv_projects.configure(
             columns=("key", "name", "Last modified", "User", "Status", "data")
         )
@@ -98,9 +87,24 @@ class HomePage(ttk.Frame):
             self.tv_projects.insert("", "end", values=item)
         self.tv_projects.bind("<Double-1>", self.item_selected_treeview)
         self.frame_thumbnails = ttk.Frame(self)
-        self.frame_thumbnails.grid(row=0, column=2, columnspan=2, sticky="nsew", padx=10, pady=10)
+        self.frame_thumbnails.grid(row=0, column=2, columnspan=2, sticky="ew", padx=10, pady=10)
         self.frame_thumbnails.columnconfigure(0, weight=1)
-        render_thumbnails(self.frame_thumbnails, filepath)
+        self.render_thumbnails(path_no_image)
+
+    def render_thumbnails(self, filepath):
+        for child in self.frame_thumbnails.winfo_children():
+            child.destroy()
+        image_thumbnail = Image.open(filepath)
+        image_thumbnail = image_thumbnail.resize((250, 150))
+        background_image = ImageTk.PhotoImage(image_thumbnail)
+        canvas_thumbnail = ttk.Canvas(
+            self.frame_thumbnails,
+            width=background_image.width(),
+            height=background_image.height(),
+        )
+        canvas_thumbnail.grid(row=0, column=0, padx=10, pady=10)
+        canvas_thumbnail.create_image(0, 0, anchor="nw", image=background_image)
+        canvas_thumbnail.image = background_image
 
 
     def new_project_callback(self):

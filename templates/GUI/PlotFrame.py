@@ -111,7 +111,7 @@ class PlotSTL(ttk.Frame):
 
 class SolidViewer(ttk.Frame):
     def __init__(self, parent, solid_trimesh_part, parts, **kwargs):
-        super().__init__(parent, **kwargs)
+        super().__init__(parent)
         self.figure = Figure(figsize=(10, 10), dpi=100)
         self.canvas = FigureCanvasTkAgg(self.figure, self)
         self.canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew")
