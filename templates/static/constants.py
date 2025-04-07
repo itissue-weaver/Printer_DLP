@@ -5,7 +5,7 @@ __date__ = "$ 05/feb/2025  at 21:21 $"
 from flask_restx import Api
 
 from templates.daemons.DLPViewer import DlpViewer
-from templates.daemons.MotorController import MotorController
+# from templates.daemons.MotorController import MotorController
 
 api = Api()
 projector = DlpViewer()
@@ -21,5 +21,5 @@ PINS = {
             "SWITCH_3": 3,
         }
 
-controller_motor = MotorController(PINS)
+# controller_motor = MotorController(PINS)
 
