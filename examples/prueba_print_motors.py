@@ -21,11 +21,16 @@ def test_print_process(controller):
         # Mover Z en sentido horario hasta el interruptor 2
         controller.move_z_until_switch(GPIO.HIGH, pins["SWITCH_2"])
 
-        # Rotar plato en sentido horario
-        controller.rotate_motor(pins["DIR_PLATE"], pins["STEP_PLATE"], GPIO.HIGH, 100)
+        # # Rotar plato en sentido horario
+        # controller.rotate_motor(pins["DIR_PLATE"], pins["STEP_PLATE"], GPIO.HIGH, 100)
 
         # Mover Z en sentido antihorario hasta el interruptor 3
         controller.move_z_until_switch(GPIO.LOW, pins["SWITCH_3"])
+
+        sleep(2)
+
+        # Mover Z en sentido horario hasta el interruptor 2
+        controller.move_z_until_switch(GPIO.HIGH, pins["SWITCH_2"])
 
         # Rotar plato en sentido antihorario
         controller.rotate_motor(pins["DIR_PLATE"], pins["STEP_PLATE"], GPIO.LOW, 100)
