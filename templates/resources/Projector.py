@@ -3,6 +3,7 @@ __author__ = "Edisson A. Naula"
 __date__ = "$ 05/feb/2025  at 21:17 $"
 
 import os
+import subprocess
 
 from flask import request
 from flask_restx import Namespace, Resource
@@ -142,4 +143,16 @@ class TestMotor(Resource):
     def post(self):
         # test motor
         controller_motor.test_init_movement()
-        return {"msg": "Ok, motor test initiated"}, 200
+        ruta_script = "examples/prueba_print_motors.py"
+
+        # Ejecutar el script
+        resultado = subprocess.run(["python3", ruta_script], capture_output=True, text=True)
+
+        # Mostrar salida y errores
+        print("Salida:")
+        print(resultado.stdout)
+
+        print("Errores:")
+        print(resultado.stderr)
+
+        return {"msg": "Ok, motor test initiated", "data": resultado.stdout}, 200
