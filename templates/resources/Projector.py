@@ -3,7 +3,7 @@ __author__ = "Edisson A. Naula"
 __date__ = "$ 05/feb/2025  at 21:17 $"
 
 import os
-import subprocess
+import threading
 
 from flask import request
 from flask_restx import Namespace, Resource
@@ -11,9 +11,9 @@ from werkzeug.utils import secure_filename
 
 from files.constants import image_path_projector, zip_file_name, path_temp_zip
 from templates.AuxiliarFunctions import read_settings, update_settings
-from templates.midleware.MD_Printer import uncompres_files_zip
+from templates.midleware.MD_Printer import uncompres_files_zip, subprocess_test
 from templates.models.printer_models import expected_files_almacen, post_settings_model
-from templates.static.constants import projector, controller_motor
+from templates.static.constants import projector
 
 ns = Namespace("api/v1/printer")
 
@@ -142,17 +142,8 @@ class Status(Resource):
 class TestMotor(Resource):
     def post(self):
         # test motor
-        controller_motor.test_init_movement()
+
         ruta_script = "examples/prueba_print_motors.py"
-
-        # Ejecutar el script
-        resultado = subprocess.run(["python3", ruta_script], capture_output=True, text=True)
-
-        # Mostrar salida y errores
-        print("Salida:")
-        print(resultado.stdout)
-
-        print("Errores:")
-        print(resultado.stderr)
-
-        return {"msg": "Ok, motor test initiated", "data": resultado.stdout}, 200
+        thread_suprocess = threading.Thread(target=subprocess_test)
+        thread_suprocess.start()
+        return {"msg": "Ok, motor test initiated"}, 200

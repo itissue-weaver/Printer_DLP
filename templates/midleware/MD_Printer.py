@@ -5,6 +5,7 @@ __date__ = "$ 05/feb/2025  at 21:24 $"
 import json
 import os
 import shutil
+import subprocess
 import zipfile
 
 import requests
@@ -160,3 +161,13 @@ def test_motor_post():
         return 200, data
     else:
         return response.status_code, None
+
+def subprocess_test(ruta):
+    # Ejecutar el script
+    resultado = subprocess.run(["python3", ruta], capture_output=True, text=True)
+    # Mostrar salida y errores
+    print("Salida:")
+    print(resultado.stdout)
+
+    print("Errores:")
+    print(resultado.stderr)
