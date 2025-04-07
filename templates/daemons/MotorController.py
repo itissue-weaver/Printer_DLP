@@ -15,20 +15,7 @@ default_pins = {
         "SWITCH_3": 3,
     }
 
-def test_print_process():
-    PINS = {
-        "DIR_PLATE": 7,
-        "STEP_PLATE": 8,
-        "DIR_Z": 19,
-        "STEP_Z": 26,
-        "MODE": (5, 6),
-        "EN": (12, 13),
-        "SLEEP": 16,
-        "SWITCH_2": 2,
-        "SWITCH_3": 3,
-    }
-
-    controller = MotorController(PINS)
+def test_print_process(controller):
     try:
         # Mover Z en sentido horario hasta el interruptor 2
         controller.move_z_until_switch(GPIO.HIGH, PINS["SWITCH_2"])
@@ -100,5 +87,6 @@ class MotorController:
     def test_init_movement(self):
         if self.thread_test is not None:
             self.thread_test.join()
-        self.thread_test = threading.Thread(target=test_print_process)
+            print("Thread joined")
+        self.thread_test = threading.Thread(target=test_print_process, args=(self,))
         self.thread_test.start()
