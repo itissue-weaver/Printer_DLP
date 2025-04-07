@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 __author__ = "Edisson A. Naula"
-__date__ = "$ 24/feb/2025 at 21:15 $"
+__date__ = "$ 04/mar/2025 at 21:15 $"
 
 from time import sleep
 import RPi.GPIO as GPIO
@@ -14,19 +14,20 @@ SPR = {
     "1/8": 1600,
 }
 RESOLUTION = {
-    "Full": (0, 0),
-    "Half": (1, 0),
-    "1/4": (0, 1),
-    "1/8": (1, 1),
+    "Full": (0, 0, 0),
+    "Half": (1, 0, 0),
+    "1/4": (0, 1, 0),
+    "1/8": (1, 1, 0),
 }
 PINS = {
     "DIR_PLATE": 20,
     "STEP_PLATE": 21,
     "DIR_Z": 19,
     "STEP_Z": 26,
-    "MODE": (5, 6),
+    "MODE": (0, 5, 6),
     "EN": (12, 13),
     "SLEEP": 16,
+    "SWITCH": 14,
 }
 
 # Suppress GPIO warnings
@@ -42,6 +43,8 @@ GPIO.setup(PINS.get("DIR_Z"), GPIO.OUT)
 GPIO.setup(PINS.get("STEP_Z"), GPIO.OUT)
 GPIO.output(PINS.get("DIR_PLATE"), CW)
 GPIO.output(PINS.get("DIR_Z"), CW)
+
+GPIO.setup(PINS.get("SWITCH"), GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # Setup MODE pins
 GPIO.setup(PINS.get("MODE"), GPIO.OUT)
@@ -65,11 +68,17 @@ if __name__ == "__main__":
     # Enable motor
     for pin in PINS.get("EN"):
         GPIO.output(pin, GPIO.HIGH)
-    GPIO.output(1, GPIO.HIGH)
+
 
     delay = 0.05
     # Step forward
     for x in range(step_count):
+        if GPIO.input(PINS.get("SWITCH")) == GPIO.HIGH:
+            print("Switch is on")
+            GPIO.output(1, GPIO.HIGH)
+        else:
+            print("Switch is off")
+            GPIO.output(1, GPIO.LOW)
         GPIO.output(PINS.get("STEP_PLATE"), GPIO.HIGH)
         GPIO.output(PINS.get("STEP_Z"), GPIO.HIGH)
         sleep(delay)

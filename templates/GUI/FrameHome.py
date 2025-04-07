@@ -69,7 +69,7 @@ class HomePage(ttk.Frame):
         ).grid(row=1, column=0, sticky="w", padx=10, pady=10)
         self.tv_projects = ttk.Treeview(
             self.frame_previous,
-            columns=("name", "timestamp"),
+            columns=("key", "name", "Last modified", "User", "Status", "data"),
             show="headings",
             style="Custom.Treeview",
         )
@@ -79,9 +79,24 @@ class HomePage(ttk.Frame):
         )
         for col in self.tv_projects["columns"]:
             self.tv_projects.heading(col, text=col.title(), anchor="w")
-        # hide data column
-        self.tv_projects.column("data", stretch=False, width=0)
-        self.tv_projects.column("key", stretch=False, width=0)
+        self.tv_projects.configure(
+            columns=("key", "name", "Last modified", "User", "Status", "data")
+        )
+
+        for col in self.tv_projects["columns"]:
+            self.tv_projects.heading(col, text=col.title(), anchor="n")
+            if col == "name":
+                self.tv_projects.column(col, stretch=True, width=150)
+            elif col == "Last modified":
+                self.tv_projects.column(col, stretch=False, width=250)
+            elif col == "User":
+                self.tv_projects.column(col, stretch=False, width=100)
+            elif col == "Status":
+                self.tv_projects.column(col, stretch=False, width=120)
+            elif col == "data":
+                self.tv_projects.column(col, stretch=False, width=0)  # Ocultar columna
+            elif col == "key":
+                self.tv_projects.column(col, stretch=False, width=0)  # Ocultar columna
         # insert data
         for item in data_lists:
             self.tv_projects.insert("", "end", values=item)

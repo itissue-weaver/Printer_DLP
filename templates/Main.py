@@ -37,6 +37,8 @@ def configure_styles():
     style.configure("danger.TButton", font=("Arial", 18))
     style.configure("Custom.Treeview", font=("Arial", 18), rowheight=30)
     style.configure("Custom.Treeview.Heading", font=("Arial", 18, "bold"))
+    style.configure("success.TButton", font=("Arial", 18))
+    style.configure("primary.TButton", font=("Arial", 18))
 
     return style
 

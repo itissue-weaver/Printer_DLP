@@ -1,5 +1,5 @@
-pygame
-PyOpenGL
+pygame~=2.6.1
+PyOpenGL~=3.1.9
 vispy
 pyqt5
 triangle
@@ -11,9 +11,12 @@ Rtree
 networkx
 scikit-image
 pyclipr
-trimesh
+trimesh~=4.6.4
 pyglet
 pyglet<2
 PythonSLM
-ttkbootstrap
-requests
+ttkbootstrap~=1.10.1
+requests~=2.32.3
+pillow~=11.1.0
+matplotlib~=3.10.1
+numpy~=2.2.4

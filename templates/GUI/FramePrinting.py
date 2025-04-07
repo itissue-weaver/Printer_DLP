@@ -6,6 +6,7 @@ import os
 import threading
 import time
 
+from PIL import Image, ImageTk
 import ttkbootstrap as ttk
 from ttkbootstrap.dialogs import Messagebox
 
@@ -146,6 +147,9 @@ class FramePrinting(ttk.Frame):
         self.is_sending = False
         self.frame_process_print = None
         self.is_process_set = False
+        image_capture = Image.open(r"files/img/capture.png")
+        image_capture = image_capture.resize((50, 50))
+        self.icon_capture = ImageTk.PhotoImage(image_capture)
         # ----------------------widgets----------------------
         self.frame_main_info = ttk.Frame(self)
         self.frame_main_info.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
@@ -201,16 +205,22 @@ class FramePrinting(ttk.Frame):
         # ----------------------Button----------------------
         self.frame_buttons = ttk.Frame(self)
         self.frame_buttons.grid(row=1, column=0, sticky="nsew", padx=15, pady=15)
-        self.frame_buttons.columnconfigure((0, 2), weight=1)
-        my_style = ttk.Style()
-        my_style.configure("success.TButton", font=("Arial", 18))
-        my_style.configure("primary.TButton", font=("Arial", 18))
+        self.frame_buttons.columnconfigure((0, 1, 2), weight=1)
+        frame_btn_img = ttk.Frame(self.frame_buttons)
+        frame_btn_img.grid(row=0, column=0, sticky="n", padx=15, pady=15)
         ttk.Button(
-            self.frame_buttons,
+            frame_btn_img,
+            text="Capture Screenshot",
+            image=self.icon_capture,
+            command=self.capture_screen_callback,
+            style="primary.TButton",
+        ).grid(row=0, column=0, sticky="ns", padx=15, pady=15)
+        ttk.Button(
+            frame_btn_img,
             text="Set Printing Process",
             command=self.callback_print_process,
             style="primary.TButton",
-        ).grid(row=0, column=0, sticky="n", padx=15, pady=15)
+        ).grid(row=0, column=1, sticky="ns", padx=15, pady=15)
         ttk.Button(
             self.frame_buttons,
             text="Send settings",
@@ -248,6 +258,11 @@ class FramePrinting(ttk.Frame):
             font=("Arial", 22, "bold"),
         ).grid(row=0, column=2, sticky="w", padx=5, pady=5)
         self.frame_progress.grid_forget()
+
+    def capture_screen_callback(self):
+        if self.file_handler is None:
+            self.file_handler = TempFilesHandler()
+        self.file_handler.capture_screen()
 
     def check_parameter_settings(self, settings=None):
         settings = read_settings() if settings is None else settings
