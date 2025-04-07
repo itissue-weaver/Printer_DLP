@@ -5,7 +5,7 @@ __date__ = "$ 18/feb/2025  at 22:16 $"
 import ttkbootstrap as ttk
 
 from templates.GUI.SubFrameConfig import DisplayConfig, PrinterConfig
-from templates.daemons.MotorController import MotorController
+from templates.midleware.MD_Printer import test_motor_post
 
 
 class FrameConfig(ttk.Toplevel):
@@ -31,7 +31,7 @@ class FrameConfig(ttk.Toplevel):
             self,
             text="Test",
             command=self.on_test_motors,
-        ).grid(row=2, column=0, sticky="n", padx=10, pady=10)
+        ).grid(row=2, column=1, sticky="n", padx=10, pady=10)
 
         self.protocol("WM_DELETE_WINDOW", self.close_callback)
 
@@ -42,17 +42,5 @@ class FrameConfig(ttk.Toplevel):
         self.destroy()
 
     def on_test_motors(self):
-        PINS = {
-            "DIR_PLATE": 7,
-            "STEP_PLATE": 8,
-            "DIR_Z": 19,
-            "STEP_Z": 26,
-            "MODE": (5, 6),
-            "EN": (12, 13),
-            "SLEEP": 16,
-            "SWITCH_2": 2,
-            "SWITCH_3": 3,
-        }
-        if self.controller_motor is None:
-            self.controller_motor = MotorController(PINS)
-        self.controller_motor.test_init_movement()
+        code, data = test_motor_post()
+        print(code, data)

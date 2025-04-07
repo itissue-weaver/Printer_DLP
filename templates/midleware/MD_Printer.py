@@ -149,3 +149,14 @@ def test_connection():
         return 200, data
     else:
         return response.status_code, None
+
+
+def test_motor_post():
+    response = requests.post(
+        f"{server_domain + base_url}/test_motor", data=json.dumps({}), headers=headers
+    )
+    if response.status_code == 200:
+        data = response.json()
+        return 200, data
+    else:
+        return response.status_code, None

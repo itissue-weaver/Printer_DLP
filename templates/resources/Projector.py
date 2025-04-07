@@ -12,7 +12,7 @@ from files.constants import image_path_projector, zip_file_name, path_temp_zip
 from templates.AuxiliarFunctions import read_settings, update_settings
 from templates.midleware.MD_Printer import uncompres_files_zip
 from templates.models.printer_models import expected_files_almacen, post_settings_model
-from templates.static.constants import projector
+from templates.static.constants import projector, controller_motor
 
 ns = Namespace("api/v1/printer")
 
@@ -136,3 +136,10 @@ class Status(Resource):
             return {"msg": "Ok, projector is alive", "data": flag}, 200
         else:
             return {"msg": "Ok, projector is not alive", "data": flag}, 200
+
+@ns.route("/test_motor")
+class TestMotor(Resource):
+    def post(self):
+        # test motor
+        controller_motor.test_init_movement()
+        return {"msg": "Ok, motor test initiated"}, 200
