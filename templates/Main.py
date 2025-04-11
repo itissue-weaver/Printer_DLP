@@ -98,7 +98,7 @@ class MainGUI(ttk.Window):
         self.frame_footer.columnconfigure((0, 1, 2, 3), weight=1)
         ttk.Button(
             self.frame_footer,
-            text="Configuración",
+            text="Configuration",
             image=self.icon_config,
             compound="left",
             command=self.click_config,
@@ -160,7 +160,7 @@ class MainGUI(ttk.Window):
                 case 4:
                     new_text = "Printing  ❎" if status == 0 else "Printing ✅"
                 case _:
-                    print("No se encontro el tab")
+                    print("No se encontró el tab")
                     continue
             self.notebook.tab(tab_index + 1, text=new_text)
 
