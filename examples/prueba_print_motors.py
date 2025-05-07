@@ -11,9 +11,11 @@ default_pins = {
         "STEP_Z": 26,
         "MODE": (5, 6),
         "EN": (12, 13),
-        "SLEEP": 16,
+        "SLEEP": 22,
         "SWITCH_2": 23,
         "SWITCH_3": 24,
+        "SWITCH_0": 17,
+        "SWITCH_1": 27
     }
 
 
@@ -177,9 +179,11 @@ if __name__ == "__main__":
         "STEP_Z": 26,
         "MODE": (5, 6),
         "EN": (12, 13),
-        "SLEEP": 16,
+        "SLEEP": 22,
         "SWITCH_2": 23,
         "SWITCH_3": 24,
+        "SWITCH_0": 17,
+        "SWITCH_1": 27
     }
     controller = MotorController(PINS)
     controller.test_init_movement()
