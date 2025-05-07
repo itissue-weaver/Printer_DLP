@@ -41,7 +41,6 @@ class MotorController:
         if pins is None:
             pins = default_pins
         self.pins = pins
-        print(self.pins)
         self.mode_spr = mode_spr
         self.spr = {"Full": 200}
         self.delay = 0.01

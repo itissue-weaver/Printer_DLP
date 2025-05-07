@@ -7,4 +7,4 @@ from templates.AuxiliarFunctions import read_settings
 
 if __name__ == "__main__":
     settings = read_settings()
-    app.run(host=settings.get("HOST", "127.0.0.1"), port=5000, debug=True)
+    app.run(host=settings.get("HOST", "127.0.0.1"), port=5000, debug=False, use_reloader=False)

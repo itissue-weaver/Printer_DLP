@@ -164,7 +164,10 @@ def test_motor_post():
 
 def subprocess_test(ruta):
     # Ejecutar el script
-    resultado = subprocess.run(["python3", ruta], capture_output=True, text=True)
+    argumentos = ["--speed", "150", "--direction", "backward"]
+
+    resultado = subprocess.run(["python3", ruta] + argumentos, capture_output=True, text=True)
+
     # Mostrar salida y errores
     print("Salida:")
     print(resultado.stdout)
