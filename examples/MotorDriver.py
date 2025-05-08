@@ -17,36 +17,6 @@ default_pins = {
         "SWITCH_1": 27
     }
 
-def test_print_process(controller_motor):
-    pins = controller_motor.pins
-    try:
-        # Mover Z en sentido horario hasta el interruptor 2
-        controller_motor.move_z_until_switch(GPIO.HIGH, pins["SWITCH_2"])
-
-        # # Rotar plato en sentido horario
-        # controller.rotate_motor(pins["DIR_PLATE"], pins["STEP_PLATE"], GPIO.HIGH, 100)
-
-        # Mover Z en sentido antihorario hasta el interruptor 3
-        controller_motor.move_z_until_switch(GPIO.LOW, pins["SWITCH_3"])
-        led_controller.turn_on_led()
-        sleep(5)
-        # Mover Z en sentido horario hasta el interruptor 2
-        led_controller.turn_off_led()
-        sleep(5)
-        controller_motor.move_z_until_switch(GPIO.HIGH, pins["SWITCH_2"])
-        sleep(1)
-        # Rotar plato en sentido antihorario
-        controller_motor.rotate_motor(pins["DIR_PLATE"], pins["STEP_PLATE"], GPIO.LOW, 100)
-        controller_motor.move_z(GPIO.LOW, 100)
-
-    except Exception as e:
-        print(f"Error: {e}")
-    finally:
-        print("Cleaning up pins final")
-        sleep(1)
-        controller_motor.pin_cleanup()
-        # led_controller.turn_off_led()
-
 class MotorController:
     def __init__(self, pins=None, mode_spr="Full"):
         self.thread_test = None
@@ -78,47 +48,63 @@ class MotorController:
         for pin in self.pins["EN"]:
             GPIO.output(pin, GPIO.LOW)
 
-    def rotate_motor(self, direction_pin, step_pin, direction_rotation, steps):
-        GPIO.output(direction_pin, direction_rotation)
-        for _ in range(steps):
-            GPIO.output(step_pin, GPIO.HIGH)
-            sleep(self.delay)
-            GPIO.output(step_pin, GPIO.LOW)
-            sleep(self.delay)
+    def rotate_motor(self, pin_dir, step_pin, direction_rotation, steps):
+        try:
+            GPIO.output(pin_dir, direction_rotation)
+            for _ in range(steps):
+                GPIO.output(step_pin, GPIO.HIGH)
+                sleep(self.delay)
+                GPIO.output(step_pin, GPIO.LOW)
+                sleep(self.delay)
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            sleep(1)
+            GPIO.cleanup()
 
     def move_z_until_switch(self, direction_rotation, switch_pin):
-        GPIO.output(self.pins["DIR_Z"], direction_rotation)
-        while GPIO.input(switch_pin) == GPIO.HIGH:
-            GPIO.output(self.pins["STEP_Z"], GPIO.HIGH)
-            sleep(self.delay_z)
-            GPIO.output(self.pins["STEP_Z"], GPIO.LOW)
-            sleep(self.delay_z)
+        try:
+            GPIO.output(self.pins["DIR_Z"], direction_rotation)
+            while GPIO.input(switch_pin) == GPIO.HIGH:
+                GPIO.output(self.pins["STEP_Z"], GPIO.HIGH)
+                sleep(self.delay_z)
+                GPIO.output(self.pins["STEP_Z"], GPIO.LOW)
+                sleep(self.delay_z)
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            sleep(1)
+            GPIO.cleanup()
 
     def move_z(self, direction_rotation, steps):
-        GPIO.output(self.pins["DIR_Z"], direction_rotation)
-        for _ in range(steps):
-            GPIO.output(self.pins["STEP_Z"], GPIO.HIGH)
-            sleep(self.delay_z)
-            GPIO.output(self.pins["STEP_Z"], GPIO.LOW)
-            sleep(self.delay_z)
+        try:
+            GPIO.output(self.pins["DIR_Z"], direction_rotation)
+            for _ in range(steps):
+                GPIO.output(self.pins["STEP_Z"], GPIO.HIGH)
+                sleep(self.delay_z)
+                GPIO.output(self.pins["STEP_Z"], GPIO.LOW)
+                sleep(self.delay_z)
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            sleep(1)
+            GPIO.cleanup()
 
     def move_plate_until_switch(self, direction_rotation, switch_pin):
-        GPIO.output(self.pins["DIR_PLATE"], direction_rotation)
-        while GPIO.input(switch_pin) == GPIO.HIGH:
-            GPIO.output(self.pins["STEP_PLATE"], GPIO.HIGH)
-            sleep(self.delay)
-            GPIO.output(self.pins["STEP_PLATE"], GPIO.LOW)
-            sleep(self.delay)
+        try:
+            GPIO.output(self.pins["DIR_PLATE"], direction_rotation)
+            while GPIO.input(switch_pin) == GPIO.HIGH:
+                GPIO.output(self.pins["STEP_PLATE"], GPIO.HIGH)
+                sleep(self.delay)
+                GPIO.output(self.pins["STEP_PLATE"], GPIO.LOW)
+                sleep(self.delay)
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            sleep(1)
+            GPIO.cleanup()
 
-    def pin_cleanup(self):
-        GPIO.cleanup()
 
-    def test_init_movement(self):
-        if self.thread_test is not None:
-            self.thread_test.join()
-            print("Thread joined")
-        self.thread_test = threading.Thread(target=test_print_process, args=(self,))
-        self.thread_test.start()
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Motors controller")
     parser.add_argument("--action", type=str, choices=["move_z_sw", "move_z", "move_plate_sw", "move_plate","rotate_motor", "empty"], default="empty",
