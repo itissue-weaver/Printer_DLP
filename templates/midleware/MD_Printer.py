@@ -15,9 +15,11 @@ from files.constants import (
     base_url,
     headers,
     path_temp_zip,
-    zip_file_name,
+    zip_file_name, ruta_script_motor, ruta_script_led,
 )
 from templates.AuxiliarFunctions import read_settings
+
+from time import sleep
 
 
 def send_start_print():
@@ -162,15 +164,53 @@ def test_motor_post():
     else:
         return response.status_code, None
 
-def subprocess_test(ruta):
+def subprocess_test():
+    # # Mover Z en sentido horario hasta el interruptor 2
+    # controller_motor.move_z_until_switch(GPIO.HIGH, pins["SWITCH_2"])
+    #
+    # # # Rotar plato en sentido horario
+    # # controller.rotate_motor(pins["DIR_PLATE"], pins["STEP_PLATE"], GPIO.HIGH, 100)
+    #
+    # # Mover Z en sentido antihorario hasta el interruptor 3
+    # controller_motor.move_z_until_switch(GPIO.LOW, pins["SWITCH_3"])
+    # led_controller.turn_on_led()
+    # sleep(5)
+    # # Mover Z en sentido horario hasta el interruptor 2
+    # led_controller.turn_off_led()
+    # sleep(5)
+    # controller_motor.move_z_until_switch(GPIO.HIGH, pins["SWITCH_2"])
+    # sleep(1)
+    # # Rotar plato en sentido antihorario
+    # controller_motor.rotate_motor(pins["DIR_PLATE"], pins["STEP_PLATE"], GPIO.LOW, 100)
+    # controller_motor.move_z(GPIO.LOW, 100)
+    #----dRIVER SCRIPT
+    # parser.add_argument("--action", type=str,
+    #                     choices=["move_z_sw", "move_z", "move_plate_sw", "move_plate", "rotate_motor", "empty"],
+    #                     default="empty",
+    #                     help="action to execute by the controller")
+    # parser.add_argument("--direction", type=str, choices=["ccw", "cw"], default="cw",
+    #                     help="direction to move the motor")
+    # parser.add_argument("--steps", type=int, default=0,
+    #                     help="number of steps to move the motor")
+    # parser.add_argument("--location_z", type=str, choices=["top", "button"], default="top",
+    #                     help="location to move z in case of move_z_sw")
+    # parser.add_argument("--motor", type=str, choices=["plate", "z"], default="z",
+    #                     help="motor to move in case of rotate_motor")
+    # args = parser.parse_args()
     # Ejecutar el script
-    argumentos = ["--speed", "150", "--direction", "backward"]
-
-    resultado = subprocess.run(["python3", ruta] + argumentos, capture_output=True, text=True)
-
-    # Mostrar salida y errores
-    print("Salida:")
-    print(resultado.stdout)
-
-    print("Errores:")
-    print(resultado.stderr)
+    # argumentos = ["--speed", "150", "--direction", "backward"]
+    argumentos = ["--action", "move_z_sw", "--direction", "cw", "--location_z", "top"]
+    resultado = subprocess.run(["python3", ruta_script_motor] + argumentos, capture_output=True, text=True)
+    argumentos = ["--action", "move_z_sw", "--direction", "ccw", "--location_z", "button"]
+    resultado = subprocess.run(["python3", ruta_script_motor] + argumentos, capture_output=True, text=True)
+    argumentos =  ["--state", "on"]
+    resultado = subprocess.run(["python3", ruta_script_led] + argumentos, capture_output=True, text=True)
+    sleep(5)
+    argumentos =  ["--state", "off"]
+    resultado = subprocess.run(["python3", ruta_script_led] + argumentos, capture_output=True, text=True)
+    argumentos = ["--action", "move_z_sw", "--direction", "cw", "--location_z", "top"]
+    resultado = subprocess.run(["python3", ruta_script_motor] + argumentos, capture_output=True, text=True)
+    argumentos = ["--action", "rotate_motor", "--direction", "cw", "--motor", "plate", "--steps", "100"]
+    resultado = subprocess.run(["python3", ruta_script_motor] + argumentos, capture_output=True, text=True)
+    argumentos = ["--action", "rotate_motor", "--direction", "ccw", "--motor", "z", "--steps", "100"]
+    resultado = subprocess.run(["python3", ruta_script_motor] + argumentos, capture_output=True, text=True)

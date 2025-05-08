@@ -36,3 +36,5 @@ font_labels_frame = ("Arial", 14, "bold")
 font_labels_plates = ("Arial", 10, "bold")
 format_timestamp = "%Y-%m-%d %H:%M:%S"
 path_no_image = "files/img/no_image.png"
+ruta_script_motor = "examples/MotorDriver.py"
+ruta_script_led = "examples/LedDriver.py"

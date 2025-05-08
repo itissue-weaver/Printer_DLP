@@ -141,8 +141,6 @@ class Status(Resource):
 @ns.route("/test_motor")
 class TestMotor(Resource):
     def post(self):
-        # test motor
-        ruta_script = "examples/prueba_print_motors.py"
-        thread_suprocess = threading.Thread(target=subprocess_test,  args=(ruta_script,))
+        thread_suprocess = threading.Thread(target=subprocess_test)
         thread_suprocess.start()
         return {"msg": "Ok, motor test initiated"}, 200
