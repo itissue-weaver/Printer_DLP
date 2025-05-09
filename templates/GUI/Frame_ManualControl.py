@@ -95,7 +95,7 @@ class ManualControl(ttk.Frame):
     def up_callback(self, displacement):
         steps = 200 * int(displacement)/8
         response = control_motor_from_gui(
-            action="move_plate",
+            action="move_z",
             direction="cw",
             location_z="top",
             motor="z",
@@ -121,6 +121,6 @@ class ManualControl(ttk.Frame):
             direction="cw",
             motor="plate",
             steps=int(steps),
-            location_z="bottom",
+            location_z="top",
         )
         print(response)

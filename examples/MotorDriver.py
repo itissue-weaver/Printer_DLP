@@ -113,7 +113,7 @@ if __name__ == "__main__":
                         help="direction to move the motor")
     parser.add_argument("--steps", type=int, default=0,
                         help="number of steps to move the motor")
-    parser.add_argument("--location_z", type=str, choices=["top", "button"], default="top",
+    parser.add_argument("--location_z", type=str, choices=["top", "bottom"], default="top",
                         help="location to move z in case of move_z_sw")
     parser.add_argument("--motor", type=str, choices=["plate", "z"], default="z",
                         help="motor to move in case of rotate_motor")
@@ -152,7 +152,7 @@ if __name__ == "__main__":
                 direction = GPIO.HIGH
             else:
                 direction = GPIO.LOW
-            if args.location_z == "button":
+            if args.location_z == "bottom":
                 sw = controller.pins["SWITCH_3"]
             else:
                 sw = controller.pins["SWITCH_2"]
