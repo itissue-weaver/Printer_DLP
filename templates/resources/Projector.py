@@ -5,7 +5,6 @@ __date__ = "$ 05/feb/2025  at 21:17 $"
 import os
 import threading
 
-from PyQt5.QtCore.QUrl import kwargs
 from flask import request
 from flask_restx import Namespace, Resource
 from werkzeug.utils import secure_filename
