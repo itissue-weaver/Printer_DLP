@@ -97,7 +97,7 @@ class ManualControl(ttk.Frame):
         response = control_motor_from_gui(
             action="move_plate",
             direction="cw",
-            location_z="up",
+            location_z="top",
             motor="z",
             steps=int(steps),
         )
@@ -108,7 +108,7 @@ class ManualControl(ttk.Frame):
         response = control_motor_from_gui(
             action="move_z",
             direction="ccw",
-            location_z="down",
+            location_z="bottom",
             motor="z",
             steps=int(steps),
         )
@@ -121,6 +121,6 @@ class ManualControl(ttk.Frame):
             direction="cw",
             motor="plate",
             steps=int(steps),
-            location_z="button",
+            location_z="bottom",
         )
         print(response)
