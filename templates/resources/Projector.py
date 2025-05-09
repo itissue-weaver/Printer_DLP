@@ -5,14 +5,17 @@ __date__ = "$ 05/feb/2025  at 21:17 $"
 import os
 import threading
 
+from PyQt5.QtCore.QUrl import kwargs
 from flask import request
 from flask_restx import Namespace, Resource
 from werkzeug.utils import secure_filename
 
 from files.constants import image_path_projector, zip_file_name, path_temp_zip
 from templates.AuxiliarFunctions import read_settings, update_settings
-from templates.midleware.MD_Printer import uncompres_files_zip, subprocess_test
-from templates.models.printer_models import expected_files_almacen, post_settings_model
+from templates.midleware.MD_Printer import uncompres_files_zip, subprocess_test, subprocess_control_motor, \
+    subprocess_control_led
+from templates.models.printer_models import expected_files_almacen, post_settings_model, post_driver_motor_model, \
+    post_driver_led_model
 from templates.static.constants import projector
 
 ns = Namespace("api/v1/printer")
@@ -141,6 +144,31 @@ class Status(Resource):
 @ns.route("/test_motor")
 class TestMotor(Resource):
     def post(self):
-        thread_suprocess = threading.Thread(target=subprocess_test)
-        thread_suprocess.start()
+        thread_subprocess = threading.Thread(target=subprocess_test)
+        thread_subprocess.start()
+        return {"msg": "Ok, motor test initiated"}, 200
+
+@ns.route("/rotate/motor")
+class RotateMotor(Resource):
+    @ns.expect(post_driver_motor_model)
+    def post(self):
+        data = ns.payload
+        try:
+            thread_subprocess = threading.Thread(target=subprocess_control_motor, args=(data["action"], data["direction"], data["location_z"], data["motor"], data["steps"]))
+            thread_subprocess.start()
+        except Exception as e:
+            return {"msg": f"Error, motor test initiated: {str(e)}"}, 400
+        return {"msg": "Ok, motor test initiated"}, 200
+
+
+@ns.route("/led")
+class Led(Resource):
+    @ns.expect(post_driver_led_model)
+    def post(self):
+        data = ns.payload
+        try:
+            thread_subprocess = threading.Thread(target=subprocess_control_led, args=(data["state"],))
+            thread_subprocess.start()
+        except Exception as e:
+            return {"msg": f"Error, motor test initiated: {str(e)}"}, 400
         return {"msg": "Ok, motor test initiated"}, 200

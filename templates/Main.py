@@ -18,6 +18,7 @@ from templates.GUI.FrameBiomaterials import FrameBiomaterials
 from templates.GUI.FrameHome import HomePage
 from templates.GUI.FramePrinting import FramePrinting
 from templates.GUI.FrameSliceFile import SliceFile
+from templates.GUI.Frame_ManualControl import ManualControlFrame
 from templates.GUI.Frame_ReadFile import ReadFile
 from templates.GUI.FrameConfig import FrameConfig
 from templates.GUI.SubFrameInit import GifFrameApp
@@ -46,6 +47,7 @@ def configure_styles():
 class MainGUI(ttk.Window):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.frame_m_control = None
         self.project_key = None
         self.title("DLP Slice")
         self.style_gui = configure_styles()
@@ -56,6 +58,9 @@ class MainGUI(ttk.Window):
         image_config = image_config.resize((50, 50))
         image_save = Image.open(r"files/img/save_btn.png")
         image_save = image_save.resize((50, 50))
+        image_control = Image.open(r"files/img/remote-control.jpg")
+        image_control = image_control.resize((50, 50))
+        self.icon_control = ImageTk.PhotoImage(image_control)
         self.icon_config = ImageTk.PhotoImage(image_config)
         self.icon_save = ImageTk.PhotoImage(image_save)
         self.frame_config = None
@@ -128,6 +133,15 @@ class MainGUI(ttk.Window):
             compound="right",
         )
         self.button_save.grid(row=0, column=3, sticky="e", padx=15, pady=15)
+        self.button_mControl = ttk.Button(
+            self.frame_footer,
+            text="Manual Control",
+            command=self.click_manual_control,
+            style="primary.TButton",
+            image=self.icon_control,
+            compound="left",
+        )
+        self.button_mControl.grid(row=0, column=4, sticky="e", padx=15, pady=15)
         self.test_connection()
 
     def change_project_key(self, project_key):
@@ -137,13 +151,19 @@ class MainGUI(ttk.Window):
         settings = read_settings()
         save_settings_to_project(self.project_key, settings)
 
-
     def click_config(self):
         if self.frame_config is None:
             self.frame_config = FrameConfig(self)
 
     def on_config_close(self):
         self.frame_config = None
+
+    def click_manual_control(self):
+        if self.frame_m_control is None:
+            self.frame_m_control = ManualControlFrame(self)
+
+    def on_m_control_close(self):
+        self.frame_m_control = None
 
     def show_gif_toplevel(self):
         GifFrameApp(self)
