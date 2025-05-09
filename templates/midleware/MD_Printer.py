@@ -217,7 +217,7 @@ def subprocess_test():
     resultado = subprocess.run(["python3", ruta_script_motor] + argumentos, capture_output=True, text=True)
 
 def subprocess_control_motor(action, direction, location_z, motor, steps):
-    argumentos = ["--action", action, "--direction", direction, "--location_z", location_z, "--motor", motor, "--steps", steps]
+    argumentos = ["--action", action, "--direction", direction, "--location_z", location_z, "--motor", motor, "--steps", str(steps)]
     resultado = subprocess.run(["python3", ruta_script_motor] + argumentos, capture_output=True, text=True)
     print(resultado.stdout)
 

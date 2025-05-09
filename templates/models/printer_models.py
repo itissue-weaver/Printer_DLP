@@ -44,7 +44,7 @@ post_driver_motor_model = api.model(
         "location_z": fields.String(
             description="Location of the Z axis",
             example="top",
-            enum=["top", "button"],
+            enum=["top", "bottom"],
         ),
         "motor": fields.String(
             description="Motor to move",
