@@ -102,6 +102,7 @@ class ManualControl(ttk.Frame):
             steps=int(steps),
         )
         print(response, steps)
+        # controlar lo maximo que sube con el switch
 
     def down_callback(self, displacement):
         steps = 200 * int(displacement)/8
