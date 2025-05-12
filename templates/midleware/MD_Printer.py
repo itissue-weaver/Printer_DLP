@@ -155,48 +155,64 @@ def test_connection():
 
 
 def test_motor_post():
-    response = requests.post(
-        f"{server_domain + base_url}/test_motor", data=json.dumps({}), headers=headers
-    )
-    if response.status_code == 200:
-        data = response.json()
-        return 200, data
-    else:
-        return response.status_code, None
+    try:
+        response = requests.post(
+            f"{server_domain + base_url}/test_motor", data=json.dumps({}), headers=headers
+        )
+        if response.status_code == 200:
+            data = response.json()
+            return 200, data
+        else:
+            return response.status_code, None
+    except  Exception as e:
+        print("Error at testing motor:", e)
+        return 500, str(e)
 
 
 def control_motor_from_gui(action, direction, location_z, motor, steps):
-    response = requests.post(
-        f"{server_domain + base_url}/rotate/motor",
-        json={
-            "action": action,
-            "direction": direction,
-            "location_z": location_z,
-            "motor": motor,
-            "steps": steps,
-        },
-        headers=headers,
-    )
-    if response.status_code == 200:
-        data = response.json()
-        return 200, data
-    else:
-        return response.status_code, None
+    try:
+        response = requests.post(
+            f"{server_domain + base_url}/rotate/motor",
+            json={
+                "action": action,
+                "direction": direction,
+                "location_z": location_z,
+                "motor": motor,
+                "steps": steps,
+            },
+            headers=headers,
+        )
+        if response.status_code == 200:
+            data = response.json()
+            print(200, data)
+            return 200, data
+        else:
+            print(response.status_code, None)
+            return response.status_code, None
+    except  Exception as e:
+        print("Error at testing motor:", e)
+        return 500, str(e)
 
 
 def control_led_from_gui(state):
-    response = requests.post(
-        f"{server_domain + base_url}/led",
-        json={
-            "state": state,
-        },
-        headers=headers,
-    )
-    if response.status_code == 200:
-        data = response.json()
-        return 200, data
-    else:
-        return response.status_code, None
+    try:
+        response = requests.post(
+            f"{server_domain + base_url}/led",
+            json={
+                "state": state,
+            },
+            headers=headers,
+        )
+        if response.status_code == 200:
+            data = response.json()
+            print(200, data)
+            return 200, data
+        else:
+            print(response.status_code, None)
+            return response.status_code, None
+    except  Exception as e:
+        print("Error at testing led:", e)
+        return 500, str(e)
 
 def subprocess_test():
     # argumentos = ["--speed", "150", "--direction", "backward"]

@@ -40,7 +40,6 @@ def configure_styles():
     style.configure("Custom.Treeview.Heading", font=("Arial", 18, "bold"))
     style.configure("success.TButton", font=("Arial", 18))
     style.configure("primary.TButton", font=("Arial", 18))
-
     return style
 
 
@@ -60,9 +59,12 @@ class MainGUI(ttk.Window):
         image_save = image_save.resize((50, 50))
         image_control = Image.open(r"files/img/remote-control.jpg")
         image_control = image_control.resize((50, 50))
+        image_link = Image.open(r"files/img/link.png")
+        image_link = image_link.resize((50, 50))
         self.icon_control = ImageTk.PhotoImage(image_control)
         self.icon_config = ImageTk.PhotoImage(image_config)
         self.icon_save = ImageTk.PhotoImage(image_save)
+        self.icon_link = ImageTk.PhotoImage(image_link)
         self.frame_config = None
         self.connected = ttk.BooleanVar(value=False)
         # --------------------Start Animation -------------------
@@ -100,7 +102,7 @@ class MainGUI(ttk.Window):
         # --------------------footer-------------------
         self.frame_footer = ttk.Frame(self)
         self.frame_footer.grid(row=1, column=0, sticky="nsew", padx=15, pady=15)
-        self.frame_footer.columnconfigure((0, 1, 2, 3), weight=1)
+        self.frame_footer.columnconfigure((0, 1, 2, 3, 4), weight=1)
         ttk.Button(
             self.frame_footer,
             text="Configuration",
@@ -114,7 +116,8 @@ class MainGUI(ttk.Window):
             text="Test Connection",
             command=self.test_connection,
             style="success.TButton",
-            compound="right",
+            compound="left",
+            image=self.icon_link,
         )
         self.button_test.grid(row=0, column=1, sticky="e", padx=15, pady=15)
         self.txt_connected = ttk.StringVar(value="Disconnected")
@@ -130,7 +133,7 @@ class MainGUI(ttk.Window):
             image=self.icon_save,
             command=self.save_project,
             style="success.TButton",
-            compound="right",
+            compound="left",
         )
         self.button_save.grid(row=0, column=3, sticky="e", padx=15, pady=15)
         self.button_mControl = ttk.Button(
