@@ -88,7 +88,7 @@ class FrameBiomaterials(ttk.Frame):
     def load_biomaterial(self, bioink, is_init=False):
         materials = read_materials()
         settings = read_settings()
-        bioink = settings.get("mode_biomaterial", "mode_a") if is_init else bioink
+        bioink = settings.get("mode_biomaterial") if is_init else bioink
         bio_1 = materials.get("bioink_1", {})
         bio_2 = materials.get("bioink_2", {})
         bio_3 = materials.get("bioink_3", {})
@@ -186,8 +186,8 @@ class FrameBiomaterials(ttk.Frame):
                 is_found = False
                 materials_seq = [bio_1, bio_2, bio_3, bio_4]
         status_frames[0] = 0 if not is_found else 1
-        self.callbacks["change_tab_text"](status_frames)
-        update_settings(materials=materials_seq, mode_biomaterial=bioink)
+        update_settings(materials=materials_seq, mode_biomaterial=bioink, status_frames=status_frames)
+        self.callbacks["change_tab_text"](status_frames, "from init")
 
     def standard_formula_callback(self):
         SubFrameFormulaBiomaterial(self)

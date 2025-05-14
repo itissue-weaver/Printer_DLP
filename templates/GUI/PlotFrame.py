@@ -146,6 +146,9 @@ class SolidViewer(ttk.Frame):
         self.parts = parts
         self.plot_solid()
 
+    def save_image(self, filename="solid_view.png"):
+        self.figure.savefig(filename, dpi=300, bbox_inches='tight')
+        print(f"Imagen guardada como {filename}")
 
 class ImageFrameApp(ttk.Frame):
     def __init__(self, master):

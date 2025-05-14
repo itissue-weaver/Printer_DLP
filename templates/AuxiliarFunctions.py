@@ -58,6 +58,7 @@ def save_settings_to_project(project_key, settings):
     timestamp = datetime.now().strftime(format_timestamp)
     project["timestamp"] = timestamp
     projects[project_key] = project
+    # print("save project", project_key, settings["status_frames"])
     with open(projects_path, "w") as f:
         json.dump(projects, f, indent=4)
 

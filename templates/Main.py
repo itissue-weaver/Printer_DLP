@@ -111,6 +111,7 @@ class MainGUI(ttk.Window):
         self.notebook.add(self.tab4, text="Printing")
         # tab5 = FrameConfig(self.notebook)
         # self.notebook.add(tab5, text="Configuración")
+        self.callbacks["reload_treeview"] = self.tab0.reload_treeview
         # --------------------footer-------------------
         self.frame_footer = ttk.Frame(self)
         self.frame_footer.grid(row=1, column=0, sticky="nsew", padx=15, pady=15)
@@ -169,6 +170,7 @@ class MainGUI(ttk.Window):
     def save_project(self):
         settings = read_settings()
         save_settings_to_project(self.project_key, settings)
+        self.callbacks["reload_treeview"]()
 
     def click_config(self):
         if self.frame_config is None:
@@ -192,8 +194,10 @@ class MainGUI(ttk.Window):
     def show_gif_toplevel(self):
         GifFrameApp(self)
 
-    def change_tab_text(self, status_frame):
+    def change_tab_text(self, status_frame, from_s=""):
+        # print(status_frame,  from_s)
         for tab_index, status in enumerate(status_frame):
+            # print(tab_index, status)
             match tab_index + 1:
                 case 1:
                     new_text = "Biomaterials ❎" if status == 0 else "Biomaterials ✅"
@@ -212,7 +216,7 @@ class MainGUI(ttk.Window):
         self.title(new_title)
 
     def init_tabs(self):
-        self.tab3.load_biomaterial(None, True)
+        self.tab3.load_biomaterial("", True)
         self.tab1.set_geometry_from_file(True)
         self.tab2.check_parameter_settings()
         self.tab4.check_parameter_settings()

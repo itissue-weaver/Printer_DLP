@@ -87,6 +87,7 @@ def create_widgets_manual(master, icon_a_up, icon_a_down, icon_rotate, kwargs):
     var_led.trace_add("write", lambda *args: kwargs.get("led_callback")(var_led.get()))
     entries.append(var_led)
     ttk.Button(
+        
         frame_led,
         text="Select file",
         command=lambda: kwargs.get("layer_callback")(),

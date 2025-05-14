@@ -334,14 +334,14 @@ class SliceFile(ttk.Frame):
             if param not in settings.keys():
                 status_frames[2] = 0
                 break
-        self.callbacks["change_tab_text"](status_frames)
+        self.callbacks["change_tab_text"](status_frames, "from init slice")
         update_settings(status_frames=status_frames)
 
     def print_file_callback(self):
         if self.display_thread is not None:
             # kill the thread
             self.display_thread.join()
-        # ---------------------restrieve parameters--------------------
+        # ---------------------retrieve parameters--------------------
         rotation, scale, translation = get_geometry_parameters(self.entries)
         (
             hatcher_type,
@@ -370,7 +370,7 @@ class SliceFile(ttk.Frame):
         settings = read_settings()
         status_frames = settings.get("status_frames")
         status_frames[2] = 1
-        self.callbacks["change_tab_text"](status_frames)
+        self.callbacks["change_tab_text"](status_frames, "from slice print file")
 
     def scale_callback(self, value):
         value = float(value)

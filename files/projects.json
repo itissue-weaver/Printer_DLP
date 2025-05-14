@@ -240,7 +240,7 @@
             "max_y_part": 520.50994873,
             "max_z_part": 8.150760173839998,
             "status_frames": [
-                0,
+                1,
                 1,
                 1,
                 0
@@ -292,7 +292,7 @@
             ],
             "mode_biomaterial": "mode_1"
         },
-        "timestamp": "2025-03-27 09:48:00",
+        "timestamp": "2025-05-14 10:14:47",
         "user": "user 1",
         "status": 0
     }

@@ -275,7 +275,7 @@ class FramePrinting(ttk.Frame):
             if param not in settings.keys():
                 status_frames[2] = 0
                 break
-        self.callbacks["change_tab_text"](status_frames)
+        self.callbacks["change_tab_text"](status_frames, "from fprinting")
         update_settings(status_frames=status_frames)
 
     def print_callback(self):
@@ -312,7 +312,7 @@ class FramePrinting(ttk.Frame):
             )
         status_frames = settings.get("status_frames")
         status_frames[3] = 1
-        self.callbacks["change_tab_text"](status_frames)
+        self.callbacks["change_tab_text"](status_frames, "from print process")
 
     def on_update_progress(self, progress):
         if not self.is_sending:
