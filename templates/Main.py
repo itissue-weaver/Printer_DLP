@@ -43,6 +43,29 @@ def configure_styles():
     return style
 
 
+def load_images():
+    imgs_path = {
+        "arrow_up": r"files/img/arrow_up.png",
+        "arrow_down": r"files/img/arrow_down.png",
+        "rotate": r"files/img/rotate-icon.png",
+        "config": r"files/img/config.png",
+        "save": r"files/img/save_btn.png",
+        "control": r"files/img/remote-control.jpg",
+        "link": r"files/img/link.png",
+        "default": r"files/img/no_image.png",
+    }
+    imgs = {}
+    for key, path in imgs_path.items():
+        try:
+            img = Image.open(path)
+        except FileNotFoundError:
+            path = imgs_path["default"]
+            img = Image.open(path)
+        img = img.resize((50, 50))
+        imgs[key] = ImageTk.PhotoImage(img)
+    return imgs
+
+
 class MainGUI(ttk.Window):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -53,18 +76,7 @@ class MainGUI(ttk.Window):
         self.after(0, lambda: self.state("zoomed"))
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
-        image_config = Image.open(r"files/img/config.png")
-        image_config = image_config.resize((50, 50))
-        image_save = Image.open(r"files/img/save_btn.png")
-        image_save = image_save.resize((50, 50))
-        image_control = Image.open(r"files/img/remote-control.jpg")
-        image_control = image_control.resize((50, 50))
-        image_link = Image.open(r"files/img/link.png")
-        image_link = image_link.resize((50, 50))
-        self.icon_control = ImageTk.PhotoImage(image_control)
-        self.icon_config = ImageTk.PhotoImage(image_config)
-        self.icon_save = ImageTk.PhotoImage(image_save)
-        self.icon_link = ImageTk.PhotoImage(image_link)
+        self.imgs = load_images()
         self.frame_config = None
         self.connected = ttk.BooleanVar(value=False)
         # --------------------Start Animation -------------------
@@ -81,21 +93,21 @@ class MainGUI(ttk.Window):
         self.notebook.grid(row=0, column=0, sticky="nsew")
         self.notebook.columnconfigure(0, weight=1)
         self.notebook.rowconfigure(0, weight=1)
-        callbacks = {
-                "change_tab_text": self.change_tab_text,
-                "change_title": self.change_title,
-                "init_tabs": self.init_tabs,
-                "change_project": self.change_project_key,
-            }
-        self.tab0 = HomePage(self.notebook, callbacks=callbacks)
+        self.callbacks = {
+            "change_tab_text": self.change_tab_text,
+            "change_title": self.change_title,
+            "init_tabs": self.init_tabs,
+            "change_project": self.change_project_key,
+        }
+        self.tab0 = HomePage(self.notebook, callbacks=self.callbacks)
         self.notebook.add(self.tab0, text="Home")
-        self.tab3 = FrameBiomaterials(self.notebook,  callbacks=callbacks)
+        self.tab3 = FrameBiomaterials(self.notebook, callbacks=self.callbacks)
         self.notebook.add(self.tab3, text="Biomaterials")
-        self.tab1 = ReadFile(self.notebook,  callbacks=callbacks)
+        self.tab1 = ReadFile(self.notebook, callbacks=self.callbacks)
         self.notebook.add(self.tab1, text="Geometry")
-        self.tab2 = SliceFile(self.notebook,  callbacks=callbacks)
+        self.tab2 = SliceFile(self.notebook, callbacks=self.callbacks)
         self.notebook.add(self.tab2, text="Slicer")
-        self.tab4 = FramePrinting(self.notebook, callbacks=callbacks)
+        self.tab4 = FramePrinting(self.notebook, callbacks=self.callbacks)
         self.notebook.add(self.tab4, text="Printing")
         # tab5 = FrameConfig(self.notebook)
         # self.notebook.add(tab5, text="Configuración")
@@ -106,7 +118,7 @@ class MainGUI(ttk.Window):
         ttk.Button(
             self.frame_footer,
             text="Configuration",
-            image=self.icon_config,
+            image=self.imgs["config"],
             compound="left",
             command=self.click_config,
             style="Custom.TButton",
@@ -117,7 +129,7 @@ class MainGUI(ttk.Window):
             command=self.test_connection,
             style="success.TButton",
             compound="left",
-            image=self.icon_link,
+            image=self.imgs["link"],
         )
         self.button_test.grid(row=0, column=1, sticky="e", padx=15, pady=15)
         self.txt_connected = ttk.StringVar(value="Disconnected")
@@ -130,7 +142,7 @@ class MainGUI(ttk.Window):
         self.button_save = ttk.Button(
             self.frame_footer,
             text="Save project",
-            image=self.icon_save,
+            image=self.imgs["save"],
             command=self.save_project,
             style="success.TButton",
             compound="left",
@@ -141,11 +153,15 @@ class MainGUI(ttk.Window):
             text="Manual Control",
             command=self.click_manual_control,
             style="primary.TButton",
-            image=self.icon_control,
+            image=self.imgs["control"],
             compound="left",
         )
         self.button_mControl.grid(row=0, column=4, sticky="e", padx=15, pady=15)
         self.test_connection()
+
+    def reload_home(self):
+        if self.tab0 is not None:
+            self.tab0.reload_treeview()
 
     def change_project_key(self, project_key):
         self.project_key = project_key
@@ -163,7 +179,12 @@ class MainGUI(ttk.Window):
 
     def click_manual_control(self):
         if self.frame_m_control is None:
-            self.frame_m_control = ManualControlFrame(self)
+            imgs = {
+                "arrow_up": self.imgs["arrow_up"],
+                "arrow_down": self.imgs["arrow_down"],
+                "rotate": self.imgs["rotate"],
+            }
+            self.frame_m_control = ManualControlFrame(self, imgs=imgs)
 
     def on_m_control_close(self):
         self.frame_m_control = None

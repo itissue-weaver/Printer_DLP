@@ -3,6 +3,7 @@ __author__ = "Edisson A. Naula"
 __date__ = "$ 20/feb/2025  at 14:21 $"
 
 import json
+from tkinter import messagebox
 
 import ttkbootstrap as ttk
 from PIL import Image, ImageTk
@@ -12,6 +13,7 @@ from templates.AuxiliarFunctions import (
     read_projects,
     update_settings,
     create_new_project,
+    delete_project,
 )
 
 
@@ -69,18 +71,26 @@ class HomePage(ttk.Frame):
         ).grid(row=1, column=0, sticky="w", padx=10, pady=10)
         self.tv_projects = ttk.Treeview(
             self.frame_previous,
-            columns=("key", "name", "Last modified", "User", "Status", "data"),
+            columns=(
+                "key",
+                "name",
+                "Last modified",
+                "User",
+                "Status",
+                "data",
+                "action",
+            ),
             show="headings",
             style="Custom.Treeview",
         )
         self.tv_projects.grid(row=2, column=0, padx=10, pady=10)
         self.tv_projects.configure(
-            columns=("key", "name", "Last modified", "User", "Status", "data")
+            columns=("key", "name", "Last modified", "User", "Status", "data", "action")
         )
         for col in self.tv_projects["columns"]:
             self.tv_projects.heading(col, text=col.title(), anchor="w")
         self.tv_projects.configure(
-            columns=("key", "name", "Last modified", "User", "Status", "data")
+            columns=("key", "name", "Last modified", "User", "Status", "data", "action")
         )
 
         for col in self.tv_projects["columns"]:
@@ -97,12 +107,18 @@ class HomePage(ttk.Frame):
                 self.tv_projects.column(col, stretch=False, width=0)  # Ocultar columna
             elif col == "key":
                 self.tv_projects.column(col, stretch=False, width=0)  # Ocultar columna
+            elif col == "action":
+                self.tv_projects.column(
+                    col, stretch=False, width=120
+                )  # Ocultar columna
         # insert data
         for item in data_lists:
-            self.tv_projects.insert("", "end", values=item)
+            self.tv_projects.insert("", "end", values=item + ["Delete"])
         self.tv_projects.bind("<Double-1>", self.item_selected_treeview)
         self.frame_thumbnails = ttk.Frame(self)
-        self.frame_thumbnails.grid(row=0, column=2, columnspan=2, sticky="ew", padx=10, pady=10)
+        self.frame_thumbnails.grid(
+            row=0, column=2, columnspan=2, sticky="ew", padx=10, pady=10
+        )
         self.frame_thumbnails.columnconfigure(0, weight=1)
         self.render_thumbnails(path_no_image)
 
@@ -121,13 +137,44 @@ class HomePage(ttk.Frame):
         canvas_thumbnail.create_image(0, 0, anchor="nw", image=background_image)
         canvas_thumbnail.image = background_image
 
-
     def new_project_callback(self):
         if self.frame_new_project is None:
-            self.frame_new_project = NewProjectWindow(self)
+            callback = {"reload_treeview": self.reload_treeview}
+            self.frame_new_project = NewProjectWindow(self, callbacks=callback)
+
+    def reload_treeview(self):
+        projects = read_projects()
+        data_lists = [
+            [
+                k,
+                v.get("name"),
+                v.get("timestamp"),
+                v.get("user"),
+                v.get("status"),
+                json.dumps(v),
+            ]
+            for k, v in projects.items()
+        ]
+        data_lists.sort(key=lambda x: x[2], reverse=True)
+        self.tv_projects.delete(*self.tv_projects.get_children())
+        for item in data_lists:
+            self.tv_projects.insert("", "end", values=item + ["Delete"])
+        self.tv_projects.bind("<Double-1>", self.item_selected_treeview)
+        self.callbacks["change_project"](self.current_project_key)
 
     def item_selected_treeview(self, event):
-        values = event.widget.item(event.widget.selection()[0], "values")
+        values = event.widget.item(event.widget.selection()[0], "values")[:-1]
+        column = event.widget.identify_column(event.x)
+        column_index = int(column[1:]) - 1
+        if column_index == 6:
+            msg = "Are you sure to delete this project?"
+            answer = messagebox.askyesno("Delete Project", msg)
+            if answer == "No":
+                return
+            delete_project(values[0])
+            print("delete project", values[0])
+            self.reload_treeview()
+            return
         data = json.loads(values[-1])
         self.current_project_key = values[0]
         self.current_p_text.set(f"Current Project: {data.get('name')}")
@@ -142,13 +189,14 @@ class HomePage(ttk.Frame):
 
 
 class NewProjectWindow(ttk.Toplevel):
-    def __init__(self, master):
+    def __init__(self, master, **kwargs):
         super().__init__(master)
+        self.master = master
         self.title("New Project")
         self.attributes("-topmost", True)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
-        self.frame = NewProjectForm(self)
+        self.frame = NewProjectForm(self, **kwargs)
         self.frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
         self.protocol("WM_DELETE_WINDOW", self.on_close)
 
@@ -189,9 +237,10 @@ def create_widgets_form_new_project(master):
 
 
 class NewProjectForm(ttk.Frame):
-    def __init__(self, master, *kwargs):
+    def __init__(self, master, **kwargs):
         super().__init__(master)
         self.master = master
+        self.callbacks = kwargs.get("callbacks")
         self.columnconfigure(0, weight=1)
 
         ttk.Label(self, text="Project Data", font=font_title).grid(
@@ -226,5 +275,7 @@ class NewProjectForm(ttk.Frame):
                 "status": 0,
             }
         )
+        self.callbacks["reload_treeview"]()
+        print("create new project", data[0])
         if not from_parent:
             self.master.destroy()

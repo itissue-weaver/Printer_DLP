@@ -14,13 +14,13 @@ from tkinter import filedialog
 
 
 class ManualControlFrame(ttk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, **kwargs):
         super().__init__(parent)
         self.title("Manual Control")
         self.parent = parent
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
-        self.main_frame = ManualControl(self)
+        self.main_frame = ManualControl(self, **kwargs)
         self.main_frame.grid(row=0, column=0, sticky="nsew", padx=20, pady=20)
 
         self.protocol("WM_DELETE_WINDOW", self.close_callback)
@@ -28,6 +28,7 @@ class ManualControlFrame(ttk.Toplevel):
     def close_callback(self):
         self.parent.on_m_control_close()
         self.destroy()
+
 
 def create_widgets_manual(master, icon_a_up, icon_a_down, icon_rotate, kwargs):
     entries = []
@@ -97,23 +98,26 @@ def create_widgets_manual(master, icon_a_up, icon_a_down, icon_rotate, kwargs):
     return entries
 
 
-
 class ManualControl(ttk.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, **kwargs):
         super().__init__(parent)
         self.parent = parent
         self.thread_led = None
         self.thread_motor = None
         self.columnconfigure(0, weight=1)
-        image_a_up = Image.open(r"files/img/arrow_up.png")
-        image_a_up = image_a_up.resize((50, 50))
-        self.icon_a_up = ImageTk.PhotoImage(image_a_up)
-        image_a_down = Image.open(r"files/img/arrow_down.png")
-        image_a_down = image_a_down.resize((50, 50))
-        self.icon_a_down = ImageTk.PhotoImage(image_a_down)
-        image_rotate = Image.open(r"files/img/rotate-icon.png")
-        image_rotate = image_rotate.resize((50, 50))
-        self.icon_rotate = ImageTk.PhotoImage(image_rotate)
+        self.imgs = kwargs.get("imgs")
+        # image_a_up = Image.open(r"files/img/arrow_up.png")
+        # image_a_up = image_a_up.resize((50, 50))
+        # self.icon_a_up = ImageTk.PhotoImage(image_a_up)
+        self.icon_a_up = self.imgs["arrow_up"]
+        # image_a_down = Image.open(r"files/img/arrow_down.png")
+        # image_a_down = image_a_down.resize((50, 50))
+        # self.icon_a_down = ImageTk.PhotoImage(image_a_down)
+        self.icon_a_down = self.imgs["arrow_down"]
+        # image_rotate = Image.open(r"files/img/rotate-icon.png")
+        # image_rotate = image_rotate.resize((50, 50))
+        # self.icon_rotate = ImageTk.PhotoImage(image_rotate)
+        self.icon_rotate = self.imgs["rotate"]
         ttk.Label(self, text="Manual Control", font=font_title).grid(row=0, column=0, sticky="nsew")
         entries_frame = ttk.Frame(self)
         entries_frame.grid(row=1, column=0, sticky="nsew")

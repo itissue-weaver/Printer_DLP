@@ -49,12 +49,21 @@ def create_new_project(data):
 
 
 def save_settings_to_project(project_key, settings):
-    if  project_key is None:
+    if project_key is None:
         print("No project selected")
         return
     projects = read_projects()
     project = projects.get(project_key)
     project["settings"] = settings
+    timestamp = datetime.now().strftime(format_timestamp)
+    project["timestamp"] = timestamp
     projects[project_key] = project
+    with open(projects_path, "w") as f:
+        json.dump(projects, f, indent=4)
+
+
+def delete_project(project_key):
+    projects = read_projects()
+    del projects[project_key]
     with open(projects_path, "w") as f:
         json.dump(projects, f, indent=4)
