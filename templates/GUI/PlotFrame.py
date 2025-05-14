@@ -10,7 +10,7 @@ from matplotlib.figure import Figure
 import pyslm.visualise
 from PIL import Image, ImageTk
 
-from files.constants import image_path_projector
+from files.constants import image_path_projector, path_solid_capture
 from templates.AuxiliarHatcher import divide_solid_in_z_parts
 
 
@@ -134,6 +134,7 @@ class SolidViewer(ttk.Frame):
             )
         self.ax.set_axis_off()
         self.ax.set_title("3D Part")
+        self.save_image()
 
     def change_solid(self, solid_trimesh_part):
         self.ax.clear()
@@ -146,7 +147,7 @@ class SolidViewer(ttk.Frame):
         self.parts = parts
         self.plot_solid()
 
-    def save_image(self, filename="solid_view.png"):
+    def save_image(self, filename=path_solid_capture):
         self.figure.savefig(filename, dpi=300, bbox_inches='tight')
         print(f"Imagen guardada como {filename}")
 

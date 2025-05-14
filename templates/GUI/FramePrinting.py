@@ -134,6 +134,8 @@ def simulate_printing(master):
 class FramePrinting(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
+        self.button_refresh = None
+        self.frame_plot = None
         self.callbacks = kwargs.get("callbacks", {})
         self.file_handler = None
         self.plotter = None
@@ -155,27 +157,28 @@ class FramePrinting(ttk.Frame):
         self.frame_main_info.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
         self.frame_main_info.columnconfigure((0, 1, 2), weight=1)
         self.frame_main_info.rowconfigure(0, weight=1)
-        try:
-            filepath_stl = settings.get("filepath", "files/pyramid_test.stl")
-            os.path.exists(filepath_stl)
-            solid_trimesh_part, solid_part = read_stl(
-                file_path=settings.get("filepath", "files/pyramid_test.stl"),
-                scale=settings.get("scale"),
-                rotation=settings.get("rotation"),
-                traslation=settings.get("traslation"),
-            )
-            self.frame_plot = SolidViewer(
-                self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=4
-            )
-            self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
-        except Exception as e:
-            self.button_refresh = ttk.Button(
-                self.frame_main_info,
-                text="Read STL",
-                command=self.import_file_stl
-            )
-            self.button_refresh.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
-            print(e)
+        # try:
+        #     filepath_stl = settings.get("filepath", "files/pyramid_test.stl")
+        #     os.path.exists(filepath_stl)
+        #     solid_trimesh_part, solid_part = read_stl(
+        #         file_path=settings.get("filepath", "files/pyramid_test.stl"),
+        #         scale=settings.get("scale"),
+        #         rotation=settings.get("rotation"),
+        #         traslation=settings.get("traslation"),
+        #     )
+        #     self.frame_plot = SolidViewer(
+        #         self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=4
+        #     )
+        #     self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+        # except Exception as e:
+        #     self.button_refresh = ttk.Button(
+        #         self.frame_main_info,
+        #         text="Read STL",
+        #         command=self.import_file_stl
+        #     )
+        #     self.button_refresh.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+        #     print(e)
+        self.load_solid_viewer()
         self.frame_resume = ttk.Frame(self.frame_main_info)
         self.frame_resume.grid(row=0, column=1, sticky="nsew", padx=15, pady=15)
         self.frame_resume.columnconfigure((0, 1), weight=1)
@@ -259,6 +262,34 @@ class FramePrinting(ttk.Frame):
         ).grid(row=0, column=2, sticky="w", padx=5, pady=5)
         self.frame_progress.grid_forget()
 
+    def load_solid_viewer(self):
+        settings = read_settings()
+        if self.frame_plot is not None:
+            self.frame_plot.destroy()
+        try:
+            filepath_stl = settings.get("filepath", "files/pyramid_test.stl")
+            os.path.exists(filepath_stl)
+            solid_trimesh_part, solid_part = read_stl(
+                file_path=settings.get("filepath", "files/pyramid_test.stl"),
+                scale=settings.get("scale"),
+                rotation=settings.get("rotation"),
+                traslation=settings.get("traslation"),
+            )
+            self.frame_plot = SolidViewer(
+                self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=4
+            )
+            self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+        except Exception as e:
+            if self.button_refresh is not None:
+                self.button_refresh.destroy()
+            self.button_refresh = ttk.Button(
+                self.frame_main_info,
+                text="Read STL",
+                command=self.import_file_stl
+            )
+            self.button_refresh.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+            print(e)
+
     def capture_screen_callback(self):
         if self.file_handler is None:
             self.file_handler = TempFilesHandler()
@@ -277,6 +308,7 @@ class FramePrinting(ttk.Frame):
                 break
         self.callbacks["change_tab_text"](status_frames, "from fprinting")
         update_settings(status_frames=status_frames)
+        self.load_solid_viewer()
 
     def print_callback(self):
         if not self.is_sliced:

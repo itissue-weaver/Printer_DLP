@@ -8,7 +8,7 @@ from tkinter import messagebox
 import ttkbootstrap as ttk
 from PIL import Image, ImageTk
 
-from files.constants import font_buttons, font_title, path_no_image
+from files.constants import font_buttons, font_title, path_no_image, path_solid_capture
 from templates.AuxiliarFunctions import (
     read_projects,
     update_settings,
@@ -120,13 +120,16 @@ class HomePage(ttk.Frame):
             row=0, column=2, columnspan=2, sticky="ew", padx=10, pady=10
         )
         self.frame_thumbnails.columnconfigure(0, weight=1)
-        self.render_thumbnails(path_no_image)
+        self.render_thumbnails(path_solid_capture)
 
     def render_thumbnails(self, filepath):
         for child in self.frame_thumbnails.winfo_children():
             child.destroy()
-        image_thumbnail = Image.open(filepath)
-        image_thumbnail = image_thumbnail.resize((250, 150))
+        try:
+            image_thumbnail = Image.open(filepath)
+        except FileNotFoundError:
+            image_thumbnail = Image.open(path_no_image)
+        image_thumbnail = image_thumbnail.resize((250, 200))
         background_image = ImageTk.PhotoImage(image_thumbnail)
         canvas_thumbnail = ttk.Canvas(
             self.frame_thumbnails,
