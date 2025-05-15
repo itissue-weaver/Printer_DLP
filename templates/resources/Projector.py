@@ -119,11 +119,11 @@ class Start(Resource):
     def post(self):
         msg = ""
         # start the print
-        if projector.is_alive_projector():
-            msg += "Ok, projector is already running\n"
-            projector.stop_projecting()
-            sleep(1)
-            msg += "Ok, projector stopped\n"
+        # if projector.is_alive_projector():
+        #     msg += "Ok, projector is already running\n"
+        #     projector.stop_projecting()
+        #     sleep(1)
+        #     msg += "Ok, projector stopped\n"
         projector.start_projecting()
         msg += "Ok, projector started\n"
         # projector = DlpViewer()

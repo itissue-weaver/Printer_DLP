@@ -31,9 +31,11 @@ def send_start_print():
     if response.status_code == 200:
         data = response.json()
         response_queue.put((200, data))
+        print(200, data)
         return 200, data
     else:
         response_queue.put((response.status_code, None))
+        print(response.status_code, None)
         return response.status_code, None
 
 
