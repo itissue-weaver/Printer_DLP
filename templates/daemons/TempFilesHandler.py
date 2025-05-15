@@ -78,7 +78,7 @@ class TempFilesHandler(threading.Thread):
         )
         layer_sliced = 1
         with zipfile.ZipFile(self.filepath_zip, "w") as zipf:
-            for n_layer in range(1, num_layers + 1):
+            for n_layer in range(1, num_layers):
                 current_z = n_layer * layer_depth
                 # print(f"current_z: {current_z}")
                 geom_slice = solid_part.getVectorSlice(current_z)
@@ -104,8 +104,8 @@ class TempFilesHandler(threading.Thread):
                 self.update_progress(num_layers, layer_sliced)
                 layer_sliced += 1
                 zipf.write(f"files/img/temp{n_layer}.png", f"temp{n_layer}.png")
-                if os.path.exists(f"files/img/temp{n_layer}.png"):
-                    os.remove(f"files/img/temp{n_layer}.png")
+                # if os.path.exists(f"files/img/temp{n_layer}.png"):
+                #     os.remove(f"files/img/temp{n_layer}.png")
                 time.sleep(0.1)
         self.send_settings_and_file()
         return True

@@ -70,7 +70,7 @@ class LayerZip(Resource):
             return {"msg": "No se subió el archivo"}, 400
 
         # Guardar el fragmento en un archivo temporal
-        temp_file_path = os.path.join(path_temp_zip, f"temp_{zip_file_name}")
+        temp_file_path = os.path.join(path_temp_zip, f"{zip_file_name}")
         try:
             with open(temp_file_path, "ab") as temp_file:  # Append binary
                 temp_file.write(file.read())

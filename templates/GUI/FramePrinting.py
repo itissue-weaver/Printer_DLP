@@ -17,7 +17,7 @@ from templates.AuxiliarFunctions import read_settings, update_settings
 from templates.GUI.PlotFrame import SolidViewer
 from templates.GUI.SubFramePrinting import FramePrintingProcess
 from templates.daemons.TempFilesHandler import TempFilesHandler
-from templates.static.constants import response_queue
+from templates.daemons.constants import response_queue
 
 
 def create_widgets_status(master):
@@ -269,8 +269,10 @@ class FramePrinting(ttk.Frame):
         settings = read_settings()
         if self.frame_plot is not None:
             self.frame_plot.destroy()
+        filepath_stl = settings.get("filepath", "files/pyramid_test.stl")
+        n_parts = len(settings.get("sequence", []))
         try:
-            filepath_stl = settings.get("filepath", "files/pyramid_test.stl")
+            print(n_parts, filepath_stl)
             os.path.exists(filepath_stl)
             solid_trimesh_part, solid_part = read_stl(
                 file_path=settings.get("filepath", "files/pyramid_test.stl"),
@@ -279,7 +281,7 @@ class FramePrinting(ttk.Frame):
                 traslation=settings.get("traslation"),
             )
             self.frame_plot = SolidViewer(
-                self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=4
+                self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=n_parts
             )
             self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
         except Exception as e:
@@ -289,7 +291,7 @@ class FramePrinting(ttk.Frame):
                 self.frame_main_info, text="Read STL", command=self.import_file_stl
             )
             self.button_refresh.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
-            print(e)
+            print("error reading solid viewer", e)
 
     def capture_screen_callback(self):
         if self.file_handler is None:
@@ -439,8 +441,10 @@ class FramePrinting(ttk.Frame):
 
     def import_file_stl(self):
         settings = read_settings()
+        filepath_stl = settings.get("filepath", "files/pyramid_test.stl")
+        n_parts = len(settings.get("sequence", []))
         try:
-            filepath_stl = settings.get("filepath", "files/pyramid_test.stl")
+            print(n_parts, filepath_stl)
             os.path.exists(filepath_stl)
             solid_trimesh_part, solid_part = read_stl(
                 file_path=settings.get("filepath", "files/pyramid_test.stl"),
@@ -449,7 +453,7 @@ class FramePrinting(ttk.Frame):
                 traslation=settings.get("traslation"),
             )
             self.frame_plot = SolidViewer(
-                self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=4
+                self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=n_parts
             )
             self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
             if self.button_refresh is not None:

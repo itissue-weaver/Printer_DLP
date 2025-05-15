@@ -21,7 +21,7 @@ from files.constants import (
 )
 from templates.AuxiliarFunctions import read_settings
 from time import sleep
-from templates.static.constants import response_queue
+from templates.daemons.constants import response_queue
 
 
 def send_start_print():

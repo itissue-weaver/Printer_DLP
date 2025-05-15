@@ -1,5 +1,5 @@
 {
-    "filepath": "C:/Users/Weaver4/PycharmProjects/Printer_DLP/files/meniscus-flat.stl",
+    "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
     "rotation": [
         0.0,
         0.0,
@@ -15,9 +15,9 @@
         0.0,
         0.0
     ],
-    "width_part": 32.191,
-    "height_part": 38.168,
-    "depth_part": 8.151,
+    "width_part": 20.0,
+    "height_part": 20.0,
+    "depth_part": 20.0,
     "hatcher_type": "Base",
     "hatch_angle": 10.0,
     "volume_offset_hatch": 0.0,
@@ -27,12 +27,12 @@
     "hatch_spacing": 0.5,
     "stripe_width": 0.5,
     "projector_dimension": [
-        30.0,
-        20.0
+        48.0,
+        48.0
     ],
     "projector_resolution": [
-        1920,
-        1080
+        3840,
+        2160
     ],
     "projector_offset": [
         0.0,
@@ -40,11 +40,11 @@
         10.0
     ],
     "dpi": 300,
-    "layer_depth": 0.1,
+    "layer_depth": 1.0,
     "delta_layer": 5.0,
     "plate": 1,
     "HOST": "127.0.0.1",
-    "num_layers": 81,
+    "num_layers": 20,
     "material1": "Solucion1",
     "quantity1": 50.0,
     "material2": "Solution 2",
@@ -82,38 +82,28 @@
         1.0
     ],
     "centroide": [
-        36.423681095072496,
-        499.38455215701515,
-        9.719475415641815
+        0.0,
+        10.0,
+        0.0
     ],
     "sequence": [
         {
             "deposit": "1",
             "height_z": 10.0,
             "index": 0
-        },
-        {
-            "deposit": "3",
-            "height_z": 15.0,
-            "index": 1
-        },
-        {
-            "deposit": "1",
-            "height_z": 30.0,
-            "index": 2
         }
     ],
-    "min_x_part": 16.6114253998,
-    "min_y_part": 482.341949463,
+    "min_x_part": -10.0,
+    "min_y_part": 0.0,
     "min_z_part": 0.0,
-    "max_x_part": 48.8028106689,
-    "max_y_part": 520.50994873,
-    "max_z_part": 8.150760173839998,
+    "max_x_part": 10.0,
+    "max_y_part": 20.0,
+    "max_z_part": 20.0,
     "status_frames": [
         1,
         1,
         1,
-        1
+        0
     ],
     "materials": [
         {
