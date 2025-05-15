@@ -139,7 +139,7 @@ class NextLayer(Resource):
     def post(self):
         # next layer
         projector.star_reload_from_api()
-        return {"msg": "Ok, next layer", "data": projector.layer_count()}, 200
+        return {"msg": "Ok, next layer", "data": projector.layer_count_fun()}, 200
 
 
 @ns.route("/status")

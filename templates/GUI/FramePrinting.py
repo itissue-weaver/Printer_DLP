@@ -18,6 +18,7 @@ from templates.GUI.PlotFrame import SolidViewer
 from templates.GUI.SubFramePrinting import FramePrintingProcess
 from templates.daemons.TempFilesHandler import TempFilesHandler
 from templates.daemons.constants import response_queue
+from templates.midleware.MD_Printer import send_start_print
 
 
 def create_widgets_status(master):
@@ -324,7 +325,7 @@ class FramePrinting(ttk.Frame):
                 print("Esperando a que termine el hilo anterior...")
                 self.thread_start_print.join()
             # Iniciar nuevo hilo de impresión
-            self.thread_start_print = threading.Thread(target=self.send_start_print)
+            self.thread_start_print = threading.Thread(target=send_start_print)
             self.thread_start_print.start()
 
             # Iniciar el hilo de monitoreo

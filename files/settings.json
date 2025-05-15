@@ -44,7 +44,7 @@
     "delta_layer": 5.0,
     "plate": 1,
     "HOST": "127.0.0.1",
-    "num_layers": 81,
+    "num_layers": 20,
     "material1": "Solucion1",
     "quantity1": 50.0,
     "material2": "Solution 2",

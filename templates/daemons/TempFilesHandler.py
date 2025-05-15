@@ -101,8 +101,8 @@ class TempFilesHandler(threading.Thread):
                     height,
                     clean_plot=True,
                 )
-                self.update_progress(num_layers, layer_sliced)
                 layer_sliced += 1
+                self.update_progress(num_layers, layer_sliced)
                 zipf.write(f"files/img/temp{n_layer}.png", f"temp{n_layer}.png")
                 if os.path.exists(f"files/img/temp{n_layer}.png"):
                     os.remove(f"files/img/temp{n_layer}.png")

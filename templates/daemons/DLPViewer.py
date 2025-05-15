@@ -80,7 +80,7 @@ class DlpViewer(threading.Thread):
     def load_texture(self):
         texture = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, texture)
-        image = pygame.image.load(self.image_path).convert_alpha()
+        image = pygame.image.load("files/img/extracted/temp1.png").convert_alpha()
         image = pygame.transform.flip(image, False, False)  # Flip the image vertically
         image_data = pygame.image.tostring(image, "RGBA", True)
         width, height = image.get_rect().size
@@ -113,6 +113,7 @@ class DlpViewer(threading.Thread):
 
         self.texture = self.load_texture()
         print("first texture", self.texture)
+        self.layer_count +=1
         self.dlp = dlp4710(self.mode, change_mode=False)
 
     def run(self):
@@ -133,9 +134,9 @@ class DlpViewer(threading.Thread):
                 elapsed_time = current_time - self.last_time
                 # Comprobar si ha pasado delta_layer
                 if elapsed_time >= self.delta_layer:
-                    self.reload_image()  # Recargar imagen poner el path aqui
-                    self.last_time = current_time  # Resetear el temporizador
                     self.layer_count += 1
+                    self.reload_image(f"files/img/extracted/temp{self.layer_count}.png")  # Recargar imagen poner el path aqui
+                    self.last_time = current_time  # Resetear el temporizador
                     print(f"Reloaded layer {self.layer_count}")
                 self.dlp.clear()
                 glClearColor(0.0, 0.0, 0.0, 1.0)  # Set the clear color to black
@@ -229,5 +230,5 @@ class DlpViewer(threading.Thread):
         self.image_path = image if image else self.image_path
         print("image_path", self.image_path)
 
-    def layer_count(self):
+    def layer_count_fun(self):
         return self.layer_count
