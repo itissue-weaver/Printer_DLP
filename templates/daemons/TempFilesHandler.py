@@ -49,7 +49,7 @@ class TempFilesHandler(threading.Thread):
         max_z_part = settings.get("max_z_part")
         min_z_part = settings.get("min_z_part")
         total_z = max_z_part - min_z_part
-        num_layers = int(total_z / layer_depth)
+        num_layers = int(total_z / layer_depth)-1
         # read the stl file and calculate the layers
         # the geometry is placed(rotate and translate) against the platform XY
         solid_trimesh_part, solid_part = read_stl(
@@ -78,7 +78,7 @@ class TempFilesHandler(threading.Thread):
         )
         layer_sliced = 1
         with zipfile.ZipFile(self.filepath_zip, "w") as zipf:
-            for n_layer in range(1, num_layers):
+            for n_layer in range(1, num_layers+1):
                 current_z = n_layer * layer_depth
                 # print(f"current_z: {current_z}")
                 geom_slice = solid_part.getVectorSlice(current_z)

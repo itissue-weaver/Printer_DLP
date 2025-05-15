@@ -147,31 +147,31 @@ class DlpViewer(threading.Thread):
                 glPushMatrix()
                 glEnable(GL_TEXTURE_2D)
                 glBindTexture(GL_TEXTURE_2D, self.texture)
-                # glBegin(GL_QUADS)
-                # glTexCoord2f(0, 0)
-                # glVertex2f(-0.1, -0.1)
-                # glTexCoord2f(1, 0)
-                # glVertex2f(+0.1, -0.1)
-                # glTexCoord2f(1, 1)
-                # glVertex2f(+0.1, +0.1)
-                # glTexCoord2f(0, 1)
-                # glVertex2f(-0.1, +0.1)
-                # glEnd()
                 glBegin(GL_QUADS)
                 glTexCoord2f(0, 0)
-                glVertex2f(-0.05, 0.3)  # Esquina superior izquierda
+                glVertex2f(-0.1, -0.1)
                 glTexCoord2f(1, 0)
-                glVertex2f(+0.05, 0.3)  # Esquina superior derecha
+                glVertex2f(+0.1, -0.1)
                 glTexCoord2f(1, 1)
-                glVertex2f(+0.05, 0.4)  # Esquina inferior derecha
+                glVertex2f(+0.1, +0.1)
                 glTexCoord2f(0, 1)
-                glVertex2f(-0.05, 0.4)  # Esquina inferior izquierda
+                glVertex2f(-0.1, +0.1)
                 glEnd()
+                # glBegin(GL_QUADS)
+                # glTexCoord2f(0, 0)
+                # glVertex2f(-0.05, 0.3)  # Esquina superior izquierda
+                # glTexCoord2f(1, 0)
+                # glVertex2f(+0.05, 0.3)  # Esquina superior derecha
+                # glTexCoord2f(1, 1)
+                # glVertex2f(+0.05, 0.4)  # Esquina inferior derecha
+                # glTexCoord2f(0, 1)
+                # glVertex2f(-0.05, 0.4)  # Esquina inferior izquierda
+                # glEnd()
                 glDisable(GL_TEXTURE_2D)
                 glPopMatrix()
                 # self.dlp.show()
         finally:
-            self.cleanup()
+            # self.cleanup()
             pygame.quit()
             turn_on_off_led()
 
@@ -203,11 +203,10 @@ class DlpViewer(threading.Thread):
     def stop_projecting(self):
         thread_log = threading.Thread(target=write_log, args=("stop command",))
         thread_log.start()
+        pygame.quit()
         self.running = False
         self.layer_count = 0
-        pygame.quit()
         # self.cleanup()
-
         turn_on_off_led("off")
 
     def pause(self):
