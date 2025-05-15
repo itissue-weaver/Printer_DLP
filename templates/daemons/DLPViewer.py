@@ -150,7 +150,7 @@ class DlpViewer(threading.Thread):
                     self.layer_count += 1
                     thread_log = threading.Thread(target=write_log, args=(f"{self.layer_count}, {self.num_layers}",))
                     thread_log.start()
-                    if self.layer_count >= self.num_layers:
+                    if self.layer_count >= self.num_layers-1:
                         self.running = False
                     self.reload_image(f"files/img/extracted/temp{self.layer_count}.png")  # Recargar imagen poner el path aqui
                     self.last_time = current_time  # Resetear el temporizador
