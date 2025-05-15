@@ -151,6 +151,8 @@ class DlpViewer(threading.Thread):
                 # Comprobar si ha pasado delta_layer
                 if elapsed_time >= self.delta_layer:
                     self.layer_count += 1
+                    thread_log = threading.Thread(target=write_log, args=(f"{self.layer_count}, {self.num_layers}",))
+                    thread_log.start()
                     if self.layer_count > self.num_layers:
                         break
                     self.reload_image(f"files/img/extracted/temp{self.layer_count}.png")  # Recargar imagen poner el path aqui
