@@ -15,11 +15,13 @@ from files.constants import (
     base_url,
     headers,
     path_temp_zip,
-    zip_file_name, ruta_script_motor, ruta_script_led,
+    zip_file_name,
+    ruta_script_motor,
+    ruta_script_led,
 )
 from templates.AuxiliarFunctions import read_settings
-
 from time import sleep
+from templates.static.constants import response_queue
 
 
 def send_start_print():
@@ -28,8 +30,10 @@ def send_start_print():
     )
     if response.status_code == 200:
         data = response.json()
+        response_queue.put((200, data))
         return 200, data
     else:
+        response_queue.put((response.status_code, None))
         return response.status_code, None
 
 
@@ -157,14 +161,16 @@ def test_connection():
 def test_motor_post():
     try:
         response = requests.post(
-            f"{server_domain + base_url}/test_motor", data=json.dumps({}), headers=headers
+            f"{server_domain + base_url}/test_motor",
+            data=json.dumps({}),
+            headers=headers,
         )
         if response.status_code == 200:
             data = response.json()
             return 200, data
         else:
             return response.status_code, None
-    except  Exception as e:
+    except Exception as e:
         print("Error at testing motor:", e)
         return 500, str(e)
 
@@ -189,7 +195,7 @@ def control_motor_from_gui(action, direction, location_z, motor, steps):
         else:
             print(response.status_code, None)
             return response.status_code, None
-    except  Exception as e:
+    except Exception as e:
         print("Error at testing motor:", e)
         return 500, str(e)
 
@@ -210,34 +216,91 @@ def control_led_from_gui(state):
         else:
             print(response.status_code, None)
             return response.status_code, None
-    except  Exception as e:
+    except Exception as e:
         print("Error at testing led:", e)
         return 500, str(e)
+
 
 def subprocess_test():
     # argumentos = ["--speed", "150", "--direction", "backward"]
     argumentos = ["--action", "move_z_sw", "--direction", "cw", "--location_z", "top"]
-    resultado = subprocess.run(["python3", ruta_script_motor] + argumentos, capture_output=True, text=True)
-    argumentos = ["--action", "move_z_sw", "--direction", "ccw", "--location_z", "button"]
-    resultado = subprocess.run(["python3", ruta_script_motor] + argumentos, capture_output=True, text=True)
-    argumentos =  ["--state", "on"]
-    resultado = subprocess.run(["python3", ruta_script_led] + argumentos, capture_output=True, text=True)
+    resultado = subprocess.run(
+        ["python3", ruta_script_motor] + argumentos, capture_output=True, text=True
+    )
+    argumentos = [
+        "--action",
+        "move_z_sw",
+        "--direction",
+        "ccw",
+        "--location_z",
+        "button",
+    ]
+    resultado = subprocess.run(
+        ["python3", ruta_script_motor] + argumentos, capture_output=True, text=True
+    )
+    argumentos = ["--state", "on"]
+    resultado = subprocess.run(
+        ["python3", ruta_script_led] + argumentos, capture_output=True, text=True
+    )
     sleep(5)
-    argumentos =  ["--state", "off"]
-    resultado = subprocess.run(["python3", ruta_script_led] + argumentos, capture_output=True, text=True)
+    argumentos = ["--state", "off"]
+    resultado = subprocess.run(
+        ["python3", ruta_script_led] + argumentos, capture_output=True, text=True
+    )
     argumentos = ["--action", "move_z_sw", "--direction", "cw", "--location_z", "top"]
-    resultado = subprocess.run(["python3", ruta_script_motor] + argumentos, capture_output=True, text=True)
-    argumentos = ["--action", "rotate_motor", "--direction", "cw", "--motor", "plate", "--steps", "100"]
-    resultado = subprocess.run(["python3", ruta_script_motor] + argumentos, capture_output=True, text=True)
-    argumentos = ["--action", "rotate_motor", "--direction", "ccw", "--motor", "z", "--steps", "100"]
-    resultado = subprocess.run(["python3", ruta_script_motor] + argumentos, capture_output=True, text=True)
+    resultado = subprocess.run(
+        ["python3", ruta_script_motor] + argumentos, capture_output=True, text=True
+    )
+    argumentos = [
+        "--action",
+        "rotate_motor",
+        "--direction",
+        "cw",
+        "--motor",
+        "plate",
+        "--steps",
+        "100",
+    ]
+    resultado = subprocess.run(
+        ["python3", ruta_script_motor] + argumentos, capture_output=True, text=True
+    )
+    argumentos = [
+        "--action",
+        "rotate_motor",
+        "--direction",
+        "ccw",
+        "--motor",
+        "z",
+        "--steps",
+        "100",
+    ]
+    resultado = subprocess.run(
+        ["python3", ruta_script_motor] + argumentos, capture_output=True, text=True
+    )
+
 
 def subprocess_control_motor(action, direction, location_z, motor, steps):
-    argumentos = ["--action", action, "--direction", direction, "--location_z", location_z, "--motor", motor, "--steps", str(steps)]
-    resultado = subprocess.run(["python3", ruta_script_motor] + argumentos, capture_output=True, text=True)
+    argumentos = [
+        "--action",
+        action,
+        "--direction",
+        direction,
+        "--location_z",
+        location_z,
+        "--motor",
+        motor,
+        "--steps",
+        str(steps),
+    ]
+    resultado = subprocess.run(
+        ["python3", ruta_script_motor] + argumentos, capture_output=True, text=True
+    )
     print(resultado.stdout)
+
 
 def subprocess_control_led(state):
     argumentos = ["--state", state]
-    resultado = subprocess.run(["python3", ruta_script_led] + argumentos, capture_output=True, text=True)
+    resultado = subprocess.run(
+        ["python3", ruta_script_led] + argumentos, capture_output=True, text=True
+    )
     print(resultado.stdout)

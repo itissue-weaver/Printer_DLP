@@ -3,6 +3,7 @@ __author__ = "Edisson A. Naula"
 __date__ = "$ 19/feb/2025  at 21:18 $"
 
 import os
+import queue
 import threading
 import time
 
@@ -16,6 +17,7 @@ from templates.AuxiliarFunctions import read_settings, update_settings
 from templates.GUI.PlotFrame import SolidViewer
 from templates.GUI.SubFramePrinting import FramePrintingProcess
 from templates.daemons.TempFilesHandler import TempFilesHandler
+from templates.static.constants import response_queue
 
 
 def create_widgets_status(master):
@@ -130,16 +132,17 @@ def simulate_printing(master):
     master.update()
 
 
-
 class FramePrinting(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
+        self.monitor_running = False
+        self.thread_monitor = None
         self.button_refresh = None
         self.frame_plot = None
         self.callbacks = kwargs.get("callbacks", {})
         self.file_handler = None
         self.plotter = None
-        self.thread_sim = None
+        self.thread_start_print = None
         self.is_sliced = False
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
@@ -283,9 +286,7 @@ class FramePrinting(ttk.Frame):
             if self.button_refresh is not None:
                 self.button_refresh.destroy()
             self.button_refresh = ttk.Button(
-                self.frame_main_info,
-                text="Read STL",
-                command=self.import_file_stl
+                self.frame_main_info, text="Read STL", command=self.import_file_stl
             )
             self.button_refresh.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
             print(e)
@@ -297,9 +298,7 @@ class FramePrinting(ttk.Frame):
 
     def check_parameter_settings(self, settings=None):
         settings = read_settings() if settings is None else settings
-        param_list = [
-            "sequence"
-        ]
+        param_list = ["sequence"]
         status_frames = settings.get("status_frames", [0, 0, 0, 0])
         status_frames[2] = 1
         for param in param_list:
@@ -316,18 +315,79 @@ class FramePrinting(ttk.Frame):
             return
         self.is_printing = not self.is_printing
         if self.is_printing:
-            self.print_button.config(text="Stop printing")
-            self.print_button.config(bootstyle="danger")
-            if self.thread_sim is not None:
-                self.thread_sim.join()
-            self.thread_sim = threading.Thread(target=simulate_printing, args=(self,))
-            # self.thread_sim.start()
+            # Configurar botón
+            self.print_button.config(text="Stop printing", bootstyle="danger")
+            # Asegurar que no haya otro hilo `start print` en ejecución
+            if self.thread_start_print and self.thread_start_print.is_alive():
+                print("Esperando a que termine el hilo anterior...")
+                self.thread_start_print.join()
+            # Iniciar nuevo hilo de impresión
+            self.thread_start_print = threading.Thread(target=self.send_start_print)
+            self.thread_start_print.start()
+
+            # Iniciar el hilo de monitoreo
+            if not self.monitor_running:
+                self.monitor_running = True
+                self.thread_monitor = threading.Thread(target=self.monitor_response)
+                self.thread_monitor.start()
         else:
-            self.print_button.config(text="Print")
-            self.print_button.config(bootstyle="success")
-            if self.thread_sim is not None:
-                self.thread_sim.join()
-                self.is_settings_sent = False
+            # Restaurar botón
+            self.print_button.config(text="Print", bootstyle="success")
+
+            # Finalizar hilo de impresión si está activo
+            if self.thread_start_print and self.thread_start_print.is_alive():
+                self.thread_start_print.join()
+            self.thread_start_print = None
+
+            # Finalizar hilo de monitoreo si está activo
+            if self.thread_monitor and self.thread_monitor.is_alive():
+                self.monitor_running = False
+                self.thread_monitor.join()
+            self.thread_monitor = None
+
+    # def print_callback(self):
+    #     if not self.is_sliced:
+    #         Messagebox.show_error("Settings not sent", "Error")
+    #         return
+    #     self.is_printing = not self.is_printing
+    #     if self.is_printing:
+    #         self.print_button.config(text="Stop printing")
+    #         self.print_button.config(bootstyle="danger")
+    #         if self.thread_start_print is not None:
+    #             self.thread_start_print.join()
+    #         # self.thread_start_print = threading.Thread(target=simulate_printing, args=(self,))
+    #         self.thread_start_print = threading.Thread(target=send_start_print, args=())
+    #         self.thread_start_print.start()
+    #         self.thread_monitor = threading.Thread(target=self.monitor_response)
+    #         self.thread_monitor.start()
+    #     else:
+    #         self.print_button.config(text="Print")
+    #         self.print_button.config(bootstyle="success")
+    #         if (
+    #             self.thread_start_print is not None
+    #             and self.thread_start_print.is_alive()
+    #         ):
+    #             self.thread_start_print.join()
+    #             self.thread_start_print = None
+    #             self.is_settings_sent = False
+
+    def monitor_response(self):
+        """Monitorea la respuesta sin crear múltiples hilos innecesarios"""
+        while self.monitor_running:
+            try:
+                status, data = response_queue.get(timeout=1)  # Esperar respuesta
+
+                if status == 200:
+                    print(f"Start successful: {data}")
+                else:
+                    print(f"Error in request: {status}")
+
+                break  # Terminar el monitoreo después de recibir la respuesta
+
+            except queue.Empty:
+                time.sleep(0.5)  # Esperar antes de volver a intentar
+
+        print("Deteniendo hilo de monitoreo...")
 
     def callback_print_process(self):
         if self.frame_process_print is None:
@@ -398,9 +458,7 @@ class FramePrinting(ttk.Frame):
             if self.button_refresh is not None:
                 return
             self.button_refresh = ttk.Button(
-                self.frame_main_info,
-                text="Read STL",
-                command=self.import_file_stl
+                self.frame_main_info, text="Read STL", command=self.import_file_stl
             )
             print(e)
 

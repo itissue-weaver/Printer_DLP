@@ -4,7 +4,7 @@ __date__ = "$ 26/ene/2025  at 15:49 $"
 
 import threading
 import time
-from time import perf_counter
+from time import perf_counter, sleep
 
 import pygame
 from OpenGL.GL import glGenTextures, glTexImage2D, glBegin, glEnd
@@ -42,6 +42,21 @@ from Dlp4710 import Dlp4710 as dlp4710
 from files.constants import image_path_projector, settings_path
 
 import json
+
+from templates.midleware.MD_Printer import subprocess_control_led
+
+
+def turn_on_off_led(state="off"):
+    try:
+        thread_subprocess = threading.Thread(
+            target=subprocess_control_led, args=(state,)
+        )
+        thread_subprocess.start()
+        sleep(2)
+        return True
+    except Exception as e:
+        print(e)
+        return False
 
 
 class DlpViewer(threading.Thread):
@@ -109,9 +124,6 @@ class DlpViewer(threading.Thread):
             self.start_time = perf_counter()
             self.last_time = perf_counter()
             while self.running:
-                # if self.flag_reload:
-                #     self.reload_image()
-                #     self.flag_reload = False
                 if self.paused:
                     # Si está pausado, espera un momento antes de verificar de nuevo
                     time.sleep(0.1)
@@ -131,15 +143,25 @@ class DlpViewer(threading.Thread):
                 glPushMatrix()
                 glEnable(GL_TEXTURE_2D)
                 glBindTexture(GL_TEXTURE_2D, self.texture)
+                # glBegin(GL_QUADS)
+                # glTexCoord2f(0, 0)
+                # glVertex2f(-0.1, -0.1)
+                # glTexCoord2f(1, 0)
+                # glVertex2f(+0.1, -0.1)
+                # glTexCoord2f(1, 1)
+                # glVertex2f(+0.1, +0.1)
+                # glTexCoord2f(0, 1)
+                # glVertex2f(-0.1, +0.1)
+                # glEnd()
                 glBegin(GL_QUADS)
                 glTexCoord2f(0, 0)
-                glVertex2f(-0.1, -0.1)
+                glVertex2f(-0.05, 0.3)  # Esquina superior izquierda
                 glTexCoord2f(1, 0)
-                glVertex2f(+0.1, -0.1)
+                glVertex2f(+0.05, 0.3)  # Esquina superior derecha
                 glTexCoord2f(1, 1)
-                glVertex2f(+0.1, +0.1)
+                glVertex2f(+0.05, 0.4)  # Esquina inferior derecha
                 glTexCoord2f(0, 1)
-                glVertex2f(-0.1, +0.1)
+                glVertex2f(-0.05, 0.4)  # Esquina inferior izquierda
                 glEnd()
                 glDisable(GL_TEXTURE_2D)
                 glPopMatrix()
@@ -147,6 +169,7 @@ class DlpViewer(threading.Thread):
         finally:
             self.cleanup()
             pygame.quit()
+            turn_on_off_led()
 
     def process_sequence(self):
         """Controla el proceso basado en la secuencia."""
@@ -165,11 +188,16 @@ class DlpViewer(threading.Thread):
 
     def start_projecting(self):
         self.running = True
-        self.start()
+        is_led_on = turn_on_off_led("on")
+        if is_led_on:
+            self.start()
+        else:
+            print("Error al encender el led")
 
     def stop_projecting(self):
         self.running = False
         self.layer_count = 0
+        turn_on_off_led("off")
 
     def pause(self):
         """Pausa el proceso."""
@@ -188,7 +216,7 @@ class DlpViewer(threading.Thread):
         if self.dlp is not None:
             self.dlp.cleanup()
 
-    def star_reload(self, image=None):
+    def star_reload_from_api(self, image=None):
         while self.running:
             current_time = perf_counter()
             elapsed_layer_time = current_time - self.last_time

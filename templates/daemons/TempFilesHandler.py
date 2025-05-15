@@ -42,7 +42,6 @@ class TempFilesHandler(threading.Thread):
                 self.uncompress()
             case _:
                 print("Invalid type")
-                return
 
     def slice_and_compress(self):
         settings = read_settings()

@@ -2,6 +2,8 @@
 __author__ = "Edisson A. Naula"
 __date__ = "$ 05/feb/2025  at 21:21 $"
 
+import queue
+
 from flask_restx import Api
 
 from templates.daemons.DLPViewer import DlpViewer
@@ -21,6 +23,6 @@ PINS = {
         "SWITCH_0": 17,
         "SWITCH_1": 27
     }
-
+response_queue = queue.Queue()
 # controller_motor = MotorController(PINS)
 

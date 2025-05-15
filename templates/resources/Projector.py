@@ -11,10 +11,18 @@ from werkzeug.utils import secure_filename
 
 from files.constants import image_path_projector, zip_file_name, path_temp_zip
 from templates.AuxiliarFunctions import read_settings, update_settings
-from templates.midleware.MD_Printer import uncompres_files_zip, subprocess_test, subprocess_control_motor, \
-    subprocess_control_led
-from templates.models.printer_models import expected_files_almacen, post_settings_model, post_driver_motor_model, \
-    post_driver_led_model
+from templates.midleware.MD_Printer import (
+    uncompres_files_zip,
+    subprocess_test,
+    subprocess_control_motor,
+    subprocess_control_led,
+)
+from templates.models.printer_models import (
+    expected_files_almacen,
+    post_settings_model,
+    post_driver_motor_model,
+    post_driver_led_model,
+)
 from templates.static.constants import projector
 
 ns = Namespace("api/v1/printer")
@@ -73,13 +81,17 @@ class LayerZip(Resource):
         if range_end + 1 == total_size:  # Todos los bytes recibidos
             final_file_path = os.path.join(path_temp_zip, zip_file_name)
             os.rename(temp_file_path, final_file_path)
+            code, msg = uncompres_files_zip()
+            if code != 200:
+                return {"msg": msg}, 400
             return {"msg": f"Archivo subido exitosamente: {zip_file_name}"}, 200
-        code, msg = uncompres_files_zip()
-        # Responder si el fragmento fue recibido pero falta más
-        if code == 200:
-            return {"msg": "Fragmento recibido, descomprimido, esperando más datos"}, 200
         else:
-            return {"msg": msg}, 400
+            return {"msg": "Fragmento recibido, esperando más datos"}, 200
+        # # Responder si el fragmento fue recibido pero falta más
+        # if code == 200:
+        #     return {"msg": "Fragmento recibido, descomprimido, esperando más datos"}, 200
+        # else:
+        #     return {"msg": msg}, 400
 
 
 @ns.route("/settings")
@@ -126,7 +138,7 @@ class Stop(Resource):
 class NextLayer(Resource):
     def post(self):
         # next layer
-        projector.star_reload()
+        projector.star_reload_from_api()
         return {"msg": "Ok, next layer", "data": projector.layer_count()}, 200
 
 
@@ -140,6 +152,7 @@ class Status(Resource):
         else:
             return {"msg": "Ok, projector is not alive", "data": flag}, 200
 
+
 @ns.route("/test_motor")
 class TestMotor(Resource):
     def post(self):
@@ -147,13 +160,23 @@ class TestMotor(Resource):
         thread_subprocess.start()
         return {"msg": "Ok, motor test initiated"}, 200
 
+
 @ns.route("/rotate/motor")
 class RotateMotor(Resource):
     @ns.expect(post_driver_motor_model)
     def post(self):
         data = ns.payload
         try:
-            thread_subprocess = threading.Thread(target=subprocess_control_motor, args=(data["action"], data["direction"], data["location_z"], data["motor"], data["steps"]))
+            thread_subprocess = threading.Thread(
+                target=subprocess_control_motor,
+                args=(
+                    data["action"],
+                    data["direction"],
+                    data["location_z"],
+                    data["motor"],
+                    data["steps"],
+                ),
+            )
             thread_subprocess.start()
         except Exception as e:
             return {"msg": f"Error, motor test initiated: {str(e)}"}, 400
@@ -166,8 +189,10 @@ class Led(Resource):
     def post(self):
         data = ns.payload
         try:
-            thread_subprocess = threading.Thread(target=subprocess_control_led, args=(data["state"],))
+            thread_subprocess = threading.Thread(
+                target=subprocess_control_led, args=(data["state"],)
+            )
             thread_subprocess.start()
         except Exception as e:
-            return {"msg": f"Error, motor test initiated: {str(e)}"}, 400
-        return {"msg": "Ok, motor test initiated"}, 200
+            return {"msg": f"Error, led test initiated: {str(e)}"}, 400
+        return {"msg": "Ok, led test initiated"}, 200
