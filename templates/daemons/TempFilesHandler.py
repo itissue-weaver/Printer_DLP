@@ -104,8 +104,8 @@ class TempFilesHandler(threading.Thread):
                 self.update_progress(num_layers, layer_sliced)
                 layer_sliced += 1
                 zipf.write(f"files/img/temp{n_layer}.png", f"temp{n_layer}.png")
-                # if os.path.exists(f"files/img/temp{n_layer}.png"):
-                #     os.remove(f"files/img/temp{n_layer}.png")
+                if os.path.exists(f"files/img/temp{n_layer}.png"):
+                    os.remove(f"files/img/temp{n_layer}.png")
                 time.sleep(0.1)
         self.send_settings_and_file()
         return True
