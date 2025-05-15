@@ -13,7 +13,7 @@ from templates.AuxiliarFunctions import read_settings
 from templates.GUI.PlotFrame import PlotSTL
 from templates.midleware.MD_Printer import send_settings_printer, send_zip_file
 from templates.AuxiliarHatcher import build_hatcher
-
+from PIL import Image
 
 class TempFilesHandler(threading.Thread):
     def __init__(self, directory, zip_name, master_plot, type_c):
@@ -103,8 +103,21 @@ class TempFilesHandler(threading.Thread):
                 )
                 layer_sliced += 1
                 self.update_progress(num_layers, layer_sliced)
-                zipf.write(f"files/img/temp{n_layer}.png", f"temp{n_layer}.png")
                 if os.path.exists(f"files/img/temp{n_layer}.png"):
+
+                    # Abrir la imagen
+                    img = Image.open(f"files/img/temp{n_layer}.png")
+                    # Definir el nuevo tamaño máximo (por ejemplo, ajustándolo a 4096 en su lado más grande)
+                    max_size = 1024
+                    # Calcular la nueva dimensión manteniendo la relación de aspecto
+                    width, height = img.size
+                    scale = max_size / max(width, height)
+                    new_size = (int(width * scale), int(height * scale))
+                    # Redimensionar la imagen con la nueva escala
+                    img_resized = img.resize(new_size, Image.LANCZOS)
+                    # Guardar la nueva imagen
+                    img_resized.save(f"files/img/temp{n_layer}.png", dpi=(dpi, dpi))
+                    zipf.write(f"files/img/temp{n_layer}.png", f"temp{n_layer}.png")
                     os.remove(f"files/img/temp{n_layer}.png")
                 time.sleep(0.1)
         self.send_settings_and_file()

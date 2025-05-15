@@ -37,6 +37,21 @@ def send_start_print():
         return response.status_code, None
 
 
+def send_stop_print():
+    response = requests.post(
+        f"{server_domain + base_url}/stop", data=json.dumps({}), headers=headers
+    )
+    if response.status_code == 200:
+        data = response.json()
+        response_queue.put((200, data))
+        print(200, data)
+        return 200, data
+    else:
+        response_queue.put((response.status_code, None))
+        print(response.status_code, None)
+        return response.status_code, None
+
+
 def send_settings_printer():
     settings = read_settings()
     response = requests.post(
@@ -66,17 +81,6 @@ def get_settings_printer():
             return response.status_code, None
     except Exception as e:
         return response.status_code, str(e)
-
-
-def send_stop_print():
-    response = requests.post(
-        f"{server_domain + base_url}/stop", data=json.dumps({}), headers=headers
-    )
-    if response.status_code == 200:
-        data = response.json()
-        return 200, data
-    else:
-        return response.status_code, None
 
 
 def send_next_layer_file(image_path):

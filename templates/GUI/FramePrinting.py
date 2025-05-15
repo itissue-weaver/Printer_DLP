@@ -18,7 +18,7 @@ from templates.GUI.PlotFrame import SolidViewer
 from templates.GUI.SubFramePrinting import FramePrintingProcess
 from templates.daemons.TempFilesHandler import TempFilesHandler
 from templates.daemons.constants import response_queue
-from templates.midleware.MD_Printer import send_start_print
+from templates.midleware.MD_Printer import send_start_print, send_stop_print
 
 
 def create_widgets_status(master):
@@ -346,7 +346,14 @@ class FramePrinting(ttk.Frame):
             if self.thread_monitor and self.thread_monitor.is_alive():
                 self.monitor_running = False
                 self.thread_monitor.join()
+
+            # iniciar hilo de detenido
+            self.thread_start_print = threading.Thread(target=send_stop_print)
+            self.thread_start_print.start()
+
             self.thread_monitor = None
+
+
 
     # def print_callback(self):
     #     if not self.is_sliced:

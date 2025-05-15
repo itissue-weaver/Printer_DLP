@@ -7,6 +7,8 @@ from datetime import datetime
 
 from files.constants import settings_path, materials_path, projects_path, format_timestamp
 
+import os
+
 
 def update_settings(**kwargs):
     with open(settings_path, "r", encoding="utf-8") as f:
@@ -68,3 +70,11 @@ def delete_project(project_key):
     del projects[project_key]
     with open(projects_path, "w") as f:
         json.dump(projects, f, indent=4)
+
+
+def write_log(log_text):
+    # check if exist if not create
+    if not os.path.exists("log.txt"):
+        open("log.txt", "w").close()
+    with open("log.txt", "a") as f:
+        f.write(log_text + "\n")

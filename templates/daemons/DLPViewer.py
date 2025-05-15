@@ -43,6 +43,7 @@ from files.constants import image_path_projector, settings_path
 
 import json
 
+from templates.AuxiliarFunctions import write_log
 from templates.midleware.MD_Printer import subprocess_control_led
 
 
@@ -114,7 +115,7 @@ class DlpViewer(threading.Thread):
         self.texture = self.load_texture()
         print("first texture", self.texture)
         self.layer_count +=1
-        self.dlp = dlp4710(self.mode, change_mode=False)
+        # self.dlp = dlp4710(self.mode, change_mode=False)
 
     def run(self):
         try:
@@ -137,8 +138,10 @@ class DlpViewer(threading.Thread):
                     self.layer_count += 1
                     self.reload_image(f"files/img/extracted/temp{self.layer_count}.png")  # Recargar imagen poner el path aqui
                     self.last_time = current_time  # Resetear el temporizador
+                    thread_log = threading.Thread(target=write_log, args=(f"Layer {self.layer_count} loaded",))
+                    thread_log.start()
                     print(f"Reloaded layer {self.layer_count}")
-                self.dlp.clear()
+                # self.dlp.clear()
                 glClearColor(0.0, 0.0, 0.0, 1.0)  # Set the clear color to black
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)  #
                 glPushMatrix()
@@ -166,7 +169,7 @@ class DlpViewer(threading.Thread):
                 glEnd()
                 glDisable(GL_TEXTURE_2D)
                 glPopMatrix()
-                self.dlp.show()
+                # self.dlp.show()
         finally:
             self.cleanup()
             pygame.quit()
@@ -188,6 +191,8 @@ class DlpViewer(threading.Thread):
         return self.running
 
     def start_projecting(self):
+        thread_log = threading.Thread(target=write_log, args=("start command",))
+        thread_log.start()
         self.running = True
         is_led_on = turn_on_off_led("on")
         if is_led_on:
@@ -196,8 +201,13 @@ class DlpViewer(threading.Thread):
             print("Error al encender el led")
 
     def stop_projecting(self):
+        thread_log = threading.Thread(target=write_log, args=("stop command",))
+        thread_log.start()
         self.running = False
         self.layer_count = 0
+        pygame.quit()
+        # self.cleanup()
+
         turn_on_off_led("off")
 
     def pause(self):
