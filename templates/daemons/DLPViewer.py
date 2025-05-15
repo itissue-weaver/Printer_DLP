@@ -96,7 +96,7 @@ class DlpViewer(threading.Thread):
     def load_texture(self):
         texture = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, texture)
-        image = pygame.image.load("files/img/extracted/temp1.png").convert_alpha()
+        image = pygame.image.load(self.image_path).convert_alpha()
         image = pygame.transform.flip(image, False, False)  # Flip the image vertically
         image_data = pygame.image.tostring(image, "RGBA", True)
         width, height = image.get_rect().size
@@ -126,11 +126,8 @@ class DlpViewer(threading.Thread):
             -width / 2, +width / 2, -height / 2, +height / 2, -height / 2, +height / 2
         )
         glMatrixMode(GL_MODELVIEW)
-
         self.texture = self.load_texture()
-        print("first texture", self.texture)
         self.layer_count +=1
-        # self.dlp = dlp4710(self.mode, change_mode=False)
 
     def run(self):
         try:
@@ -153,13 +150,12 @@ class DlpViewer(threading.Thread):
                     self.layer_count += 1
                     thread_log = threading.Thread(target=write_log, args=(f"{self.layer_count}, {self.num_layers}",))
                     thread_log.start()
-                    if self.layer_count > self.num_layers:
-                        break
+                    if self.layer_count >= self.num_layers:
+                        self.running = False
                     self.reload_image(f"files/img/extracted/temp{self.layer_count}.png")  # Recargar imagen poner el path aqui
                     self.last_time = current_time  # Resetear el temporizador
                     thread_log = threading.Thread(target=write_log, args=(f"Layer {self.layer_count} loaded",))
                     thread_log.start()
-                    print(f"Reloaded layer {self.layer_count}")
                 # self.dlp.clear()
                 glClearColor(0.0, 0.0, 0.0, 1.0)  # Set the clear color to black
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)  #
@@ -188,11 +184,13 @@ class DlpViewer(threading.Thread):
                 # glEnd()
                 glDisable(GL_TEXTURE_2D)
                 glPopMatrix()
-                # self.dlp.show()
-        finally:
-            # self.cleanup()
-            pygame.quit()
-            turn_on_off_led()
+        except Exception as e:
+            print(e)
+            thread_log = threading.Thread(target=write_log, args=(f"Error: {e}", ))
+            thread_log.start()
+        turn_on_off_led()
+        pygame.display.quit()
+        pygame.quit()
 
     def process_sequence(self):
         """Controla el proceso basado en la secuencia."""
@@ -225,9 +223,10 @@ class DlpViewer(threading.Thread):
         thread_log.start()
         self.running = False
         self.layer_count = 0
-        # pygame.quit()
+        pygame.display.quit()
+        pygame.quit()
         # self.cleanup()
-        # turn_on_off_led("off")
+        turn_on_off_led("off")
 
     def pause(self):
         """Pausa el proceso."""
