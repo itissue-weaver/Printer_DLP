@@ -4,6 +4,7 @@ __date__ = "$ 05/feb/2025  at 21:17 $"
 
 import os
 import threading
+from time import sleep
 
 from flask import request
 from flask_restx import Namespace, Resource
@@ -11,6 +12,7 @@ from werkzeug.utils import secure_filename
 
 from files.constants import image_path_projector, zip_file_name, path_temp_zip
 from templates.AuxiliarFunctions import read_settings, update_settings
+from templates.daemons.DLPViewer import DlpViewer
 from templates.midleware.MD_Printer import (
     uncompres_files_zip,
     subprocess_test,
@@ -115,10 +117,18 @@ class Settings(Resource):
 @ns.route("/start")
 class Start(Resource):
     def post(self):
+        msg = ""
         # start the print
+        if projector.is_alive_projector():
+            msg += "Ok, projector is already running\n"
+            projector.stop_projecting()
+            sleep(1)
+            msg += "Ok, projector stopped\n"
         projector.start_projecting()
+        msg += "Ok, projector started\n"
+        # projector = DlpViewer()
         return {
-            "msg": "Ok, projector started",
+            "msg": msg,
             "data": projector.is_alive_projector(),
         }, 200
 

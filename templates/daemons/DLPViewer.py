@@ -63,6 +63,12 @@ def turn_on_off_led(state="off"):
 class DlpViewer(threading.Thread):
     def __init__(self, mode=60, image_path=image_path_projector):
         super().__init__()
+        self.num_layers = None
+        self.layer_count = None
+        self.layer_depth = None
+        self.sequence = None
+        self.delta_layer = None
+        self.settings = None
         self.flag_reload = False
         self.mode = mode
         self.image_path = image_path
@@ -72,11 +78,20 @@ class DlpViewer(threading.Thread):
         self.paused = False
         self.start_time = 0.0
         self.last_time = 0.0
+        self.load_variables()
+
+    def load_variables(self):
+        self.running = False
+        self.paused = False
+        self.start_time = 0.0
+        self.last_time = 0.0
+        self.flag_reload = False
         self.settings = json.load(open(settings_path, "r"))
         self.delta_layer = self.settings["delta_layer"]
         self.sequence = self.settings.get("sequence", [])  # Carga la secuencia
         self.layer_depth = self.settings.get("layer_depth", 1.0)  # Espesor de la capa
         self.layer_count = 0  # Contador de capas procesadas
+        self.num_layers = self.settings.get("num_layers", 0)  # Número de capas
 
     def load_texture(self):
         texture = glGenTextures(1)
@@ -136,6 +151,8 @@ class DlpViewer(threading.Thread):
                 # Comprobar si ha pasado delta_layer
                 if elapsed_time >= self.delta_layer:
                     self.layer_count += 1
+                    if self.layer_count > self.num_layers:
+                        break
                     self.reload_image(f"files/img/extracted/temp{self.layer_count}.png")  # Recargar imagen poner el path aqui
                     self.last_time = current_time  # Resetear el temporizador
                     thread_log = threading.Thread(target=write_log, args=(f"Layer {self.layer_count} loaded",))
@@ -191,6 +208,7 @@ class DlpViewer(threading.Thread):
         return self.running
 
     def start_projecting(self):
+        self.load_variables()
         thread_log = threading.Thread(target=write_log, args=("start command",))
         thread_log.start()
         self.running = True
@@ -203,11 +221,11 @@ class DlpViewer(threading.Thread):
     def stop_projecting(self):
         thread_log = threading.Thread(target=write_log, args=("stop command",))
         thread_log.start()
-        pygame.quit()
         self.running = False
         self.layer_count = 0
+        # pygame.quit()
         # self.cleanup()
-        turn_on_off_led("off")
+        # turn_on_off_led("off")
 
     def pause(self):
         """Pausa el proceso."""
