@@ -43,7 +43,7 @@ from files.constants import image_path_projector, settings_path
 import json
 
 from templates.AuxiliarFunctions import write_log
-from templates.midleware.MD_Printer import subprocess_control_led
+from templates.midleware.MD_Printer import subprocess_control_led, subprocess_control_motor
 
 
 def turn_on_off_led(state="off"):
@@ -154,6 +154,7 @@ class DlpViewer(threading.Thread):
                 # Comprobar si ha pasado delta_layer
                 if elapsed_time >= self.delta_layer:
                     self.layer_count += 1
+                    self.change_z_motor()
                     thread_log = threading.Thread(target=write_log, args=(f"{self.layer_count}, {self.num_layers}",))
                     thread_log.start()
                     print(f"{self.layer_count}, {self.num_layers}")
@@ -183,7 +184,7 @@ class DlpViewer(threading.Thread):
                 # glVertex2f(-0.1, +0.1)
                 # glEnd()
                 offset_x = (
-                    0.05  # Ajusta este valor para mover la imagen hacia la derecha
+                    0.00  # Ajusta este valor para mover la imagen hacia la derecha
                 )
                 offset_y = 0.05  # Ajusta este valor para mover la imagen hacia arriba
 
@@ -246,6 +247,12 @@ class DlpViewer(threading.Thread):
 
     def is_alive_projector(self):
         return self.running
+
+    def change_z_motor(self):
+        r = 8/200
+        steps = int(self.layer_depth / r)
+        result = subprocess_control_motor("move_z", "cw", "top", "z", steps)
+        print(steps, result)
 
     def start_projecting(self):
         self.load_variables()

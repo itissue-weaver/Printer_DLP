@@ -283,6 +283,7 @@ def subprocess_test():
     resultado = subprocess.run(
         ["python3", ruta_script_motor] + argumentos, capture_output=True, text=True
     )
+    return resultado.stdout
 
 
 def subprocess_control_motor(action, direction, location_z, motor, steps):
@@ -302,7 +303,7 @@ def subprocess_control_motor(action, direction, location_z, motor, steps):
         ["python3", ruta_script_motor] + argumentos, capture_output=True, text=True
     )
     print(resultado.stdout)
-
+    return resultado.stdout
 
 def subprocess_control_led(state):
     argumentos = ["--state", state]
@@ -310,3 +311,4 @@ def subprocess_control_led(state):
         ["python3", ruta_script_led] + argumentos, capture_output=True, text=True
     )
     print(resultado.stdout)
+    return resultado.stdout
