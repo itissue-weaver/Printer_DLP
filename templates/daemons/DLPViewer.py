@@ -38,7 +38,6 @@ from OpenGL.raw.GL.VERSION.GL_1_1 import glBindTexture
 from OpenGL.raw.GL.VERSION.GL_4_0 import GL_QUADS
 from OpenGL.raw.GL._types import GL_UNSIGNED_BYTE
 from pygame import OPENGL, DOUBLEBUF, FULLSCREEN
-from Dlp4710 import Dlp4710 as dlp4710
 from files.constants import image_path_projector, settings_path
 
 import json
@@ -100,6 +99,7 @@ class DlpViewer(threading.Thread):
         image = pygame.transform.flip(image, False, False)  # Flip the image vertically
         image_data = pygame.image.tostring(image, "RGBA", True)
         width, height = image.get_rect().size
+        print(f"Image size: {width}x{height}")
         glTexImage2D(
             GL_TEXTURE_2D,
             0,
@@ -125,9 +125,11 @@ class DlpViewer(threading.Thread):
         glOrtho(
             -width / 2, +width / 2, -height / 2, +height / 2, -height / 2, +height / 2
         )
+        print(f"Width: {W}, Height: {H}")
         glMatrixMode(GL_MODELVIEW)
         self.texture = self.load_texture()
-        self.layer_count +=1
+        print(f"Texture ID: {self.texture}")
+        self.layer_count += 1
 
     def run(self):
         try:
@@ -137,7 +139,11 @@ class DlpViewer(threading.Thread):
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
             self.start_time = perf_counter()
             self.last_time = perf_counter()
+            self.running = True
             while self.running:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.running = False
                 if self.paused:
                     # Si está pausado, espera un momento antes de verificar de nuevo
                     time.sleep(0.1)
@@ -148,49 +154,83 @@ class DlpViewer(threading.Thread):
                 # Comprobar si ha pasado delta_layer
                 if elapsed_time >= self.delta_layer:
                     self.layer_count += 1
-                    thread_log = threading.Thread(target=write_log, args=(f"{self.layer_count}, {self.num_layers}",))
-                    thread_log.start()
-                    if self.layer_count >= self.num_layers-1:
+                    # thread_log = threading.Thread(target=write_log, args=(f"{self.layer_count}, {self.num_layers}",))
+                    # thread_log.start()
+                    print(f"{self.layer_count}, {self.num_layers}")
+                    if self.layer_count >= self.num_layers - 1:
                         self.running = False
-                    self.reload_image(f"files/img/extracted/temp{self.layer_count}.png")  # Recargar imagen poner el path aqui
+                    self.reload_image(
+                        f"files/img/extracted/temp{self.layer_count}.png"
+                    )  # Recargar imagen poner el path aqui
                     self.last_time = current_time  # Resetear el temporizador
-                    thread_log = threading.Thread(target=write_log, args=(f"Layer {self.layer_count} loaded",))
-                    thread_log.start()
+                    # thread_log = threading.Thread(target=write_log, args=(f"Layer {self.layer_count} loaded",))
+                    # thread_log.start()
+                    print(f"Layer {self.layer_count} loaded")
                 # self.dlp.clear()
                 glClearColor(0.0, 0.0, 0.0, 1.0)  # Set the clear color to black
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)  #
                 glPushMatrix()
                 glEnable(GL_TEXTURE_2D)
                 glBindTexture(GL_TEXTURE_2D, self.texture)
-                glBegin(GL_QUADS)
-                glTexCoord2f(0, 0)
-                glVertex2f(-0.1, -0.1)
-                glTexCoord2f(1, 0)
-                glVertex2f(+0.1, -0.1)
-                glTexCoord2f(1, 1)
-                glVertex2f(+0.1, +0.1)
-                glTexCoord2f(0, 1)
-                glVertex2f(-0.1, +0.1)
-                glEnd()
                 # glBegin(GL_QUADS)
                 # glTexCoord2f(0, 0)
-                # glVertex2f(-0.05, 0.3)  # Esquina superior izquierda
+                # glVertex2f(-0.1, -0.1)
                 # glTexCoord2f(1, 0)
-                # glVertex2f(+0.05, 0.3)  # Esquina superior derecha
+                # glVertex2f(+0.1, -0.1)
                 # glTexCoord2f(1, 1)
-                # glVertex2f(+0.05, 0.4)  # Esquina inferior derecha
+                # glVertex2f(+0.1, +0.1)
                 # glTexCoord2f(0, 1)
-                # glVertex2f(-0.05, 0.4)  # Esquina inferior izquierda
+                # glVertex2f(-0.1, +0.1)
                 # glEnd()
+                offset_x = (
+                    0.05  # Ajusta este valor para mover la imagen hacia la derecha
+                )
+                offset_y = 0.05  # Ajusta este valor para mover la imagen hacia arriba
+
+                glBegin(GL_QUADS)
+                glTexCoord2f(0, 0)
+                glVertex2f(
+                    -0.1 + offset_x, -0.1 + offset_y
+                )  # Aplicando offsets en X y Y
+
+                glTexCoord2f(1, 0)
+                glVertex2f(
+                    +0.1 + offset_x, -0.1 + offset_y
+                )  # Aplicando offsets en X y Y
+
+                glTexCoord2f(1, 1)
+                glVertex2f(
+                    +0.1 + offset_x, +0.1 + offset_y
+                )  # Aplicando offsets en X y Y
+
+                glTexCoord2f(0, 1)
+                glVertex2f(
+                    -0.1 + offset_x, +0.1 + offset_y
+                )  # Aplicando offsets en X y Y
+                glEnd()
                 glDisable(GL_TEXTURE_2D)
                 glPopMatrix()
+                pygame.display.flip()
+                if not self.running:
+                    break
         except Exception as e:
             print(e)
-            thread_log = threading.Thread(target=write_log, args=(f"Error: {e}", ))
-            thread_log.start()
-        turn_on_off_led()
-        pygame.display.quit()
+            # thread_log = threading.Thread(target=write_log, args=(f"Error: {e}", ))
+            # thread_log.start()
+        glDisable(GL_TEXTURE_2D)
+        glDisable(GL_BLEND)
+        # try:
+        #     glDisable(GL_TEXTURE_2D)
+        #     glDisable(GL_BLEND)
+        # except Exception as e:
+        #     print(e)
+        # print("stop initiate")
+        # pygame.display.quit()
+        print("dsiplay quit")
         pygame.quit()
+        turn_on_off_led()
+        # pygame.display.quit()
+        # pygame.quit()
 
     def process_sequence(self):
         """Controla el proceso basado en la secuencia."""
@@ -223,10 +263,11 @@ class DlpViewer(threading.Thread):
         thread_log.start()
         self.running = False
         self.layer_count = 0
-        pygame.display.quit()
-        pygame.quit()
+
         # self.cleanup()
-        turn_on_off_led("off")
+        # turn_on_off_led("off")
+        # print("Projector stopped")
+        # sys.exit()
 
     def pause(self):
         """Pausa el proceso."""
