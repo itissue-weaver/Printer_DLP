@@ -154,8 +154,8 @@ class DlpViewer(threading.Thread):
                 # Comprobar si ha pasado delta_layer
                 if elapsed_time >= self.delta_layer:
                     self.layer_count += 1
-                    # thread_log = threading.Thread(target=write_log, args=(f"{self.layer_count}, {self.num_layers}",))
-                    # thread_log.start()
+                    thread_log = threading.Thread(target=write_log, args=(f"{self.layer_count}, {self.num_layers}",))
+                    thread_log.start()
                     print(f"{self.layer_count}, {self.num_layers}")
                     if self.layer_count >= self.num_layers - 1:
                         self.running = False
@@ -163,8 +163,8 @@ class DlpViewer(threading.Thread):
                         f"files/img/extracted/temp{self.layer_count}.png"
                     )  # Recargar imagen poner el path aqui
                     self.last_time = current_time  # Resetear el temporizador
-                    # thread_log = threading.Thread(target=write_log, args=(f"Layer {self.layer_count} loaded",))
-                    # thread_log.start()
+                    thread_log = threading.Thread(target=write_log, args=(f"Layer {self.layer_count} loaded",))
+                    thread_log.start()
                     print(f"Layer {self.layer_count} loaded")
                 # self.dlp.clear()
                 glClearColor(0.0, 0.0, 0.0, 1.0)  # Set the clear color to black
@@ -215,8 +215,8 @@ class DlpViewer(threading.Thread):
                     break
         except Exception as e:
             print(e)
-            # thread_log = threading.Thread(target=write_log, args=(f"Error: {e}", ))
-            # thread_log.start()
+            thread_log = threading.Thread(target=write_log, args=(f"Error: {e}", ))
+            thread_log.start()
         glDisable(GL_TEXTURE_2D)
         glDisable(GL_BLEND)
         # try:
