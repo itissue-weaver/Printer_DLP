@@ -10,7 +10,7 @@ from matplotlib.figure import Figure
 import pyslm.visualise
 from PIL import Image, ImageTk
 
-from files.constants import image_path_projector, path_solid_capture
+from files.constants import image_path_projector, path_solid_capture, desired_width_slice_image
 from templates.AuxiliarHatcher import divide_solid_in_z_parts
 
 
@@ -45,7 +45,7 @@ class PlotSTL(ttk.Frame):
                     self.axes.set_xlabel("X")
                     self.axes.set_ylabel("Y")
                     self.axes.set_zlabel("Z")
-                    self.axes.set_title("3D Part")
+                    # self.axes.set_title("3D Part")
 
     def plotLayer(
         self,
@@ -133,7 +133,7 @@ class SolidViewer(ttk.Frame):
                 color=color,
             )
         self.ax.set_axis_off()
-        self.ax.set_title("3D Part")
+        # self.ax.set_title("3D Part")
         self.save_image()
 
     def change_solid(self, solid_trimesh_part):
@@ -159,6 +159,7 @@ class ImageFrameApp(ttk.Frame):
         self.image = None
         self.image_start = None
         self.load_image()
+        # print("image loaded")
         self.create_widgets()
 
     def load_image(self):
@@ -170,16 +171,21 @@ class ImageFrameApp(ttk.Frame):
     def create_widgets(self):
         self.canvas = ttk.Canvas(self.master)
         self.canvas.grid(row=0, column=0, sticky="n")
+        # print("canvas created")
         if self.image is not None:
             self.show_image()
 
     def show_image(self):
         width, height = self.image.size
-        new_width = int(width / 2.5)
-        new_height = int(height / 2.5)
-        resized_image = self.image.resize((new_width, new_height))
+        desired_width = desired_width_slice_image
+        factor = desired_width / width
+        new_height = int(height * factor)
+        # resized_image = self.image.resize((desired_width, new_height))
+        resized_image = self.image.resize((desired_width, new_height)).convert("RGB")
+        # print("image resized",  desired_width, new_height)
         self.image_start = ImageTk.PhotoImage(resized_image)
-        self.canvas.config(width=new_width, height=new_height)
+        # print("image resized")
+        self.canvas.config(width=desired_width, height=new_height)
         self.canvas.create_image(0, 0, anchor="nw", image=self.image_start)
 
     def reaload_image(self):

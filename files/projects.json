@@ -301,7 +301,7 @@
         "user": "Edisson",
         "thumbnail": "",
         "status": 0,
-        "timestamp": "2025-05-15 09:30:10",
+        "timestamp": "2025-05-16 14:13:11",
         "settings": {
             "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
             "rotation": [
@@ -344,7 +344,168 @@
                 10.0
             ],
             "dpi": 300,
-            "layer_depth": 1.0,
+            "layer_depth": 0.5,
+            "delta_layer": 50.0,
+            "plate": 1,
+            "HOST": "127.0.0.1",
+            "num_layers": 40,
+            "material1": "Solucion1",
+            "quantity1": 50.0,
+            "material2": "Solution 2",
+            "quantity2": 70.0,
+            "material3": "Water",
+            "quantity3": 100.0,
+            "material4": "Water",
+            "quantity4": 100.0,
+            "max_level1": 100.0,
+            "shape1": "Cylinder",
+            "dimensions1": [
+                0.0,
+                1.0,
+                1.0
+            ],
+            "max_level2": 100.0,
+            "shape2": "Cylinder",
+            "dimensions2": [
+                0.0,
+                1.0,
+                1.0
+            ],
+            "max_level3": 100.0,
+            "shape3": "Rectangle",
+            "dimensions3": [
+                0.0,
+                1.0,
+                1.0
+            ],
+            "max_level4": 100.0,
+            "shape4": "Cylinder",
+            "dimensions4": [
+                0.0,
+                1.0,
+                1.0
+            ],
+            "centroide": [
+                0.0,
+                10.0,
+                0.0
+            ],
+            "sequence": [
+                {
+                    "deposit": "1",
+                    "height_z": 10.0,
+                    "index": 0
+                }
+            ],
+            "min_x_part": -10.0,
+            "min_y_part": 0.0,
+            "min_z_part": 0.0,
+            "max_x_part": 10.0,
+            "max_y_part": 20.0,
+            "max_z_part": 20.0,
+            "status_frames": [
+                1,
+                1,
+                1,
+                0
+            ],
+            "materials": [
+                {
+                    "layer": "Superficial",
+                    "components": [
+                        "PEGDA + (5-10)% Bioglass",
+                        "Condrocyte",
+                        "TGF-\beta 0.1 ng/ml"
+                    ],
+                    "layer_depth": 0.5,
+                    "layer_delta": 1,
+                    "max_volume": 100
+                },
+                {
+                    "layer": "Intermediate",
+                    "components": [
+                        "PEGDA + (10-15)% Bioglass",
+                        "TGF-\beta 0.5 ng/ml"
+                    ],
+                    "layer_depth": 0.5,
+                    "layer_delta": 1,
+                    "max_volume": 100
+                },
+                {
+                    "layer": "Deep",
+                    "components": [
+                        "PEGDA + (15-20)% Bioglass",
+                        "Condrocyte",
+                        "TGF-\beta (1-5) ng/ml / BMP (1-10) ng/ml"
+                    ],
+                    "layer_depth": 0.5,
+                    "layer_delta": 1,
+                    "max_volume": 100
+                },
+                {
+                    "layer": "Interphase (osteochondrial)",
+                    "components": [
+                        "PEGDA + (20-30)% Bioglass",
+                        "Inorganic salts (calcium or phosphorus)",
+                        "TGF-\beta 0.1 ng/ml"
+                    ],
+                    "layer_depth": 0.5,
+                    "layer_delta": 1,
+                    "max_volume": 100
+                }
+            ],
+            "mode_biomaterial": "mode_1"
+        }
+    },
+    "prueba2": {
+        "name": "prueba 2",
+        "user": "prueba",
+        "thumbnail": "",
+        "status": 0,
+        "timestamp": "2025-05-16 14:33:34",
+        "settings": {
+            "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "width_part": 20.0,
+            "height_part": 20.0,
+            "depth_part": 20.0,
+            "hatcher_type": "Base",
+            "hatch_angle": 10.0,
+            "volume_offset_hatch": 0.0,
+            "spot_compensation": 0.0,
+            "num_inner_contours": 2,
+            "num_outer_contours": 1,
+            "hatch_spacing": 0.5,
+            "stripe_width": 0.5,
+            "projector_dimension": [
+                30.0,
+                20.0
+            ],
+            "projector_resolution": [
+                1920,
+                1080
+            ],
+            "projector_offset": [
+                0.0,
+                0.0,
+                10.0
+            ],
+            "dpi": 300,
+            "layer_depth": 0.1,
             "delta_layer": 5.0,
             "plate": 1,
             "HOST": "127.0.0.1",
@@ -455,6 +616,21 @@
                 }
             ],
             "mode_biomaterial": "mode_1"
+        }
+    },
+    "meniscoprueba": {
+        "name": "menisco prueba",
+        "user": "iml",
+        "thumbnail": "",
+        "status": 0,
+        "timestamp": "2025-05-16 15:03:17",
+        "settings": {
+            "status_frames": [
+                0,
+                0,
+                0,
+                0
+            ]
         }
     }
 }

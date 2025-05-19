@@ -281,7 +281,6 @@ class FramePrinting(ttk.Frame):
         filepath_stl = settings.get("filepath", "files/pyramid_test.stl")
         n_parts = len(settings.get("sequence", []))
         try:
-            print(n_parts, filepath_stl)
             os.path.exists(filepath_stl)
             solid_trimesh_part, solid_part = read_stl(
                 file_path=settings.get("filepath", "files/pyramid_test.stl"),
@@ -456,7 +455,6 @@ class FramePrinting(ttk.Frame):
         filepath_stl = settings.get("filepath", "files/pyramid_test.stl")
         n_parts = len(settings.get("sequence", []))
         try:
-            print(n_parts, filepath_stl)
             os.path.exists(filepath_stl)
             solid_trimesh_part, solid_part = read_stl(
                 file_path=settings.get("filepath", "files/pyramid_test.stl"),

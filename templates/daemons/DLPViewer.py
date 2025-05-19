@@ -154,7 +154,9 @@ class DlpViewer(threading.Thread):
                 # Comprobar si ha pasado delta_layer
                 if elapsed_time >= self.delta_layer:
                     self.layer_count += 1
+                    turn_on_off_led(state="off")
                     self.change_z_motor()
+                    turn_on_off_led(state="on")
                     thread_log = threading.Thread(target=write_log, args=(f"{self.layer_count}, {self.num_layers}",))
                     thread_log.start()
                     print(f"{self.layer_count}, {self.num_layers}")
@@ -250,8 +252,12 @@ class DlpViewer(threading.Thread):
 
     def change_z_motor(self):
         r = 8/200
-        steps = int(self.layer_depth / r)
+        dist_free = 3   # 3 mm
+        steps = int(dist_free/r)
         result = subprocess_control_motor("move_z", "cw", "top", "z", steps)
+        print(steps, result)
+        steps = int(dist_free-self.layer_depth / r)
+        result = subprocess_control_motor("move_z", "ccw", "top", "z", steps)
         print(steps, result)
 
     def start_projecting(self):

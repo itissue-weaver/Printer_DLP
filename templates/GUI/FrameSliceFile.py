@@ -305,6 +305,7 @@ class SliceFile(ttk.Frame):
             callback_sliceFile=self.slice_geometry,
             callback_saveSettings=self.print_file_callback,
         )
+        print("init slice file")
 
     def check_parameter_settings(self, settings=None):
         settings = read_settings() if settings is None else settings
@@ -438,7 +439,7 @@ class SliceFile(ttk.Frame):
                     self,
                     layer=None,
                     type_plot="layer",
-                    dpi=dpi,
+                    dpi=200,
                     save_temp_flag=True,
                     path_to_save="files/img/temp.png",
                 )
@@ -447,7 +448,7 @@ class SliceFile(ttk.Frame):
             width = settings.get("width_part", 0.0)
             height = settings.get("height_part", 0.0)
             self.plotter.plotLayer(
-                dpi,
+                200,
                 layer,
                 projector_dimension[0],
                 projector_dimension[1],

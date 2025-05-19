@@ -27,12 +27,12 @@
     "hatch_spacing": 0.5,
     "stripe_width": 0.5,
     "projector_dimension": [
-        48.0,
-        48.0
+        30.0,
+        20.0
     ],
     "projector_resolution": [
-        3840,
-        2160
+        1920,
+        1080
     ],
     "projector_offset": [
         0.0,
@@ -40,7 +40,7 @@
         10.0
     ],
     "dpi": 300,
-    "layer_depth": 1.0,
+    "layer_depth": 0.1,
     "delta_layer": 5.0,
     "plate": 1,
     "HOST": "127.0.0.1",

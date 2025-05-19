@@ -2,6 +2,7 @@
 __author__ = "Edisson A. Naula"
 __date__ = "$ 22/ene/2025  at 18:56 $"
 
+import threading
 
 import ttkbootstrap as ttk
 from PIL import Image, ImageTk
@@ -99,16 +100,22 @@ class MainGUI(ttk.Window):
             "init_tabs": self.init_tabs,
             "change_project": self.change_project_key,
         }
+        print("init tabs")
         self.tab0 = HomePage(self.notebook, callbacks=self.callbacks)
         self.notebook.add(self.tab0, text="Home")
+        print("init tabs home")
         self.tab3 = FrameBiomaterials(self.notebook, callbacks=self.callbacks)
         self.notebook.add(self.tab3, text="Biomaterials")
+        print("init tabs biomaterials")
         self.tab1 = ReadFile(self.notebook, callbacks=self.callbacks)
         self.notebook.add(self.tab1, text="Geometry")
+        print("init tabs geometry")
         self.tab2 = SliceFile(self.notebook, callbacks=self.callbacks)
         self.notebook.add(self.tab2, text="Slicer")
+        print("init tabs slicer")
         self.tab4 = FramePrinting(self.notebook, callbacks=self.callbacks)
         self.notebook.add(self.tab4, text="Printing")
+        print("init tabs printing")
         # tab5 = FrameConfig(self.notebook)
         # self.notebook.add(tab5, text="Configuración")
         self.callbacks["reload_treeview"] = self.tab0.reload_treeview
@@ -128,7 +135,7 @@ class MainGUI(ttk.Window):
             self.frame_footer,
             text="Test Connection",
             command=self.test_connection,
-            style="success.TButton",
+            style="danger.TButton",
             compound="left",
             image=self.imgs["link"],
         )
@@ -158,7 +165,9 @@ class MainGUI(ttk.Window):
             compound="left",
         )
         self.button_mControl.grid(row=0, column=4, sticky="e", padx=15, pady=15)
-        self.test_connection()
+        print("init tabs footer")
+        self.thread_connection = threading.Thread(target=self.test_connection)
+        self.thread_connection.start()
 
     def reload_home(self):
         if self.tab0 is not None:
