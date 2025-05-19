@@ -22,7 +22,6 @@ class ManualControlFrame(ttk.Toplevel):
         self.rowconfigure(0, weight=1)
         self.main_frame = ManualControl(self, **kwargs)
         self.main_frame.grid(row=0, column=0, sticky="nsew", padx=20, pady=20)
-
         self.protocol("WM_DELETE_WINDOW", self.close_callback)
 
     def close_callback(self):
@@ -50,12 +49,28 @@ def create_widgets_manual(master, icon_a_up, icon_a_down, icon_rotate, kwargs):
     ).grid(row=2, column=0, sticky="n", pady=10, columnspan=2)
     ttk.Button(
         frame_platform,
+        image=icon_a_up,
+        command=lambda: kwargs.get("up_top_callback")(),
+        text="Up sw",
+        compound="right",
+        style="success.TButton"
+    ).grid(row=2, column=1, sticky="n", pady=10, columnspan=2, padx=10)
+    ttk.Button(
+        frame_platform,
         image=icon_a_down,
         command=lambda: kwargs.get("down_callback")(svar_displacement.get()),
         text="Down",
         compound="right",
         style="success.TButton"
     ).grid(row=3, column=0, sticky="n", pady=10, columnspan=2)
+    ttk.Button(
+        frame_platform,
+        image=icon_a_down,
+        command=lambda: kwargs.get("down_bottom_callback")(),
+        text="Down sw",
+        compound="right",
+        style="success.TButton"
+    ).grid(row=3, column=1, sticky="n", pady=10, columnspan=2, padx=10)
     frame_vat = ttk.LabelFrame(master, text="VAT Control", style="Custom.TLabelframe", padding=3)
     frame_vat.grid(row=1, column=0, sticky="nsew",  padx=10, pady=10)
     frame_vat.columnconfigure((0, 1), weight=1)
@@ -128,7 +143,9 @@ class ManualControl(ttk.Frame):
             "down_callback": self.down_callback,
             "vat_callback": self.vat_callback,
             "led_callback": self.led_callback,
-            "layer_callback":  self.layer_callback
+            "layer_callback":  self.layer_callback,
+            "up_top_callback": self.up_top_callback,
+            "down_bottom_callback": self.down_bottom_callback,
         }
         self.entries = create_widgets_manual(entries_frame, self.icon_a_up, self.icon_a_down, self.icon_rotate, kwargs=kwargs)
 
@@ -147,6 +164,26 @@ class ManualControl(ttk.Frame):
         else:
             print("Motor is already running... Wait until it finishes")
         # controlar lo maximo que sube con el switch
+            if not self.thread_motor.is_alive():
+                self.thread_motor.join()
+                self.thread_motor = None
+
+    def up_top_callback(self):
+        if self.thread_motor is None or not self.thread_motor.is_alive():
+            self.thread_motor = threading.Thread(target=control_motor_from_gui, args=("move_z_sw", "cw", "top", "z", 0, ))
+            self.thread_motor.start()
+        else:
+            print("Motor is already running... Wait until it finishes")
+            if not self.thread_motor.is_alive():
+                self.thread_motor.join()
+                self.thread_motor = None
+
+    def down_bottom_callback(self):
+        if self.thread_motor is None or not self.thread_motor.is_alive():
+            self.thread_motor = threading.Thread(target=control_motor_from_gui, args=("move_z_sw", "ccw", "bottom", "z", 0,))
+            self.thread_motor.start()
+        else:
+            print("Motor is already running... Wait until it finishes")
             if not self.thread_motor.is_alive():
                 self.thread_motor.join()
                 self.thread_motor = None

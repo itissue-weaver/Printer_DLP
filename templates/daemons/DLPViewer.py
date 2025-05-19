@@ -134,9 +134,22 @@ class DlpViewer(threading.Thread):
         print(f"Texture ID: {self.texture}")
         self.layer_count += 1
 
+    def init_motors(self):
+        # "move_z_sw", "cw", "top", "z", 0,
+        r = 8/200
+        msg = ""
+        result = subprocess_control_motor("move_z_sw", "ccw", "bottom", "z", 0)
+        msg += f"move z to sw {result}"
+        steps = int(self.layer_depth / r)
+        result = subprocess_control_motor("move_z", "cw", "top", "z", steps)
+        msg += f"move z {result}"
+
+
+
     def run(self):
         try:
             self.init_display()
+            self.init_motors()
             # Enable blending and set the blend function
             glEnable(GL_BLEND)
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -283,7 +296,7 @@ class DlpViewer(threading.Thread):
         thread_log = threading.Thread(target=write_log, args=("stop command",))
         thread_log.start()
         self.running = False
-        self.layer_count = 0
+        self.layer_count = 1
 
         # self.cleanup()
         # turn_on_off_led("off")

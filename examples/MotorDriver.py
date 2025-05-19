@@ -26,7 +26,7 @@ class MotorController:
         self.mode_spr = mode_spr
         self.spr = {"Full": 200}
         self.delay = 0.01
-        self.delay_z = 0.001
+        self.delay_z = 0.005
 
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
