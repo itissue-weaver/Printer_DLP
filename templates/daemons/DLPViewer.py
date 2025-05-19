@@ -97,10 +97,12 @@ class DlpViewer(threading.Thread):
         texture = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, texture)
         image = pygame.image.load(self.image_path).convert_alpha()
+        thread_log = threading.Thread(target=write_log, args=(f"{self.image_path} {self.layer_count}",))
+        thread_log.start()
         image = pygame.transform.flip(image, False, False)  # Flip the image vertically
         image_data = pygame.image.tostring(image, "RGBA", True)
         width, height = image.get_rect().size
-        print(f"Image size: {width}x{height}")
+
         glTexImage2D(
             GL_TEXTURE_2D,
             0,
@@ -258,8 +260,8 @@ class DlpViewer(threading.Thread):
         msg = ""
         result = subprocess_control_motor("move_z", "cw", "top", "z", steps)
         print(steps, result)
-        msg += f"change z motor: {steps}, {result}\n"
-        steps = int(dist_free-self.layer_depth / r)
+        msg += f"change z motor: {steps}, {result} {dist_free} {self.layer_depth}\n"
+        steps = int((dist_free-self.layer_depth) / r)
         result = subprocess_control_motor("move_z", "ccw", "top", "z", steps)
         print(steps, result)
         msg += f"change z motor: {steps}, {result}\n"
@@ -297,6 +299,8 @@ class DlpViewer(threading.Thread):
         self.paused = False
 
     def reload_image(self, image_path=None):
+        thread_log = threading.Thread(target=write_log, args=(f"reload image: {image_path}", ))
+        thread_log.start()
         if image_path:
             self.image_path = image_path
         self.texture = self.load_texture()
