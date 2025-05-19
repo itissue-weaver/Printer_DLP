@@ -8,7 +8,7 @@ from tkinter import messagebox
 import ttkbootstrap as ttk
 from PIL import Image, ImageTk
 
-from files.constants import font_buttons, font_title, path_no_image, path_solid_capture
+from files.constants import font_buttons, font_title, path_no_image, path_solid_capture, desired_width_thumbnail
 from templates.AuxiliarFunctions import (
     read_projects,
     update_settings,
@@ -129,7 +129,10 @@ class HomePage(ttk.Frame):
             image_thumbnail = Image.open(filepath)
         except FileNotFoundError:
             image_thumbnail = Image.open(path_no_image)
-        image_thumbnail = image_thumbnail.resize((250, 200))
+        width, height = image_thumbnail.size
+        factor = desired_width_thumbnail / width
+        new_height = int(height * factor)
+        image_thumbnail = image_thumbnail.resize((desired_width_thumbnail, new_height))
         background_image = ImageTk.PhotoImage(image_thumbnail)
         canvas_thumbnail = ttk.Canvas(
             self.frame_thumbnails,
@@ -165,6 +168,7 @@ class HomePage(ttk.Frame):
         self.tv_projects.bind("<Double-1>", self.item_selected_treeview)
         self.callbacks["change_project"](self.current_project_key)
 
+
     def item_selected_treeview(self, event):
         values = event.widget.item(event.widget.selection()[0], "values")[:-1]
         column = event.widget.identify_column(event.x)
@@ -189,6 +193,7 @@ class HomePage(ttk.Frame):
         )
         self.callbacks["init_tabs"]()
         self.callbacks["change_project"](self.current_project_key)
+        self.render_thumbnails(path_solid_capture)
 
 
 class NewProjectWindow(ttk.Toplevel):

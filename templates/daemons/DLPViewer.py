@@ -4,6 +4,7 @@ __date__ = "$ 26/ene/2025  at 15:49 $"
 
 import threading
 import time
+from sys import thread_info
 from time import perf_counter, sleep
 
 import pygame
@@ -43,7 +44,7 @@ from files.constants import image_path_projector, settings_path
 import json
 
 from templates.AuxiliarFunctions import write_log
-from templates.midleware.MD_Printer import subprocess_control_led
+from templates.midleware.MD_Printer import subprocess_control_led, subprocess_control_motor
 
 
 def turn_on_off_led(state="off"):
@@ -96,10 +97,12 @@ class DlpViewer(threading.Thread):
         texture = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, texture)
         image = pygame.image.load(self.image_path).convert_alpha()
+        thread_log = threading.Thread(target=write_log, args=(f"{self.image_path} {self.layer_count}",))
+        thread_log.start()
         image = pygame.transform.flip(image, False, False)  # Flip the image vertically
         image_data = pygame.image.tostring(image, "RGBA", True)
         width, height = image.get_rect().size
-        print(f"Image size: {width}x{height}")
+
         glTexImage2D(
             GL_TEXTURE_2D,
             0,
@@ -131,9 +134,22 @@ class DlpViewer(threading.Thread):
         print(f"Texture ID: {self.texture}")
         self.layer_count += 1
 
+    def init_motors(self):
+        # "move_z_sw", "cw", "top", "z", 0,
+        r = 8/200
+        msg = ""
+        result = subprocess_control_motor("move_z_sw", "ccw", "bottom", "z", 0)
+        msg += f"move z to sw {result}"
+        steps = int(self.layer_depth / r)
+        result = subprocess_control_motor("move_z", "cw", "top", "z", steps)
+        msg += f"move z {result}"
+
+
+
     def run(self):
         try:
             self.init_display()
+            self.init_motors()
             # Enable blending and set the blend function
             glEnable(GL_BLEND)
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -154,8 +170,11 @@ class DlpViewer(threading.Thread):
                 # Comprobar si ha pasado delta_layer
                 if elapsed_time >= self.delta_layer:
                     self.layer_count += 1
-                    # thread_log = threading.Thread(target=write_log, args=(f"{self.layer_count}, {self.num_layers}",))
-                    # thread_log.start()
+                    turn_on_off_led(state="off")
+                    self.change_z_motor()
+                    turn_on_off_led(state="on")
+                    thread_log = threading.Thread(target=write_log, args=(f"{self.layer_count}, {self.num_layers}",))
+                    thread_log.start()
                     print(f"{self.layer_count}, {self.num_layers}")
                     if self.layer_count >= self.num_layers - 1:
                         self.running = False
@@ -163,8 +182,8 @@ class DlpViewer(threading.Thread):
                         f"files/img/extracted/temp{self.layer_count}.png"
                     )  # Recargar imagen poner el path aqui
                     self.last_time = current_time  # Resetear el temporizador
-                    # thread_log = threading.Thread(target=write_log, args=(f"Layer {self.layer_count} loaded",))
-                    # thread_log.start()
+                    thread_log = threading.Thread(target=write_log, args=(f"Layer {self.layer_count} loaded",))
+                    thread_log.start()
                     print(f"Layer {self.layer_count} loaded")
                 # self.dlp.clear()
                 glClearColor(0.0, 0.0, 0.0, 1.0)  # Set the clear color to black
@@ -183,7 +202,7 @@ class DlpViewer(threading.Thread):
                 # glVertex2f(-0.1, +0.1)
                 # glEnd()
                 offset_x = (
-                    0.05  # Ajusta este valor para mover la imagen hacia la derecha
+                    0.00  # Ajusta este valor para mover la imagen hacia la derecha
                 )
                 offset_y = 0.05  # Ajusta este valor para mover la imagen hacia arriba
 
@@ -215,9 +234,8 @@ class DlpViewer(threading.Thread):
                     break
         except Exception as e:
             print(e)
-
-            # thread_log = threading.Thread(target=write_log, args=(f"Error: {e}", ))
-            # thread_log.start()
+            thread_log = threading.Thread(target=write_log, args=(f"Error: {e}", ))
+            thread_log.start()
         glDisable(GL_TEXTURE_2D)
         glDisable(GL_BLEND)
         # try:
@@ -248,6 +266,21 @@ class DlpViewer(threading.Thread):
     def is_alive_projector(self):
         return self.running
 
+    def change_z_motor(self):
+        r = 8/200
+        dist_free = 3   # 3 mm
+        steps = int(dist_free/r)
+        msg = ""
+        result = subprocess_control_motor("move_z", "cw", "top", "z", steps)
+        print(steps, result)
+        msg += f"change z motor: {steps}, {result} {dist_free} {self.layer_depth}\n"
+        steps = int((dist_free-self.layer_depth) / r)
+        result = subprocess_control_motor("move_z", "ccw", "top", "z", steps)
+        print(steps, result)
+        msg += f"change z motor: {steps}, {result}\n"
+        thread_log = threading.Thread(target=write_log, args=(msg,))
+        thread_log.start()
+
     def start_projecting(self):
         self.load_variables()
         thread_log = threading.Thread(target=write_log, args=("start command",))
@@ -263,7 +296,7 @@ class DlpViewer(threading.Thread):
         thread_log = threading.Thread(target=write_log, args=("stop command",))
         thread_log.start()
         self.running = False
-        self.layer_count = 0
+        self.layer_count = 1
 
         # self.cleanup()
         # turn_on_off_led("off")
@@ -279,6 +312,8 @@ class DlpViewer(threading.Thread):
         self.paused = False
 
     def reload_image(self, image_path=None):
+        thread_log = threading.Thread(target=write_log, args=(f"reload image: {image_path}", ))
+        thread_log.start()
         if image_path:
             self.image_path = image_path
         self.texture = self.load_texture()

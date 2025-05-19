@@ -25,7 +25,9 @@ from templates.models.printer_models import (
     post_driver_motor_model,
     post_driver_led_model,
 )
-from templates.static.constants import projector
+
+# Definir la variable global
+projector = None
 
 ns = Namespace("api/v1/printer")
 
@@ -118,15 +120,14 @@ class Settings(Resource):
 class Start(Resource):
     def post(self):
         msg = ""
-        # start the print
-        # if projector.is_alive_projector():
-        #     msg += "Ok, projector is already running\n"
-        #     projector.stop_projecting()
-        #     sleep(1)
-        #     msg += "Ok, projector stopped\n"
-        projector.start_projecting()
-        msg += "Ok, projector started\n"
-        # projector = DlpViewer()
+        global projector  # Indicar que estamos modificando la variable global
+        if projector and projector.is_alive():
+            print("El hilo ya está en ejecución.")
+            msg += "Ok, projector already started\n"
+        else:
+            projector = DlpViewer()  # Crear una nueva instancia accesible globalmente
+            projector.start_projecting()
+            msg += "Ok, projector started\n"
         return {
             "msg": msg,
             "data": projector.is_alive_projector(),
@@ -137,10 +138,19 @@ class Start(Resource):
 class Stop(Resource):
     def post(self):
         # stop the print
-        projector.stop_projecting()
+        global projector
+        msg = ""
+        if projector:
+            projector.stop_projecting()
+            projector = None  # Resetear la referencia después de detenerlo
+            msg += "Ok, projector stopped\n"
+            data = True
+        else:
+            msg += "Ok, projector already stopped\n"
+            data = False
         return {
-            "msg": "Ok, projector stopped",
-            "data": projector.is_alive_projector(),
+            "msg": msg,
+            "data": data,
         }, 200
 
 

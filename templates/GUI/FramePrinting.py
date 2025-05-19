@@ -136,6 +136,7 @@ def simulate_printing(master):
 class FramePrinting(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
+        self.thread_stop_print = None
         self.monitor_running = False
         self.thread_monitor = None
         self.button_refresh = None
@@ -212,7 +213,7 @@ class FramePrinting(ttk.Frame):
         # ----------------------Button----------------------
         self.frame_buttons = ttk.Frame(self)
         self.frame_buttons.grid(row=1, column=0, sticky="nsew", padx=15, pady=15)
-        self.frame_buttons.columnconfigure((0, 1, 2), weight=1)
+        self.frame_buttons.columnconfigure((0, 1, 2, 3), weight=1)
         frame_btn_img = ttk.Frame(self.frame_buttons)
         frame_btn_img.grid(row=0, column=0, sticky="n", padx=15, pady=15)
         ttk.Button(
@@ -241,6 +242,13 @@ class FramePrinting(ttk.Frame):
             style="success.TButton",
         )
         self.print_button.grid(row=0, column=2, sticky="n", padx=15, pady=15)
+        self.stop_button = ttk.Button(
+            self.frame_buttons,
+            text="Stop",
+            command=self.stop_callback,
+            style="danger.TButton",
+        )
+        self.stop_button.grid(row=0, column=3, sticky="n", padx=15, pady=15)
         # ---------------------progress bar --------------------
         self.frame_progress = ttk.Frame(self)
         self.frame_progress.grid(row=2, column=0, sticky="nsew", padx=15, pady=15)
@@ -273,7 +281,6 @@ class FramePrinting(ttk.Frame):
         filepath_stl = settings.get("filepath", "files/pyramid_test.stl")
         n_parts = len(settings.get("sequence", []))
         try:
-            print(n_parts, filepath_stl)
             os.path.exists(filepath_stl)
             solid_trimesh_part, solid_part = read_stl(
                 file_path=settings.get("filepath", "files/pyramid_test.stl"),
@@ -316,44 +323,40 @@ class FramePrinting(ttk.Frame):
         if not self.is_sliced:
             Messagebox.show_error("Settings not sent", "Error")
             return
-        self.is_printing = not self.is_printing
         if self.is_printing:
-            # Configurar botón
-            self.print_button.config(text="Stop printing", bootstyle="danger")
-            # Asegurar que no haya otro hilo `start print` en ejecución
-            if self.thread_start_print and self.thread_start_print.is_alive():
-                print("Esperando a que termine el hilo anterior...")
-                self.thread_start_print.join()
-            # Iniciar nuevo hilo de impresión
-            self.thread_start_print = threading.Thread(target=send_start_print)
-            self.thread_start_print.start()
+           print("Print already in progress")
+        # Asegurar que no haya otro hilo `start print` en ejecución
+        print("Start printing init")
+        if self.thread_start_print and self.thread_start_print.is_alive():
+            print("Esperando a que termine el hilo anterior...")
+            self.thread_start_print.join()
+        # Iniciar nuevo hilo de impresión
+        self.thread_start_print = threading.Thread(target=send_start_print)
+        self.thread_start_print.start()
 
-            # Iniciar el hilo de monitoreo
-            if not self.monitor_running:
-                self.monitor_running = True
-                self.thread_monitor = threading.Thread(target=self.monitor_response)
-                self.thread_monitor.start()
-        else:
-            # Restaurar botón
-            self.print_button.config(text="Print", bootstyle="success")
+        # Iniciar el hilo de monitoreo
+        if not self.monitor_running:
+            self.monitor_running = True
+            self.thread_monitor = threading.Thread(target=self.monitor_response)
+            self.thread_monitor.start()
 
-            # Finalizar hilo de impresión si está activo
-            if self.thread_start_print and self.thread_start_print.is_alive():
-                self.thread_start_print.join()
-            self.thread_start_print = None
+    def stop_callback(self):
+        if not self.is_printing:
+            print("Print not in progress")
+        print("Stop printing init")
+        # Asegurar que no haya otro hilo `stop print` en ejecución
+        if self.thread_stop_print and self.thread_stop_print.is_alive():
+            print("Esperando a que termine el hilo anterior...")
+            self.thread_stop_print.join()
+        # Iniciar nuevo hilo de impresión
+        self.thread_stop_print = threading.Thread(target=send_stop_print)
+        self.thread_stop_print.start()
 
-            # Finalizar hilo de monitoreo si está activo
-            if self.thread_monitor and self.thread_monitor.is_alive():
-                self.monitor_running = False
-                self.thread_monitor.join()
-
-            # iniciar hilo de detenido
-            self.thread_start_print = threading.Thread(target=send_stop_print)
-            self.thread_start_print.start()
-
-            self.thread_monitor = None
-
-
+        # Iniciar el hilo de monitoreo
+        if not self.monitor_running:
+            self.monitor_running = True
+            self.thread_monitor = threading.Thread(target=self.monitor_response)
+            self.thread_monitor.start()
 
     # def print_callback(self):
     #     if not self.is_sliced:
@@ -452,7 +455,6 @@ class FramePrinting(ttk.Frame):
         filepath_stl = settings.get("filepath", "files/pyramid_test.stl")
         n_parts = len(settings.get("sequence", []))
         try:
-            print(n_parts, filepath_stl)
             os.path.exists(filepath_stl)
             solid_trimesh_part, solid_part = read_stl(
                 file_path=settings.get("filepath", "files/pyramid_test.stl"),

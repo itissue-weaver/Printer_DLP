@@ -39,3 +39,5 @@ path_no_image = "files/img/no_image.png"
 ruta_script_motor = "examples/MotorDriver.py"
 ruta_script_led = "examples/LedDriver.py"
 path_solid_capture = "files/img/solid_capture.png"
+desired_width_slice_image = 800
+desired_width_thumbnail = 400
