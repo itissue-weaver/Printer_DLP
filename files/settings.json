@@ -27,12 +27,12 @@
     "hatch_spacing": 0.5,
     "stripe_width": 0.5,
     "projector_dimension": [
-        30.0,
-        20.0
+        48.0,
+        48.0
     ],
     "projector_resolution": [
-        1920,
-        1080
+        3840,
+        2160
     ],
     "projector_offset": [
         0.0,
@@ -40,11 +40,11 @@
         10.0
     ],
     "dpi": 300,
-    "layer_depth": 1.0,
-    "delta_layer": 10.0,
+    "layer_depth": 0.5,
+    "delta_layer": 30.0,
     "plate": 1,
     "HOST": "127.0.0.1",
-    "num_layers": 20,
+    "num_layers": 40,
     "material1": "Solucion1",
     "quantity1": 50.0,
     "material2": "Solution 2",
