@@ -4,6 +4,7 @@ __date__ = "$ 26/ene/2025  at 15:49 $"
 
 import threading
 import time
+from sys import thread_info
 from time import perf_counter, sleep
 
 import pygame
@@ -254,11 +255,16 @@ class DlpViewer(threading.Thread):
         r = 8/200
         dist_free = 3   # 3 mm
         steps = int(dist_free/r)
+        msg = ""
         result = subprocess_control_motor("move_z", "cw", "top", "z", steps)
         print(steps, result)
+        msg += f"change z motor: {steps}, {result}\n"
         steps = int(dist_free-self.layer_depth / r)
         result = subprocess_control_motor("move_z", "ccw", "top", "z", steps)
         print(steps, result)
+        msg += f"change z motor: {steps}, {result}\n"
+        thread_log = threading.Thread(target=write_log, args=(msg,))
+        thread_log.start()
 
     def start_projecting(self):
         self.load_variables()
