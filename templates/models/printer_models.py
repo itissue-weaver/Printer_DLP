@@ -30,7 +30,14 @@ post_driver_motor_model = api.model(
         "action": fields.String(
             description="Action to perform",
             example="move_plate",
-            enum=["move_z_sw", "move_z", "move_plate_sw", "move_plate","rotate_motor", "empty"],
+            enum=[
+                "move_z_sw",
+                "move_z",
+                "move_plate_sw",
+                "move_plate",
+                "rotate_motor",
+                "empty",
+            ],
         ),
         "direction": fields.String(
             description="Direction to move",
@@ -50,6 +57,14 @@ post_driver_motor_model = api.model(
             description="Motor to move",
             example="plate",
             enum=["plate", "z"],
+        ),
+        "delay_z": fields.Float(
+            description="Delay of the Z axis",
+            example=0.005,
+        ),
+        "delay_n": fields.Float(
+            description="Delay of the plate",
+            example=0.01,
         ),
     },
 )

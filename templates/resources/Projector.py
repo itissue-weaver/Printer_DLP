@@ -195,6 +195,8 @@ class RotateMotor(Resource):
                     data["location_z"],
                     data["motor"],
                     data["steps"],
+                    data["delay_z"],
+                    data["delay_n"],
                 ),
             )
             thread_subprocess.start()

@@ -116,17 +116,22 @@ def create_input_widgets_print(master):
         row=1, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_delta_layer)
-    ttk.Label(frame_inputs, text="Plate:").grid(
+    ttk.Label(frame_inputs, text="Delay steps z [s]:").grid(
         row=2, column=0, sticky="w", padx=10, pady=10
     )
-    entry_plate = ttk.StringVar(value=str(settings.get("plate", "1")))
-    ttk.Combobox(
-        frame_inputs,
-        values=["1", "2", "3", "4"],
-        textvariable=entry_plate,
-        state="readonly",
-    ).grid(row=2, column=1, sticky="w", padx=5, pady=5)
-    entries.append(entry_plate)
+    entry_delay_steps_z = ttk.StringVar(value=str(settings.get("delay_z", "0.005")))
+    ttk.Entry(frame_inputs, textvariable=entry_delay_steps_z).grid(
+        row=2, column=1, sticky="w", padx=5, pady=5
+    )
+    entries.append(entry_delay_steps_z)
+    ttk.Label(frame_inputs, text="Delay steps plate [s]:").grid(
+        row=3, column=0, sticky="w", padx=10, pady=10
+    )
+    entry_delay_steps_plate = ttk.StringVar(value=str(settings.get("delay_n", "0.01")))
+    ttk.Entry(frame_inputs, textvariable=entry_delay_steps_plate).grid(
+        row=3, column=1, sticky="w", padx=5, pady=5
+    )
+    entries.append(entry_delay_steps_plate)
     return entries
 
 
@@ -145,9 +150,11 @@ class PrinterConfig(ttk.Frame):
         # Obtener los valores de las entradas
         layer_depth = float(self.entries[0].get())
         delta_layer = float(self.entries[1].get())
-        plate = int(self.entries[2].get())
+        delay_z = float(self.entries[2].get())
+        delay_n = float(self.entries[3].get())
         update_settings(
             layer_depth=layer_depth,
             delta_layer=delta_layer,
-            plate=plate,
+            delay_z=delay_z,
+            delay_n=delay_n,
         )

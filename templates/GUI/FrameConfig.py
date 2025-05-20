@@ -27,11 +27,11 @@ class FrameConfig(ttk.Toplevel):
             text="Close",
             command=self.close_callback,
         ).grid(row=2, column=0, sticky="n", padx=10, pady=10)
-        ttk.Button(
-            self,
-            text="Test",
-            command=self.on_test_motors,
-        ).grid(row=2, column=1, sticky="n", padx=10, pady=10)
+        # ttk.Button(
+        #     self,
+        #     text="Test",
+        #     command=self.on_test_motors,
+        # ).grid(row=2, column=1, sticky="n", padx=10, pady=10)
 
         self.protocol("WM_DELETE_WINDOW", self.close_callback)
 

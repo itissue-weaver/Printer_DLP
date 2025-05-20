@@ -4,7 +4,6 @@ __date__ = "$ 26/ene/2025  at 15:49 $"
 
 import threading
 import time
-from sys import thread_info
 from time import perf_counter, sleep
 
 import pygame
@@ -39,12 +38,15 @@ from OpenGL.raw.GL.VERSION.GL_1_1 import glBindTexture
 from OpenGL.raw.GL.VERSION.GL_4_0 import GL_QUADS
 from OpenGL.raw.GL._types import GL_UNSIGNED_BYTE
 from pygame import OPENGL, DOUBLEBUF, FULLSCREEN
-from files.constants import image_path_projector, settings_path
+from files.constants import image_path_projector, settings_path, delay_z, delay_n
 
 import json
 
 from templates.AuxiliarFunctions import write_log
-from templates.midleware.MD_Printer import subprocess_control_led, subprocess_control_motor
+from templates.midleware.MD_Printer import (
+    subprocess_control_led,
+    subprocess_control_motor,
+)
 
 
 def turn_on_off_led(state="off"):
@@ -63,17 +65,21 @@ def turn_on_off_led(state="off"):
 class DlpViewer(threading.Thread):
     def __init__(self, mode=60, image_path=image_path_projector):
         super().__init__()
-        self.num_layers = None
-        self.layer_count = None
-        self.layer_depth = None
-        self.sequence = None
-        self.delta_layer = None
-        self.settings = None
+        (
+            self.num_layers,
+            self.layer_count,
+            self.layer_depth,
+            self.sequence,
+            self.delta_layer,
+            self.delay_z,
+            self.delay_n,
+            self.settings,
+            self.dlp,
+            self.texture,
+        ) = (None,) * 10
         self.flag_reload = False
         self.mode = mode
         self.image_path = image_path
-        self.dlp = None
-        self.texture = None
         self.running = False
         self.paused = False
         self.start_time = 0.0
@@ -92,12 +98,16 @@ class DlpViewer(threading.Thread):
         self.layer_depth = self.settings.get("layer_depth", 1.0)  # Espesor de la capa
         self.layer_count = 0  # Contador de capas procesadas
         self.num_layers = self.settings.get("num_layers", 0)  # Número de capas
+        self.delay_z = self.settings.get("delay_z", delay_z)  # Retardo de movimiento
+        self.delay_n = self.settings.get("delay_n", delay_n)  # Retardo de movimiento
 
     def load_texture(self):
         texture = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, texture)
         image = pygame.image.load(self.image_path).convert_alpha()
-        thread_log = threading.Thread(target=write_log, args=(f"{self.image_path} {self.layer_count}",))
+        thread_log = threading.Thread(
+            target=write_log, args=(f"{self.image_path} {self.layer_count}",)
+        )
         thread_log.start()
         image = pygame.transform.flip(image, False, False)  # Flip the image vertically
         image_data = pygame.image.tostring(image, "RGBA", True)
@@ -136,15 +146,17 @@ class DlpViewer(threading.Thread):
 
     def init_motors(self):
         # "move_z_sw", "cw", "top", "z", 0,
-        r = 8/200
+        r = 8 / 200
         msg = ""
-        result = subprocess_control_motor("move_z_sw", "ccw", "bottom", "z", 0)
+        result = subprocess_control_motor(
+            "move_z_sw", "ccw", "bottom", "z", 0, delayz=self.delay_z, delayn=self.delay_n
+        )
         msg += f"move z to sw {result}"
         steps = int(self.layer_depth / r)
-        result = subprocess_control_motor("move_z", "cw", "top", "z", steps)
+        result = subprocess_control_motor(
+            "move_z", "cw", "top", "z", steps, delayz=self.delay_z, delayn=self.delay_n
+        )
         msg += f"move z {result}"
-
-
 
     def run(self):
         try:
@@ -173,7 +185,10 @@ class DlpViewer(threading.Thread):
                     turn_on_off_led(state="off")
                     self.change_z_motor()
                     turn_on_off_led(state="on")
-                    thread_log = threading.Thread(target=write_log, args=(f"{self.layer_count}, {self.num_layers}",))
+                    thread_log = threading.Thread(
+                        target=write_log,
+                        args=(f"{self.layer_count}, {self.num_layers}",),
+                    )
                     thread_log.start()
                     print(f"{self.layer_count}, {self.num_layers}")
                     if self.layer_count >= self.num_layers - 1:
@@ -182,7 +197,9 @@ class DlpViewer(threading.Thread):
                         f"files/img/extracted/temp{self.layer_count}.png"
                     )  # Recargar imagen poner el path aqui
                     self.last_time = current_time  # Resetear el temporizador
-                    thread_log = threading.Thread(target=write_log, args=(f"Layer {self.layer_count} loaded",))
+                    thread_log = threading.Thread(
+                        target=write_log, args=(f"Layer {self.layer_count} loaded",)
+                    )
                     thread_log.start()
                     print(f"Layer {self.layer_count} loaded")
                 # self.dlp.clear()
@@ -234,7 +251,7 @@ class DlpViewer(threading.Thread):
                     break
         except Exception as e:
             print(e)
-            thread_log = threading.Thread(target=write_log, args=(f"Error: {e}", ))
+            thread_log = threading.Thread(target=write_log, args=(f"Error: {e}",))
             thread_log.start()
         glDisable(GL_TEXTURE_2D)
         glDisable(GL_BLEND)
@@ -267,15 +284,19 @@ class DlpViewer(threading.Thread):
         return self.running
 
     def change_z_motor(self):
-        r = 8/200
-        dist_free = 3   # 3 mm
-        steps = int(dist_free/r)
+        r = 8 / 200
+        dist_free = 3  # 3 mm
+        steps = int(dist_free / r)
         msg = ""
-        result = subprocess_control_motor("move_z", "cw", "top", "z", steps)
+        result = subprocess_control_motor(
+            "move_z", "cw", "top", "z", steps, delayz=self.delay_z, delayn=self.delay_n
+        )
         print(steps, result)
         msg += f"change z motor: {steps}, {result} {dist_free} {self.layer_depth}\n"
-        steps = int((dist_free-self.layer_depth) / r)
-        result = subprocess_control_motor("move_z", "ccw", "top", "z", steps)
+        steps = int((dist_free - self.layer_depth) / r)
+        result = subprocess_control_motor(
+            "move_z", "ccw", "top", "z", steps, delayz=self.delay_z, delayn=self.delay_n
+        )
         print(steps, result)
         msg += f"change z motor: {steps}, {result}\n"
         thread_log = threading.Thread(target=write_log, args=(msg,))
@@ -312,7 +333,9 @@ class DlpViewer(threading.Thread):
         self.paused = False
 
     def reload_image(self, image_path=None):
-        thread_log = threading.Thread(target=write_log, args=(f"reload image: {image_path}", ))
+        thread_log = threading.Thread(
+            target=write_log, args=(f"reload image: {image_path}",)
+        )
         thread_log.start()
         if image_path:
             self.image_path = image_path
@@ -337,3 +360,7 @@ class DlpViewer(threading.Thread):
 
     def layer_count_fun(self):
         return self.layer_count
+
+    def set_delays(self, delayz, delayn):
+        self.delay_z = delayz
+        self.delay_n = delayn

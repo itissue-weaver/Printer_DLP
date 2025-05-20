@@ -18,6 +18,8 @@ from files.constants import (
     zip_file_name,
     ruta_script_motor,
     ruta_script_led,
+    delay_z,
+    delay_n,
 )
 from templates.AuxiliarFunctions import read_settings
 from time import sleep
@@ -181,7 +183,7 @@ def test_motor_post():
         return 500, str(e)
 
 
-def control_motor_from_gui(action, direction, location_z, motor, steps):
+def control_motor_from_gui(action, direction, location_z, motor, steps, delayz=delay_z, delayn=delay_n):
     try:
         response = requests.post(
             f"{server_domain + base_url}/rotate/motor",
@@ -191,6 +193,8 @@ def control_motor_from_gui(action, direction, location_z, motor, steps):
                 "location_z": location_z,
                 "motor": motor,
                 "steps": steps,
+                "delay_z": delayz,
+                "delay_n": delayn
             },
             headers=headers,
         )
@@ -286,7 +290,7 @@ def subprocess_test():
     return resultado.stdout
 
 
-def subprocess_control_motor(action, direction, location_z, motor, steps):
+def subprocess_control_motor(action, direction, location_z, motor, steps, delayz=delay_z, delayn=delay_n):
     argumentos = [
         "--action",
         action,
@@ -298,12 +302,17 @@ def subprocess_control_motor(action, direction, location_z, motor, steps):
         motor,
         "--steps",
         str(steps),
+        "--delay_z",
+        str(delayz),
+        "--delay_n",
+        str(delayn)
     ]
     resultado = subprocess.run(
         ["python3", ruta_script_motor] + argumentos, capture_output=True, text=True
     )
     print(resultado.stdout)
     return resultado.stdout
+
 
 def subprocess_control_led(state):
     argumentos = ["--state", state]
