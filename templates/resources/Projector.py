@@ -11,7 +11,7 @@ from flask_restx import Namespace, Resource
 from werkzeug.utils import secure_filename
 
 from files.constants import image_path_projector, zip_file_name, path_temp_zip
-from templates.AuxiliarFunctions import read_settings, update_settings
+from templates.AuxiliarFunctions import read_settings, update_settings, write_log
 from templates.daemons.DLPViewer import DlpViewer
 from templates.midleware.MD_Printer import (
     uncompres_files_zip,
@@ -200,6 +200,8 @@ class RotateMotor(Resource):
                 ),
             )
             thread_subprocess.start()
+            thread_log = threading.Thread(target=write_log, args=(f"Motor: {data}",))
+            thread_log.start()
         except Exception as e:
             return {"msg": f"Error, motor test initiated: {str(e)}"}, 400
         return {"msg": "Ok, motor test initiated"}, 200
