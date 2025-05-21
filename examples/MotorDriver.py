@@ -174,7 +174,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     thread_log = threading.Thread(
-        target=write_log, args=(f"Motor: {args} {args.action} {args.direction} {args.steps}",)
+        target=write_log, args=(f"Motor args: {args} {args.action} {args.direction} {args.steps}",)
     )
     thread_log.start()
     PINS = {
