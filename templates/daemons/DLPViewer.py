@@ -76,7 +76,9 @@ class DlpViewer(threading.Thread):
             self.settings,
             self.dlp,
             self.texture,
-        ) = (None,) * 10
+            self.bottom_layers,
+            self.delta_bottom
+        ) = (None,) * 12
         self.flag_reload = False
         self.mode = mode
         self.image_path = image_path
@@ -100,6 +102,8 @@ class DlpViewer(threading.Thread):
         self.num_layers = self.settings.get("num_layers", 0)  # Número de capas
         self.delay_z = self.settings.get("delay_z", delay_z)  # Retardo de movimiento
         self.delay_n = self.settings.get("delay_n", delay_n)  # Retardo de movimiento
+        self.bottom_layers = self.settings.get("b_layers", 1)
+        self.delta_bottom  = self.settings.get("e_time_b_layers", 40)
 
     def load_texture(self):
         texture = glGenTextures(1)
@@ -180,7 +184,8 @@ class DlpViewer(threading.Thread):
                 current_time = perf_counter()
                 elapsed_time = current_time - self.last_time
                 # Comprobar si ha pasado delta_layer
-                if elapsed_time >= self.delta_layer:
+                time_to_wait = self.delta_layer if self.layer_count>self.bottom_layers else self.delta_bottom
+                if elapsed_time >= time_to_wait:
                     self.layer_count += 1
                     turn_on_off_led(state="off")
                     self.change_z_motor()

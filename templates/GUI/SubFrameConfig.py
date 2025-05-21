@@ -100,7 +100,7 @@ def create_input_widgets_print(master):
     frame_inputs.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
     frame_inputs.columnconfigure(0, weight=1)
     # ----------------------parameters print--------------------
-    ttk.Label(frame_inputs, text="Layer depth [mm]:").grid(
+    ttk.Label(frame_inputs, text="Layer thickness [mm]:").grid(
         row=0, column=0, sticky="w", padx=10, pady=10
     )
     entry_layer_depth = ttk.StringVar(value=str(settings.get("layer_depth", "0.5")))
@@ -132,6 +132,20 @@ def create_input_widgets_print(master):
         row=3, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_delay_steps_plate)
+    ttk.Label(frame_inputs, text="# Bottom Layers:").grid(row=4, column=0, sticky="w", padx=10, pady=10)
+    entry_bottom_layers = ttk.StringVar(value=str(settings.get("b_layers", "1")))
+    ttk.Entry(frame_inputs, textvariable=entry_bottom_layers).grid(
+        row=4, column=1, sticky="w", padx=5, pady=5
+    )
+    entries.append(entry_bottom_layers)
+    ttk.Label(frame_inputs, text="Exposure time B. Layers [s]:").grid(
+        row=5, column=0, sticky="w", padx=10, pady=10
+    )
+    entry_e_time_b_layers = ttk.StringVar(value=str(settings.get("e_time_b_layers", "40")))
+    ttk.Entry(frame_inputs, textvariable=entry_e_time_b_layers).grid(
+        row=5, column=1, sticky="w", padx=5, pady=5
+    )
+    entries.append(entry_e_time_b_layers)
     return entries
 
 
@@ -152,9 +166,13 @@ class PrinterConfig(ttk.Frame):
         delta_layer = float(self.entries[1].get())
         delay_z = float(self.entries[2].get())
         delay_n = float(self.entries[3].get())
+        b_layers = int(self.entries[4].get())
+        e_time_b_layers = float(self.entries[5].get())
         update_settings(
             layer_depth=layer_depth,
             delta_layer=delta_layer,
             delay_z=delay_z,
             delay_n=delay_n,
+            b_layers=b_layers,
+            e_time_b_layers=e_time_b_layers,
         )

@@ -462,7 +462,7 @@
         "user": "prueba",
         "thumbnail": "",
         "status": 0,
-        "timestamp": "2025-05-19 10:58:58",
+        "timestamp": "2025-05-21 10:55:25",
         "settings": {
             "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
             "rotation": [
@@ -615,7 +615,11 @@
                     "max_volume": 100
                 }
             ],
-            "mode_biomaterial": "mode_1"
+            "mode_biomaterial": "mode_1",
+            "delay_z": 0.005,
+            "delay_n": 0.01,
+            "b_layers": 1,
+            "e_time_b_layers": 40.0
         }
     },
     "meniscoprueba": {

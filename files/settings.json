@@ -27,12 +27,12 @@
     "hatch_spacing": 0.5,
     "stripe_width": 0.5,
     "projector_dimension": [
-        30.0,
-        20.0
+        48.0,
+        48.0
     ],
     "projector_resolution": [
-        1920,
-        1080
+        3840,
+        2160
     ],
     "projector_offset": [
         0.0,
@@ -40,11 +40,11 @@
         10.0
     ],
     "dpi": 300,
-    "layer_depth": 1.0,
-    "delta_layer": 10.0,
+    "layer_depth": 0.5,
+    "delta_layer": 50.0,
     "plate": 1,
     "HOST": "127.0.0.1",
-    "num_layers": 20,
+    "num_layers": 40,
     "material1": "Solucion1",
     "quantity1": 50.0,
     "material2": "Solution 2",
@@ -101,7 +101,7 @@
     "max_z_part": 20.0,
     "status_frames": [
         1,
-        0,
+        1,
         1,
         0
     ],
@@ -152,5 +152,7 @@
     ],
     "mode_biomaterial": "mode_1",
     "delay_z": 0.005,
-    "delay_n": 0.005
+    "delay_n": 0.01,
+    "b_layers": 1,
+    "e_time_b_layers": 40.0
 }
