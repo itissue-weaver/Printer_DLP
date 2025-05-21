@@ -26,8 +26,6 @@ from templates.AuxiliarFunctions import read_settings, write_log
 from time import sleep
 from templates.daemons.constants import response_queue
 
-from mmcv.utils import print_log
-
 
 def send_start_print():
     response = requests.post(
