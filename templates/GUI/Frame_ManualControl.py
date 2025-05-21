@@ -64,7 +64,7 @@ def create_widgets_manual(master, icon_a_up, icon_a_down, icon_rotate, kwargs):
     ttk.Button(
         frame_platform,
         image=icon_a_up,
-        command=lambda: kwargs.get("up_top_callback")(),
+        command=lambda: kwargs.get("up_top_callback")(svar_delay_z.get()),
         text="Up sw",
         compound="right",
         style="success.TButton",
@@ -82,7 +82,7 @@ def create_widgets_manual(master, icon_a_up, icon_a_down, icon_rotate, kwargs):
     ttk.Button(
         frame_platform,
         image=icon_a_down,
-        command=lambda: kwargs.get("down_bottom_callback")(),
+        command=lambda: kwargs.get("down_bottom_callback")(svar_delay_z.get()),
         text="Down sw",
         compound="right",
         style="success.TButton",

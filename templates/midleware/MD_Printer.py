@@ -290,7 +290,7 @@ def subprocess_test():
     return resultado.stdout
 
 
-def subprocess_control_motor(action, direction, location_z, motor, steps, delayz=delay_z, delayn=delay_n):
+def subprocess_control_motor(action, direction, location_z, motor, steps, delayz, delayn):
     argumentos = [
         "--action",
         action,
