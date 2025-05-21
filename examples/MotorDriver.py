@@ -2,9 +2,6 @@ import argparse
 from time import sleep
 import RPi.GPIO as GPIO
 
-
-from files.constants import delay_z, delay_n
-
 import threading
 
 from templates.AuxiliarFunctions import write_log
@@ -22,6 +19,8 @@ default_pins = {
     "SWITCH_0": 17,
     "SWITCH_1": 27,
 }
+delay_z = 0.005
+delay_n = 0.01
 
 
 class MotorController:
