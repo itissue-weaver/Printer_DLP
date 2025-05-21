@@ -2,10 +2,6 @@ import argparse
 from time import sleep
 import RPi.GPIO as GPIO
 
-import threading
-
-from templates.AuxiliarFunctions import write_log
-
 default_pins = {
     "DIR_PLATE": 7,
     "STEP_PLATE": 8,
@@ -57,10 +53,6 @@ class MotorController:
     def set_delays(self, delayz=delay_z, delayn=delay_n):
         self.delay = delayn
         self.delay_z = delayz
-        thread_log = threading.Thread(
-            target=write_log, args=(f"Delay set to {delayn} and {delayz}",)
-        )
-        thread_log.start()
 
     def rotate_motor(self, pin_dir, step_pin, direction_rotation, steps):
         try:
@@ -172,10 +164,6 @@ if __name__ == "__main__":
         help="delay to move n in case of move_plate",
     )
     args = parser.parse_args()
-    thread_log = threading.Thread(
-        target=write_log, args=(f"Motor args: {args} {args.action} {args.direction} {args.steps}",)
-    )
-    thread_log.start()
     PINS = {
         "DIR_PLATE": 7,
         "STEP_PLATE": 8,
