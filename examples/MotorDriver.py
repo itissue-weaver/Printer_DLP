@@ -173,6 +173,10 @@ if __name__ == "__main__":
         help="delay to move n in case of move_plate",
     )
     args = parser.parse_args()
+    thread_log = threading.Thread(
+        target=write_log, args=(f"Motor: {args} {args.action} {args.direction} {args.steps}",)
+    )
+    thread_log.start()
     PINS = {
         "DIR_PLATE": 7,
         "STEP_PLATE": 8,

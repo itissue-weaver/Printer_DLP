@@ -6,6 +6,7 @@ import json
 import os
 import shutil
 import subprocess
+import threading
 import zipfile
 
 import requests
@@ -21,9 +22,11 @@ from files.constants import (
     delay_z,
     delay_n,
 )
-from templates.AuxiliarFunctions import read_settings
+from templates.AuxiliarFunctions import read_settings, write_log
 from time import sleep
 from templates.daemons.constants import response_queue
+
+from mmcv.utils import print_log
 
 
 def send_start_print():
@@ -307,10 +310,14 @@ def subprocess_control_motor(action, direction, location_z, motor, steps, delayz
         "--delay_n",
         str(delayn)
     ]
+    thread_log = threading.Thread(target=write_log, args=(f"Motor: {argumentos}",))
+    thread_log.start()
     resultado = subprocess.run(
         ["python3", ruta_script_motor] + argumentos, capture_output=True, text=True
     )
     print(resultado.stdout)
+    thread_log = threading.Thread(target=write_log, args=(f"Motor: {resultado.stdout}",))
+    thread_log.start()
     return resultado.stdout
 
 
