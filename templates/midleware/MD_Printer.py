@@ -308,7 +308,7 @@ def subprocess_control_motor(action, direction, location_z, motor, steps, delayz
         "--delay_n",
         str(delayn)
     ]
-    thread_log = threading.Thread(target=write_log, args=(f"Motor: {argumentos}",))
+    thread_log = threading.Thread(target=write_log, args=(f"Motorsubpro: {argumentos}",))
     thread_log.start()
     resultado = subprocess.run(
         ["python3", ruta_script_motor] + argumentos, capture_output=True, text=True

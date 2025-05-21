@@ -200,7 +200,7 @@ class RotateMotor(Resource):
                 ),
             )
             thread_subprocess.start()
-            thread_log = threading.Thread(target=write_log, args=(f"Motor: {data}",))
+            thread_log = threading.Thread(target=write_log, args=(f"Motor api: {data}",))
             thread_log.start()
         except Exception as e:
             return {"msg": f"Error, motor test initiated: {str(e)}"}, 400
