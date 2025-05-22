@@ -83,7 +83,7 @@ class HomePage(ttk.Frame):
             show="headings",
             style="Custom.Treeview",
         )
-        self.tv_projects.grid(row=2, column=0, padx=10, pady=10)
+        self.tv_projects.grid(row=2, column=0, padx=10, pady=10, sticky="we")
         self.tv_projects.configure(
             columns=("key", "name", "Last modified", "User", "Status", "data", "action")
         )

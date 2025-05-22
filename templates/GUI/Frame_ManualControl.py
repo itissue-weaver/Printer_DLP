@@ -116,8 +116,15 @@ def create_widgets_manual(master, icon_a_up, icon_a_down, icon_rotate, kwargs):
         ),
         text="Rotation",
         style="success.TButton",
-    ).grid(row=2, column=0, sticky="n", pady=10, columnspan=2)
+    ).grid(row=2, column=0, sticky="n", pady=10)
     entries.append(svar_rotation)
+    ttk.Button(
+        frame_vat,
+        image=icon_rotate,
+        command=lambda: kwargs.get("vat_sw_callback")(svar_delay_n.get()),
+        text="Rotation sw",
+        style="success.TButton",
+    ).grid(row=2, column=1, sticky="n", pady=10, padx=10)
     frame_led = ttk.LabelFrame(
         master, text="LED Control", style="Custom.TLabelframe", padding=3
     )
@@ -176,6 +183,7 @@ class ManualControl(ttk.Frame):
             "layer_callback": self.layer_callback,
             "up_top_callback": self.up_top_callback,
             "down_bottom_callback": self.down_bottom_callback,
+            "vat_sw_callback": self.vat_sw_callback,
         }
         self.entries = create_widgets_manual(
             entries_frame,
@@ -277,6 +285,19 @@ class ManualControl(ttk.Frame):
                     delay_z,
                     float(delayn),
                 ),
+            )
+            self.thread_motor.start()
+        else:
+            print("Motor is already running... Wait until it finishes")
+            if not self.thread_motor.is_alive():
+                self.thread_motor.join()
+                self.thread_motor = None
+
+    def vat_sw_callback(self, delayn):
+        if self.thread_motor is None or not self.thread_motor.is_alive():
+            self.thread_motor = threading.Thread(
+                target=control_motor_from_gui,
+                args=("move_plate_sw", "cw", "top", "plate", 0, delay_z, float(delayn)),
             )
             self.thread_motor.start()
         else:

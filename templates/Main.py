@@ -39,8 +39,9 @@ def configure_styles():
     style.configure("danger.TButton", font=("Arial", 18))
     style.configure("Custom.Treeview", font=("Arial", 18), rowheight=30)
     style.configure("Custom.Treeview.Heading", font=("Arial", 18, "bold"))
-    style.configure("success.TButton", font=("Arial", 18))
-    style.configure("primary.TButton", font=("Arial", 18))
+    style.configure("success.TButton", font=font_buttons)
+    style.configure("primary.TButton", font=font_buttons)
+    style.configure("secondary.TButton", font=font_buttons)
     return style
 
 
@@ -129,7 +130,7 @@ class MainGUI(ttk.Window):
             image=self.imgs["config"],
             compound="left",
             command=self.click_config,
-            style="Custom.TButton",
+            style="secondary.TButton",
         ).grid(row=0, column=0, sticky="w", padx=15, pady=15)
         self.button_test = ttk.Button(
             self.frame_footer,

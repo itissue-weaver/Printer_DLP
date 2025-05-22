@@ -42,6 +42,8 @@ class MotorController:
         GPIO.setup(self.pins["SLEEP"], GPIO.OUT)
         GPIO.setup(self.pins["SWITCH_2"], GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.setup(self.pins["SWITCH_3"], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(self.pins["SWITCH_0"], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(self.pins["SWITCH_1"], GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
         GPIO.output(self.pins["SLEEP"], GPIO.HIGH)
         GPIO.output(self.pins["DIR_PLATE"], GPIO.HIGH)
@@ -213,7 +215,7 @@ if __name__ == "__main__":
                 direction = GPIO.HIGH
             else:
                 direction = GPIO.LOW
-            controller.move_plate_until_switch(direction, controller.pins["SWITCH_0"])
+            controller.move_plate_until_switch(direction, controller.pins["SWITCH_1"])
         case "rotate_motor":
             if args.direction == "cw":
                 direction = GPIO.HIGH

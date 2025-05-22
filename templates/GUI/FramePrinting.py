@@ -11,7 +11,7 @@ from PIL import Image, ImageTk
 import ttkbootstrap as ttk
 from ttkbootstrap.dialogs import Messagebox
 
-from files.constants import zip_file_name
+from files.constants import zip_file_name, font_tabs
 from templates.AuxFunctionsPlots import read_stl
 from templates.AuxiliarFunctions import read_settings, update_settings
 from templates.GUI.PlotFrame import SolidViewer
@@ -41,37 +41,37 @@ def create_widgets_status(master):
 def create_widgets_resume(master):
     settings = read_settings()
     widgets = []
-    ttk.Label(master, text="File name:", font=("Arial", 16, "bold")).grid(
+    ttk.Label(master, text="File name:", font=font_tabs).grid(
         row=0, column=0, sticky="w", padx=5, pady=5
     )
     filepath = settings.get("filepath", "Not filepath")
     entry_file_name = ttk.StringVar(value=os.path.basename(filepath))
     ttk.Entry(master, textvariable=entry_file_name, state="readonly").grid(
-        row=0, column=1, sticky="w", padx=5, pady=5
+        row=0, column=1, sticky="we", padx=5, pady=5
     )
     widgets.append(entry_file_name)
-    ttk.Label(master, text="Width <x>[mm]:", font=("Arial", 16, "bold")).grid(
+    ttk.Label(master, text="Width <x>[mm]:", font=font_tabs).grid(
         row=1, column=0, sticky="w", padx=5, pady=5
     )
     entry_width = ttk.StringVar(value=str(settings.get("width_part", "0.0")))
     ttk.Entry(master, textvariable=entry_width, state="readonly").grid(
-        row=1, column=1, sticky="w", padx=5, pady=5
+        row=1, column=1, sticky="we", padx=5, pady=5
     )
     widgets.append(entry_width)
-    ttk.Label(master, text="Height <y>[mm]:", font=("Arial", 16, "bold")).grid(
+    ttk.Label(master, text="Height <y>[mm]:", font=font_tabs).grid(
         row=2, column=0, sticky="w", padx=5, pady=5
     )
     entry_height = ttk.StringVar(value=str(settings.get("height_part", "0.0")))
     ttk.Entry(master, textvariable=entry_height, state="readonly").grid(
-        row=2, column=1, sticky="w", padx=5, pady=5
+        row=2, column=1, sticky="we", padx=5, pady=5
     )
     widgets.append(entry_height)
-    ttk.Label(master, text="Depth  <z>[mm]:", font=("Arial", 16, "bold")).grid(
+    ttk.Label(master, text="Depth  <z>[mm]:", font=font_tabs).grid(
         row=3, column=0, sticky="w", padx=5, pady=5
     )
     entry_length = ttk.StringVar(value=str(settings.get("depth_part", "0.0")))
     ttk.Entry(master, textvariable=entry_length, state="readonly").grid(
-        row=3, column=1, sticky="w", padx=5, pady=5
+        row=3, column=1, sticky="we", padx=5, pady=5
     )
     widgets.append(entry_length)
     delta_layer = settings.get("delta_layer", 0.5)  # seconds
@@ -80,14 +80,14 @@ def create_widgets_resume(master):
     hours = int(estimated_time / 3600)
     minutes = int((estimated_time % 3600) / 60)
     seconds = int(estimated_time % 60)
-    ttk.Label(master, text="Estimated time:", font=("Arial", 16, "bold")).grid(
+    ttk.Label(master, text="Estimated time:", font=font_tabs).grid(
         row=4, column=0, sticky="w", padx=5, pady=5
     )
     entry_estimated_time = ttk.StringVar(
         value=f"{hours} hours, {minutes} minutes, {seconds:.2f} seconds"
     )
     ttk.Entry(master, textvariable=entry_estimated_time, state="readonly").grid(
-        row=4, column=1, sticky="w", padx=5, pady=5
+        row=4, column=1, sticky="we", padx=5, pady=5
     )
     widgets.append(entry_estimated_time)
     # -----------------frame sequence--------------------------------
@@ -95,7 +95,7 @@ def create_widgets_resume(master):
     frame_sequence = ttk.Frame(master)
     frame_sequence.grid(row=5, column=0, columnspan=2, sticky="nsew", padx=5, pady=5)
     frame_sequence.columnconfigure(0, weight=1)
-    ttk.Label(frame_sequence, text="Sequence: ", font=("Arial", 16, "bold")).grid(
+    ttk.Label(frame_sequence, text="Sequence: ", font=font_tabs).grid(
         row=0, column=0, sticky="w", padx=5, pady=5
     )
     tree = ttk.Treeview(
@@ -109,7 +109,7 @@ def create_widgets_resume(master):
     tree.heading("Height Z", text="Height Z [mm]", anchor="center")
     tree.column("Deposit", width=80, anchor="center")
     tree.column("Height Z", width=80, anchor="center")
-    tree.grid(row=1, column=0, sticky="n")
+    tree.grid(row=1, column=0, sticky="nswe")
     for step in sequence:
         tree.insert("", "end", values=(step["deposit"], step["height_z"]))
     widgets.append(tree)
@@ -154,9 +154,9 @@ class FramePrinting(ttk.Frame):
         self.is_sending = False
         self.frame_process_print = None
         self.is_process_set = False
-        image_capture = Image.open(r"files/img/capture.png")
-        image_capture = image_capture.resize((50, 50))
-        self.icon_capture = ImageTk.PhotoImage(image_capture)
+        # image_capture = Image.open(r"files/img/capture.png")
+        # image_capture = image_capture.resize((40, 40))
+        # self.icon_capture = ImageTk.PhotoImage(image_capture)
         # ----------------------widgets----------------------
         self.frame_main_info = ttk.Frame(self)
         self.frame_main_info.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
@@ -214,21 +214,21 @@ class FramePrinting(ttk.Frame):
         self.frame_buttons = ttk.Frame(self)
         self.frame_buttons.grid(row=1, column=0, sticky="nsew", padx=15, pady=15)
         self.frame_buttons.columnconfigure((0, 1, 2, 3), weight=1)
-        frame_btn_img = ttk.Frame(self.frame_buttons)
-        frame_btn_img.grid(row=0, column=0, sticky="n", padx=15, pady=15)
+        # frame_btn_img = ttk.LabelFrame(self.frame_buttons)
+        # frame_btn_img.grid(row=0, column=0, sticky="n", padx=15, pady=1)
+        # ttk.Button(
+        #     frame_btn_img,
+        #     text="Capture Screenshot",
+        #     image=self.icon_capture,
+        #     command=self.capture_screen_callback,
+        #     style="primary.TButton",
+        # ).grid(row=0, column=0, sticky="ns", padx=15, pady=15)
         ttk.Button(
-            frame_btn_img,
-            text="Capture Screenshot",
-            image=self.icon_capture,
-            command=self.capture_screen_callback,
-            style="primary.TButton",
-        ).grid(row=0, column=0, sticky="ns", padx=15, pady=15)
-        ttk.Button(
-            frame_btn_img,
+            self.frame_buttons,
             text="Set Printing Process",
             command=self.callback_print_process,
-            style="primary.TButton",
-        ).grid(row=0, column=1, sticky="ns", padx=15, pady=15)
+            style="secondary.TButton",
+        ).grid(row=0, column=0, sticky="n", padx=15, pady=15)
         ttk.Button(
             self.frame_buttons,
             text="Send settings",

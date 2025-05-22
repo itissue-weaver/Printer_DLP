@@ -25,7 +25,7 @@ def create_input_widgets(master, **kwargs):
         master,
         text="Buscar archivo",
         command=kwargs.get("callback_searchFile", None),
-        style="Custom.TButton",
+        style="primary.TButton",
     ).grid(row=0, column=0, sticky="ew", padx=3, pady=5)
     return entries
 

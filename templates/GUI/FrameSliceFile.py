@@ -241,7 +241,7 @@ class SliceFile(ttk.Frame):
         filepath = settings.get("filepath")
         self.z_value = 0.0
         self.show_path = ttk.StringVar(
-            value=filepath if filepath is not None else "No file selected"
+            value=filepath.split("/")[-1] if filepath is not None else "No file selected"
         )
         self.z_max = settings.get("depth_part", 100)
         # self.viewer = DlpViewer()

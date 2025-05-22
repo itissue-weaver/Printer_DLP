@@ -401,7 +401,7 @@ class SubFrameConfigBiomaterials(ttk.Toplevel):
             self.frame_buttons,
             text="Aceptar",
             command=lambda: self.on_close(),
-            style="Custom.TButton",
+            style="primary.TButton",
         ).grid(row=0, column=0, sticky="n", padx=15, pady=15)
         # Interceptar el evento de cierre de la ventana
         self.protocol("WM_DELETE_WINDOW", self.on_close)
