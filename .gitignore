@@ -2,3 +2,5 @@
 .idea/
 ./*test.py
 files/img/extracted/*
+files/img/*.zip
+*_test.py
