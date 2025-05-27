@@ -250,6 +250,18 @@ class MainGUIDisplay(ttk.Window):
             font=("Arial", 18),
             style="Custom.TLabel",
         ).grid(row=0, column=1, sticky="w", padx=15, pady=15)
+        self.button_config = ttk.Button(
+            self.frame_footer,
+            text="Close",
+            command=self.on_close,
+            style="danger.TButton",
+            compound="left",
+            image=self.imgs["close"],
+        )
+
+    def on_close(self):
+        self.destroy()
+        self.quit()
 
     def maximize_window(self):
         try:
