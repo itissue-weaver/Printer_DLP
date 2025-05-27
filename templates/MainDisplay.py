@@ -233,7 +233,7 @@ class MainGUIDisplay(ttk.Window):
         # --------------------footer-------------------
         self.frame_footer = ttk.Frame(self)
         self.frame_footer.grid(row=2, column=0, sticky="nsew", padx=15, pady=15)
-        self.frame_footer.columnconfigure((0, 1), weight=1)
+        self.frame_footer.columnconfigure((0, 1, 2), weight=1)
         self.button_test = ttk.Button(
             self.frame_footer,
             text="Test Connection",
@@ -258,6 +258,7 @@ class MainGUIDisplay(ttk.Window):
             compound="left",
             image=self.imgs["close"],
         )
+        self.button_config.grid(row=0, column=2, sticky="e", padx=15, pady=15)
 
     def on_close(self):
         self.destroy()
