@@ -208,7 +208,7 @@ class MainGUIDisplay(ttk.Window):
         self.connected = ttk.BooleanVar(value=False)
         self.title("DLP Bioprinter Control")
         self.style_gui = configure_styles()
-        self.after(0, lambda: self.state("zoomed"))
+        self.after(0, self.maximize_window)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
         self.imgs = load_images()
@@ -250,6 +250,14 @@ class MainGUIDisplay(ttk.Window):
             font=("Arial", 18),
             style="Custom.TLabel",
         ).grid(row=0, column=1, sticky="w", padx=15, pady=15)
+
+    def maximize_window(self):
+        try:
+            self.state("zoomed")
+        except Exception  as e:
+            print(e)
+            self.attributes("-zoomed", True)
+            self.attributes("-fullscreen", True)
 
     def up_callback(self, displacement, delayz):
         if self.thread_motor is None or not self.thread_motor.is_alive():
