@@ -271,7 +271,7 @@ class MainGUIDisplay(ttk.Window):
         except Exception  as e:
             print(e)
             self.attributes("-zoomed", True) # maximize
-            self.attributes("-fullscreen", True) # hide title bar
+            # self.attributes("-fullscreen", True) # hide title bar
 
     def up_callback(self, displacement, delayz):
         if self.thread_motor is None or not self.thread_motor.is_alive():
