@@ -257,7 +257,7 @@ class MainGUIDisplay(ttk.Window):
             command=self.on_close,
             style="danger.TButton",
             compound="left",
-            image=self.imgs.get("close", "default"),
+            image=self.imgs.get("close"),
         )
         self.button_config.grid(row=0, column=2, sticky="e", padx=15, pady=15)
 
