@@ -256,7 +256,7 @@ class MainGUIDisplay(ttk.Window):
             self.state("zoomed")
         except Exception  as e:
             print(e)
-            self.attributes("-zoomed", True)
+            # self.attributes("-zoomed", True)
             self.attributes("-fullscreen", True)
 
     def up_callback(self, displacement, delayz):
