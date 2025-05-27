@@ -27,6 +27,7 @@ headers = {
     # "Referer": "http://raspberrypi.local",
 }
 font_title = ("Arial", 28, "bold")
+font_title_n = ("Arial", 28, "normal")
 font_text = ("Arial", 16, "normal")
 font_tabs = ("Arial", 18, "bold")
 font_buttons = ("Arial", 18, "normal")
