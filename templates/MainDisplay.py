@@ -50,6 +50,7 @@ def load_images():
         "save": r"files/img/save_btn.png",
         "control": r"files/img/remote-control.jpg",
         "link": r"files/img/link.png",
+        "close":  r"files/img/close.png",
         "default": r"files/img/no_image.png",
     }
     imgs = {}
