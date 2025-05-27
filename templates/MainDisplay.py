@@ -11,7 +11,7 @@ from files.constants import (
     font_entry,
     font_tabs,
     delay_z,
-    delay_n,
+    delay_n, font_entry_display,
 )
 from templates.midleware.MD_Printer import (
     control_led_from_gui,
@@ -26,10 +26,10 @@ def configure_styles():
     style = ttk.Style()
     style.configure("Custom.TButton", font=font_buttons)
     style.configure("Custom.TLabel", font=("Sylfaen", 20, "normal"))
-    style.configure("Custom.TEntry", font=font_entry)
+    style.configure("Custom.TEntry", font=font_entry_display)
     style.configure("Custom.TLabelframe.Label", font=("Sylfaen", 24, "normal"))
     style.configure("Custom.TNotebook.Tab", font=font_tabs)
-    style.configure("Custom.TCombobox", font=font_entry)
+    style.configure("Custom.TCombobox", font=font_entry_display)
     style.configure("info.TButton", font=font_buttons)
     style.configure("success.TButton", font=font_buttons)
     style.configure("danger.TButton", font=font_buttons)
@@ -81,7 +81,7 @@ def create_widgets(master, **kwargs):
         frame_platform,
         textvariable=svar_displacement,
         style="Custom.TEntry",
-        font=font_entry,
+        font=font_entry_display,
     ).grid(row=1, column=1, sticky="nsew", pady=5)
     ttk.Label(
         frame_platform, text="Delay step (Speed) [s]: ", style="Custom.TLabel"
@@ -91,7 +91,7 @@ def create_widgets(master, **kwargs):
         frame_platform,
         textvariable=svar_delay_z,
         style="Custom.TEntry",
-        font=font_entry,
+        font=font_entry_display,
     ).grid(row=2, column=1, sticky="nsew    ", pady=5)
     ttk.Button(
         frame_platform,
@@ -139,14 +139,14 @@ def create_widgets(master, **kwargs):
     )
     svar_rotation = ttk.StringVar(value="90")
     ttk.Entry(
-        frame_vat, textvariable=svar_rotation, style="Custom.TEntry", font=font_entry
+        frame_vat, textvariable=svar_rotation, style="Custom.TEntry", font=font_entry_display
     ).grid(row=0, column=1, sticky="nsew", pady=5, padx=10)
     ttk.Label(frame_vat, text="Delay step (Speed) [s]: ", style="Custom.TLabel").grid(
         row=1, column=0, sticky="nsew", pady=5, padx=10
     )
     svar_delay_n = ttk.StringVar(value="0.005")
     ttk.Entry(
-        frame_vat, textvariable=svar_delay_n, style="Custom.TEntry", font=font_entry
+        frame_vat, textvariable=svar_delay_n, style="Custom.TEntry", font=font_entry_display
     ).grid(row=1, column=1, sticky="nsew", pady=5, padx=10)
     ttk.Button(
         frame_vat,
@@ -270,8 +270,8 @@ class MainGUIDisplay(ttk.Window):
             self.state("zoomed")
         except Exception  as e:
             print(e)
-            self.attributes("-zoomed", True)
-            self.attributes("-fullscreen", True)
+            self.attributes("-zoomed", True) # maximize
+            self.attributes("-fullscreen", True) # hide title bar
 
     def up_callback(self, displacement, delayz):
         if self.thread_motor is None or not self.thread_motor.is_alive():
