@@ -6,6 +6,7 @@ import threading
 
 import ttkbootstrap as ttk
 from PIL import Image, ImageTk
+from PIL.ImageChops import offset
 
 from files.constants import (
     font_entry,
@@ -82,7 +83,26 @@ def create_widgets(master, **kwargs):
         textvariable=svar_displacement,
         style="Custom.TEntry",
         font=font_entry_display,
-    ).grid(row=1, column=1, sticky="nsew", pady=5)
+    ).grid(row=1, column=1, sticky="we", pady=5)
+    frame_btn_displacement = ttk.Frame(frame_platform)
+    frame_btn_displacement.grid(row=1, column=2, sticky="nsew", padx=10, pady=10)
+    frame_btn_displacement.columnconfigure(0, weight=1)
+    frame_btn_displacement.rowconfigure((0, 1), weight=1)
+    ttk.Button(
+        frame_btn_displacement,
+        image=kwargs.get("imgs")["arrow_up"],
+        command=lambda: kwargs.get("change_value_callback")(svar_displacement, True, "z"),
+        compound="center",
+        style="success.TButton",
+    ).grid(row=0, column=0, sticky="nswe", pady=10)
+    ttk.Button(
+        frame_btn_displacement,
+        image=kwargs.get("imgs")["arrow_down"],
+        command=lambda: kwargs.get("change_value_callback")(svar_displacement, False, "z"),
+        compound="center",
+        style="success.TButton",
+    ).grid(row=1, column=0, sticky="nswe", pady=10)
+    # ---------------------------------Delay z-------------------
     ttk.Label(
         frame_platform, text="Delay step (Speed) [s]: ", style="Custom.TLabel"
     ).grid(row=2, column=0, sticky="nsew", pady=5)
@@ -92,7 +112,26 @@ def create_widgets(master, **kwargs):
         textvariable=svar_delay_z,
         style="Custom.TEntry",
         font=font_entry_display,
-    ).grid(row=2, column=1, sticky="nsew    ", pady=5)
+    ).grid(row=2, column=1, sticky="we    ", pady=5)
+    frame_btn_delay_z = ttk.Frame(frame_platform)
+    frame_btn_delay_z.grid(row=2, column=2, sticky="nsew", padx=10, pady=10)
+    frame_btn_delay_z.columnconfigure(0, weight=1)
+    frame_btn_delay_z.rowconfigure((0, 1), weight=1)
+    ttk.Button(
+        frame_btn_delay_z,
+        image=kwargs.get("imgs")["arrow_up"],
+        command=lambda: kwargs.get("change_value_callback")(svar_delay_z, True, "delay_z"),
+        compound="center",
+        style="success.TButton",
+    ).grid(row=0, column=0, sticky="nswe", pady=10)
+    ttk.Button(
+        frame_btn_delay_z,
+        image=kwargs.get("imgs")["arrow_down"],
+        command=lambda: kwargs.get("change_value_callback")(svar_delay_z, False, "delay_z"),
+        compound="center",
+        style="success.TButton",
+    ).grid(row=1, column=0, sticky="nswe", pady=10)
+    # ------------------------------actuators z------------------------------
     ttk.Button(
         frame_platform,
         image=kwargs.get("imgs")["arrow_up"],
@@ -140,14 +179,52 @@ def create_widgets(master, **kwargs):
     svar_rotation = ttk.StringVar(value="90")
     ttk.Entry(
         frame_vat, textvariable=svar_rotation, style="Custom.TEntry", font=font_entry_display
-    ).grid(row=0, column=1, sticky="nsew", pady=5, padx=10)
+    ).grid(row=0, column=1, sticky="we", pady=5, padx=10)
+    frame_rotation = ttk.Frame(frame_vat)
+    frame_rotation.grid(row=0, column=2, sticky="nswe", padx=10, pady=10)
+    frame_rotation.columnconfigure(0, weight=1)
+    frame_rotation.rowconfigure((0, 1), weight=1)
+    ttk.Button(
+        frame_rotation,
+        image=kwargs.get("imgs")["arrow_up"],
+        command=lambda: kwargs.get("change_value_callback")(svar_rotation, True, "plate"),
+        compound="right",
+        style="success.TButton",
+    ).grid(row=0, column=0, sticky="nswe", pady=10, padx=10)
+    ttk.Button(
+        frame_rotation,
+        image=kwargs.get("imgs")["arrow_down"],
+        command=lambda: kwargs.get("change_value_callback")(svar_rotation, False, "plate"),
+        compound="right",
+        style="success.TButton",
+    ).grid(row=1, column=0, sticky="nswe", pady=10, padx=10)
+    # -----------------------------------delay plate--------------------------------------------------
     ttk.Label(frame_vat, text="Delay step (Speed) [s]: ", style="Custom.TLabel").grid(
         row=1, column=0, sticky="nsew", pady=5, padx=10
     )
     svar_delay_n = ttk.StringVar(value="0.005")
     ttk.Entry(
         frame_vat, textvariable=svar_delay_n, style="Custom.TEntry", font=font_entry_display
-    ).grid(row=1, column=1, sticky="nsew", pady=5, padx=10)
+    ).grid(row=1, column=1, sticky="we", pady=5, padx=10)
+    frame_delay_n = ttk.Frame(frame_vat)
+    frame_delay_n.grid(row=1, column=2, sticky="nswe", padx=10, pady=10)
+    frame_delay_n.columnconfigure(0, weight=1)
+    frame_delay_n.rowconfigure((0, 1), weight=1)
+    ttk.Button(
+        frame_delay_n,
+        image=kwargs.get("imgs")["arrow_up"],
+        command=lambda: kwargs.get("change_value_callback")(svar_delay_n, True, "delay_n"),
+        compound="right",
+        style="success.TButton",
+    ).grid(row=0, column=0, sticky="nswe", pady=10, padx=10)
+    ttk.Button(
+        frame_delay_n,
+        image=kwargs.get("imgs")["arrow_down"],
+        command=lambda: kwargs.get("change_value_callback")(svar_delay_n, False, "delay_n"),
+        compound="right",
+        style="success.TButton",
+    ).grid(row=1, column=0, sticky="nswe", pady=10, padx=10)
+    # -----------------------------------rotation actuators--------------------------------------------------
     ttk.Button(
         frame_vat,
         image=kwargs.get("imgs")["rotate"],
@@ -206,6 +283,10 @@ class MainGUIDisplay(ttk.Window):
         self.thread_motor = None
         self.frame_m_control = None
         self.project_key = None
+        self.add_displacement = 0.5
+        self.add_angle = 1
+        self.add_delay_z = 0.001
+        self.add_delay_n = 0.001
         self.connected = ttk.BooleanVar(value=False)
         self.title("DLP Bioprinter Control")
         self.style_gui = configure_styles()
@@ -221,6 +302,8 @@ class MainGUIDisplay(ttk.Window):
             "up_top_callback": self.up_top_callback,
             "down_bottom_callback": self.down_bottom_callback,
             "vat_sw_callback": self.vat_sw_callback,
+            "change_value_callback": self.change_value_callback,
+            "imgs": self.imgs
         }
         # --------------------header-------------------
         self.frame_header = ttk.Frame(self)
@@ -230,7 +313,7 @@ class MainGUIDisplay(ttk.Window):
         self.frame_body.grid(row=1, column=0, sticky="nsew", padx=15, pady=15)
         self.frame_body.columnconfigure((0, 1), weight=1)
         self.frame_body.rowconfigure(0, weight=1)
-        self.entries = create_widgets(self.frame_body, imgs=self.imgs, **kwargs)
+        self.entries = create_widgets(self.frame_body, **kwargs)
         # --------------------footer-------------------
         self.frame_footer = ttk.Frame(self)
         self.frame_footer.grid(row=2, column=0, sticky="nsew", padx=15, pady=15)
@@ -398,3 +481,22 @@ class MainGUIDisplay(ttk.Window):
             self.connected.set(False)
             self.txt_connected.set("Disconnected")
             self.button_test.configure(style="danger.TButton")
+
+    def change_value_callback(self, svar, increase=True, platform="plate"):
+        current_value = float(svar.get())
+        match platform:
+            case "plate":
+                offset_d = self.add_angle
+            case "z":
+                offset_d = self.add_displacement
+            case "delay_z":
+                offset_d = self.add_delay_z
+            case "delay_n":
+                offset_d = self.add_delay_n
+            case _:
+                return
+        current_value += offset_d if increase else -offset_d
+        current_value = round(current_value, 3)
+        if current_value <= 0:
+            current_value = offset_d
+        svar.set(str(current_value))
