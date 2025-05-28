@@ -3,13 +3,12 @@ __author__ = "Edisson A. Naula"
 __date__ = "$ 24/may/2025  at 11:38 $"
 
 import threading
+from tkinter import filedialog
 
 import ttkbootstrap as ttk
 from PIL import Image, ImageTk
-from PIL.ImageChops import offset
 
 from files.constants import (
-    font_entry,
     font_tabs,
     delay_z,
     delay_n, font_entry_display,
@@ -43,7 +42,7 @@ def configure_styles():
 
 
 def load_images():
-    imgs_path = {
+    images_path = {
         "arrow_up": r"files/img/arrow_up.png",
         "arrow_down": r"files/img/arrow_down.png",
         "rotate": r"files/img/rotate-icon.png",
@@ -54,16 +53,16 @@ def load_images():
         "close":  r"files/img/close.png",
         "default": r"files/img/no_image.png",
     }
-    imgs = {}
-    for key, path in imgs_path.items():
+    images = {}
+    for key, path in images_path.items():
         try:
             img = Image.open(path)
         except FileNotFoundError:
-            path = imgs_path["default"]
+            path = images_path["default"]
             img = Image.open(path)
         img = img.resize((50, 50))
-        imgs[key] = ImageTk.PhotoImage(img)
-    return imgs
+        images[key] = ImageTk.PhotoImage(img)
+    return images
 
 
 def create_widgets(master, **kwargs):
@@ -90,14 +89,14 @@ def create_widgets(master, **kwargs):
     frame_btn_displacement.rowconfigure((0, 1), weight=1)
     ttk.Button(
         frame_btn_displacement,
-        image=kwargs.get("imgs")["arrow_up"],
+        image=kwargs.get("images")["arrow_up"],
         command=lambda: kwargs.get("change_value_callback")(svar_displacement, True, "z"),
         compound="center",
         style="success.TButton",
     ).grid(row=0, column=0, sticky="nswe", pady=10)
     ttk.Button(
         frame_btn_displacement,
-        image=kwargs.get("imgs")["arrow_down"],
+        image=kwargs.get("images")["arrow_down"],
         command=lambda: kwargs.get("change_value_callback")(svar_displacement, False, "z"),
         compound="center",
         style="success.TButton",
@@ -119,14 +118,14 @@ def create_widgets(master, **kwargs):
     frame_btn_delay_z.rowconfigure((0, 1), weight=1)
     ttk.Button(
         frame_btn_delay_z,
-        image=kwargs.get("imgs")["arrow_up"],
+        image=kwargs.get("images")["arrow_up"],
         command=lambda: kwargs.get("change_value_callback")(svar_delay_z, True, "delay_z"),
         compound="center",
         style="success.TButton",
     ).grid(row=0, column=0, sticky="nswe", pady=10)
     ttk.Button(
         frame_btn_delay_z,
-        image=kwargs.get("imgs")["arrow_down"],
+        image=kwargs.get("images")["arrow_down"],
         command=lambda: kwargs.get("change_value_callback")(svar_delay_z, False, "delay_z"),
         compound="center",
         style="success.TButton",
@@ -134,7 +133,7 @@ def create_widgets(master, **kwargs):
     # ------------------------------actuators z------------------------------
     ttk.Button(
         frame_platform,
-        image=kwargs.get("imgs")["arrow_up"],
+        image=kwargs.get("images")["arrow_up"],
         command=lambda: kwargs.get("up_callback")(
             svar_displacement.get(), svar_delay_z.get()
         ),
@@ -144,7 +143,7 @@ def create_widgets(master, **kwargs):
     ).grid(row=3, column=0, sticky="nswe", pady=10, padx=10)
     ttk.Button(
         frame_platform,
-        image=kwargs.get("imgs")["arrow_up"],
+        image=kwargs.get("images")["arrow_up"],
         command=lambda: kwargs.get("up_top_callback")(svar_delay_z.get()),
         text="Up sw",
         compound="right",
@@ -152,7 +151,7 @@ def create_widgets(master, **kwargs):
     ).grid(row=3, column=1, sticky="nswe", pady=10, padx=10)
     ttk.Button(
         frame_platform,
-        image=kwargs.get("imgs")["arrow_down"],
+        image=kwargs.get("images")["arrow_down"],
         command=lambda: kwargs.get("down_callback")(
             svar_displacement.get(), svar_delay_z.get()
         ),
@@ -162,7 +161,7 @@ def create_widgets(master, **kwargs):
     ).grid(row=4, column=0, sticky="nswe", pady=10, padx=10)
     ttk.Button(
         frame_platform,
-        image=kwargs.get("imgs")["arrow_down"],
+        image=kwargs.get("images")["arrow_down"],
         command=lambda: kwargs.get("down_bottom_callback")(svar_delay_z.get()),
         text="Down sw",
         compound="right",
@@ -186,14 +185,14 @@ def create_widgets(master, **kwargs):
     frame_rotation.rowconfigure((0, 1), weight=1)
     ttk.Button(
         frame_rotation,
-        image=kwargs.get("imgs")["arrow_up"],
+        image=kwargs.get("images")["arrow_up"],
         command=lambda: kwargs.get("change_value_callback")(svar_rotation, True, "plate"),
         compound="right",
         style="success.TButton",
     ).grid(row=0, column=0, sticky="nswe", pady=10, padx=10)
     ttk.Button(
         frame_rotation,
-        image=kwargs.get("imgs")["arrow_down"],
+        image=kwargs.get("images")["arrow_down"],
         command=lambda: kwargs.get("change_value_callback")(svar_rotation, False, "plate"),
         compound="right",
         style="success.TButton",
@@ -212,14 +211,14 @@ def create_widgets(master, **kwargs):
     frame_delay_n.rowconfigure((0, 1), weight=1)
     ttk.Button(
         frame_delay_n,
-        image=kwargs.get("imgs")["arrow_up"],
+        image=kwargs.get("images")["arrow_up"],
         command=lambda: kwargs.get("change_value_callback")(svar_delay_n, True, "delay_n"),
         compound="right",
         style="success.TButton",
     ).grid(row=0, column=0, sticky="nswe", pady=10, padx=10)
     ttk.Button(
         frame_delay_n,
-        image=kwargs.get("imgs")["arrow_down"],
+        image=kwargs.get("images")["arrow_down"],
         command=lambda: kwargs.get("change_value_callback")(svar_delay_n, False, "delay_n"),
         compound="right",
         style="success.TButton",
@@ -227,7 +226,7 @@ def create_widgets(master, **kwargs):
     # -----------------------------------rotation actuators--------------------------------------------------
     ttk.Button(
         frame_vat,
-        image=kwargs.get("imgs")["rotate"],
+        image=kwargs.get("images")["rotate"],
         command=lambda: kwargs.get("vat_callback")(
             svar_rotation.get(), svar_delay_n.get()
         ),
@@ -238,7 +237,7 @@ def create_widgets(master, **kwargs):
     entries.append(svar_rotation)
     ttk.Button(
         frame_vat,
-        image=kwargs.get("imgs")["rotate"],
+        image=kwargs.get("images")["rotate"],
         command=lambda: kwargs.get("vat_sw_callback")(svar_delay_n.get()),
         text="Rotation sw",
         style="success.TButton",
@@ -293,7 +292,7 @@ class MainGUIDisplay(ttk.Window):
         self.after(0, self.maximize_window)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
-        self.imgs = load_images()
+        self.images = load_images()
         kwargs = {
             "up_callback": self.up_callback,
             "down_callback": self.down_callback,
@@ -303,7 +302,8 @@ class MainGUIDisplay(ttk.Window):
             "down_bottom_callback": self.down_bottom_callback,
             "vat_sw_callback": self.vat_sw_callback,
             "change_value_callback": self.change_value_callback,
-            "imgs": self.imgs
+            "images": self.images,
+            "layer_callback": self.layer_callback,
         }
         # --------------------header-------------------
         self.frame_header = ttk.Frame(self)
@@ -324,7 +324,7 @@ class MainGUIDisplay(ttk.Window):
             command=self.test_connection,
             style="danger.TButton",
             compound="left",
-            image=self.imgs["link"],
+            image=self.images["link"],
         )
         self.button_test.grid(row=0, column=0, sticky="e", padx=15, pady=15)
         self.txt_connected = ttk.StringVar(value="Disconnected")
@@ -340,7 +340,7 @@ class MainGUIDisplay(ttk.Window):
             command=self.on_close,
             style="danger.TButton",
             compound="left",
-            image=self.imgs.get("close"),
+            image=self.images.get("close"),
         )
         self.button_config.grid(row=0, column=2, sticky="e", padx=15, pady=15)
 
@@ -356,12 +356,12 @@ class MainGUIDisplay(ttk.Window):
             self.attributes("-zoomed", True) # maximize
             # self.attributes("-fullscreen", True) # hide title bar
 
-    def up_callback(self, displacement, delayz):
+    def up_callback(self, displacement, delay__z):
         if self.thread_motor is None or not self.thread_motor.is_alive():
             steps = 200 * int(displacement) / 8
             self.thread_motor = threading.Thread(
                 target=control_motor_from_gui,
-                args=("move_z", "cw", "top", "z", int(steps), float(delayz), delay_n),
+                args=("move_z", "cw", "top", "z", int(steps), float(delay__z), delay_n),
             )
             self.thread_motor.start()
         else:
@@ -371,11 +371,11 @@ class MainGUIDisplay(ttk.Window):
                 self.thread_motor.join()
                 self.thread_motor = None
 
-    def up_top_callback(self, delayz):
+    def up_top_callback(self, delay__z):
         if self.thread_motor is None or not self.thread_motor.is_alive():
             self.thread_motor = threading.Thread(
                 target=control_motor_from_gui,
-                args=("move_z_sw", "cw", "top", "z", 0, float(delayz), delay_n),
+                args=("move_z_sw", "cw", "top", "z", 0, float(delay__z), delay_n),
             )
             self.thread_motor.start()
         else:
@@ -384,11 +384,11 @@ class MainGUIDisplay(ttk.Window):
                 self.thread_motor.join()
                 self.thread_motor = None
 
-    def down_bottom_callback(self, delayz):
+    def down_bottom_callback(self, delay__z):
         if self.thread_motor is None or not self.thread_motor.is_alive():
             self.thread_motor = threading.Thread(
                 target=control_motor_from_gui,
-                args=("move_z_sw", "ccw", "bottom", "z", 0, float(delayz), delay_n),
+                args=("move_z_sw", "ccw", "bottom", "z", 0, float(delay__z), delay_n),
             )
             self.thread_motor.start()
         else:
@@ -397,7 +397,7 @@ class MainGUIDisplay(ttk.Window):
                 self.thread_motor.join()
                 self.thread_motor = None
 
-    def down_callback(self, displacement, delayz):
+    def down_callback(self, displacement, delay__z):
         if self.thread_motor is None or not self.thread_motor.is_alive():
             steps = 200 * int(displacement) / 8
             self.thread_motor = threading.Thread(
@@ -408,7 +408,7 @@ class MainGUIDisplay(ttk.Window):
                     "bottom",
                     "z",
                     int(steps),
-                    float(delayz),
+                    float(delay__z),
                     delay_n,
                 ),
             )
@@ -419,7 +419,7 @@ class MainGUIDisplay(ttk.Window):
                 self.thread_motor.join()
                 self.thread_motor = None
 
-    def vat_callback(self, rotation, delayn):
+    def vat_callback(self, rotation, delay__n):
         if self.thread_motor is None or not self.thread_motor.is_alive():
             steps = 200 * int(rotation) / 360
             self.thread_motor = threading.Thread(
@@ -431,7 +431,7 @@ class MainGUIDisplay(ttk.Window):
                     "plate",
                     int(steps),
                     delay_z,
-                    float(delayn),
+                    float(delay__n),
                 ),
             )
             self.thread_motor.start()
@@ -441,11 +441,11 @@ class MainGUIDisplay(ttk.Window):
                 self.thread_motor.join()
                 self.thread_motor = None
 
-    def vat_sw_callback(self, delayn):
+    def vat_sw_callback(self, delay__n):
         if self.thread_motor is None or not self.thread_motor.is_alive():
             self.thread_motor = threading.Thread(
                 target=control_motor_from_gui,
-                args=("move_plate_sw", "cw", "top", "plate", 0, delay_z, float(delayn)),
+                args=("move_plate_sw", "cw", "top", "plate", 0, delay_z, float(delay__n)),
             )
             self.thread_motor.start()
         else:
@@ -500,3 +500,11 @@ class MainGUIDisplay(ttk.Window):
         if current_value <= 0:
             current_value = offset_d
         svar.set(str(current_value))
+
+    def layer_callback(self):
+        path = filedialog.askopenfilename(
+            title="Select an  image file",
+            filetypes=[("Image files", "*.png *.jpg *.jpeg"), ("All files", "*.*")],
+        )
+        if path:
+            print(path)
