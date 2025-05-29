@@ -123,7 +123,7 @@ class Start(Resource):
         msg = ""
         global projector  # Indicar que estamos modificando la variable global
         with projector_lock:
-            if projector and projector.is_alive():
+            if projector.is_alive():
                 print("El hilo ya está en ejecución.")
                 msg += "Ok, projector already started\n"
             else:
@@ -143,11 +143,10 @@ class Stop(Resource):
         global projector
         msg = ""
         with projector_lock:
-            if projector and projector.is_alive():
+            if projector.is_alive():
                 msg += f"Ok, projector stopped -{projector}-\n"
                 projector.stop_projecting()
                 projector.join()
-                projector = None  # Resetear la referencia después de detenerlo
                 data = True
             else:
                 msg += f"Ok, projector already stopped {projector}\n"
