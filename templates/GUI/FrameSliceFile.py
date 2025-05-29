@@ -429,7 +429,7 @@ class SliceFile(ttk.Frame):
                 stripe_width=stripe_width,
             )
             # Slice the object at Z and get the boundaries
-            geom_slice = solid_part.getVectorSlice(current_z)
+            geom_slice = solid_part.getVectorSlice(current_z, simplificationFactor=0.9, simplificationFactorMode="absolute", simplificationPreserveTopology=True)
             # print("slicing: ", settings.get("filepath"), " at z=", current_z)
             # Perform the hatching operations
             layer = my_hatcher.hatch(geom_slice)
@@ -457,6 +457,7 @@ class SliceFile(ttk.Frame):
                 width,
                 height,
                 clean_plot=True,
+                contour_coords=geom_slice
             )
             self.canvas_img.reaload_image()
             return layer

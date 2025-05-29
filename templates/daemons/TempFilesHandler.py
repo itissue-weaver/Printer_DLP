@@ -90,6 +90,7 @@ class TempFilesHandler(threading.Thread):
                 centroide = settings.get("centroide", [0, 0, 0])
                 width = settings.get("width_part", 0.0)
                 height = settings.get("height_part", 0.0)
+                contour_coords = geom_slice.getContourCoordinates()
                 self.ploter.plotLayer(
                     dpi,
                     layer,
@@ -100,6 +101,7 @@ class TempFilesHandler(threading.Thread):
                     width,
                     height,
                     clean_plot=True,
+                    contour_coords=contour_coords
                 )
                 layer_sliced += 1
                 self.update_progress(num_layers, layer_sliced)

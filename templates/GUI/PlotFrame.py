@@ -9,6 +9,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import pyslm.visualise
 from PIL import Image, ImageTk
+from matplotlib.patches import Polygon
 
 from files.constants import image_path_projector, path_solid_capture, desired_width_slice_image
 from templates.AuxiliarHatcher import divide_solid_in_z_parts
@@ -58,6 +59,7 @@ class PlotSTL(ttk.Frame):
         width,
         height,
         clean_plot=False,
+        contour_coords=None
     ):
         if layer is None:
             print("No layer found")
@@ -82,6 +84,17 @@ class PlotSTL(ttk.Frame):
             [centroide[1] - height * 1.5 / 2, centroide[1] + height * 1.5 / 2]
         )
         self.axes.set_axis_off()
+        for line in self.axes.get_lines():
+            line.set_color("white")
+        if contour_coords is not None:
+            for contour in contour_coords:
+                # contour[:, 0] = contour[:, 0] - centroide[0] + width / 2
+                # contour[:, 1] = contour[:, 1] - centroide[1] + height / 2
+                # contour[:, 0] *= desired_width_slice_image / width
+                # contour[:, 1] *= desired_width_slice_image / height
+                white_fill = Polygon(contour, closed=True, facecolor="white", edgecolor="white")
+                self.axes.add_patch(white_fill)
+
         if self.save_temp_flag:
             # Convert cm to inches (1 inch = 2.54 cm)
             width_inch = projector_width_cm / 2.54
