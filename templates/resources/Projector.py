@@ -142,7 +142,7 @@ class Stop(Resource):
         global projector
         msg = ""
         if projector:
-            msg += f"Ok, projector stopped {projector}\n"
+            msg += f"Ok, projector stopped -{projector}-\n"
             projector.stop_projecting()
             projector = None  # Resetear la referencia después de detenerlo
             data = True
