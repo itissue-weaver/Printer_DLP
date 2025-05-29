@@ -41,7 +41,7 @@
     ],
     "dpi": 300,
     "layer_depth": 0.5,
-    "delta_layer": 30.0,
+    "delta_layer": 20.0,
     "plate": 1,
     "HOST": "127.0.0.1",
     "num_layers": 40,
@@ -153,6 +153,6 @@
     "mode_biomaterial": "mode_1",
     "delay_z": 0.005,
     "delay_n": 0.01,
-    "b_layers": 4,
-    "e_time_b_layers": 50.0
+    "b_layers": 1,
+    "e_time_b_layers": 40.0
 }

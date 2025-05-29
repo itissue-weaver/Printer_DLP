@@ -146,7 +146,7 @@ class Stop(Resource):
             msg += "Ok, projector stopped\n"
             data = True
         else:
-            msg += "Ok, projector already stopped\n"
+            msg += f"Ok, projector already stopped {projector}\n"
             data = False
         return {
             "msg": msg,

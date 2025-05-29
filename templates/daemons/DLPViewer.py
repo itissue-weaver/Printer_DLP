@@ -267,7 +267,7 @@ class DlpViewer(threading.Thread):
         #     print(e)
         # print("stop initiate")
         # pygame.display.quit()
-        print("dsiplay quit")
+        print("display quit")
         pygame.quit()
         turn_on_off_led()
         # pygame.display.quit()
