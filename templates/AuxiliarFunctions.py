@@ -5,7 +5,7 @@ __date__ = "$ 22/ene/2025  at 21:07 $"
 import json
 from datetime import datetime
 
-from files.constants import settings_path, materials_path, projects_path, format_timestamp
+from files.constants import settings_path, materials_path, projects_path, format_timestamp, flags_path
 
 import os
 
@@ -37,6 +37,21 @@ def update_materials(materials):
 def read_projects():
     projects = json.load(open(projects_path, "r"))
     return projects
+
+
+def read_flags():
+    with open(flags_path, "r") as f:
+        flags = json.load(f)
+    return flags
+
+
+def update_flags(**kwargs):
+    with open(flags_path, "r") as f:
+        flags = json.load(f)
+    for key, value in kwargs.items():
+        flags[key] = value
+    with open(flags_path, "w") as f:
+        json.dump(flags, f, indent=4)
 
 
 def create_new_project(data):

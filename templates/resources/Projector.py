@@ -11,7 +11,7 @@ from flask_restx import Namespace, Resource
 from werkzeug.utils import secure_filename
 
 from files.constants import image_path_projector, zip_file_name, path_temp_zip
-from templates.AuxiliarFunctions import read_settings, update_settings, write_log
+from templates.AuxiliarFunctions import read_settings, update_settings, write_log, update_flags
 from templates.daemons.DLPViewer import DlpViewer
 from templates.midleware.MD_Printer import (
     uncompres_files_zip,
@@ -28,8 +28,6 @@ from templates.models.printer_models import (
 
 # Definir la variable global
 projector = None
-projector_lock = threading.Lock()
-
 ns = Namespace("api/v1/printer")
 
 
@@ -122,14 +120,13 @@ class Start(Resource):
     def post(self):
         msg = ""
         global projector  # Indicar que estamos modificando la variable global
-        with projector_lock:
-            if projector and projector.is_alive():
-                print("El hilo ya está en ejecución.")
-                msg += "Ok, projector already started\n"
-            else:
-                projector = DlpViewer()  # Crear una nueva instancia accesible globalmente
-                projector.start_projecting()
-                msg += "Ok, projector started\n"
+        if projector and projector.is_alive():
+            print("El hilo ya está en ejecución.")
+            msg += "Ok, projector already started\n"
+        else:
+            projector = DlpViewer()  # Crear una nueva instancia accesible globalmente
+            projector.start_projecting()
+            msg += "Ok, projector started\n"
         return {
             "msg": msg,
             "data": projector.is_alive_projector(),
@@ -140,20 +137,11 @@ class Start(Resource):
 class Stop(Resource):
     def post(self):
         # stop the print
-        global projector
         msg = ""
-        with projector_lock:
-            if projector.is_alive():
-                msg += f"Ok, projector stopped -{projector}-\n"
-                projector.stop_projecting()
-                projector.join()
-                data = True
-            else:
-                msg += f"Ok, projector already stopped {projector}\n"
-                data = False
+        update_flags(stop_printing=True)
         return {
             "msg": msg,
-            "data": data,
+            "data": True,
         }, 200
 
 

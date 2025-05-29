@@ -42,7 +42,7 @@ from files.constants import image_path_projector, settings_path, delay_z, delay_
 
 import json
 
-from templates.AuxiliarFunctions import write_log
+from templates.AuxiliarFunctions import write_log, update_flags, read_flags
 from templates.midleware.MD_Printer import (
     subprocess_control_led,
     subprocess_control_motor,
@@ -173,6 +173,9 @@ class DlpViewer(threading.Thread):
             self.last_time = perf_counter()
             self.running = True
             while self.running:
+                flags = read_flags()
+                if flags["stop_printing"]:
+                    self.running = False
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self.running = False
@@ -314,6 +317,7 @@ class DlpViewer(threading.Thread):
         self.running = True
         is_led_on = turn_on_off_led("on")
         if is_led_on:
+            update_flags(stop_printing=False, is_printing=True)
             self.start()
         else:
             print("Error al encender el led")
