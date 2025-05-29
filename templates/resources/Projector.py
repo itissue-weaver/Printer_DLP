@@ -123,7 +123,7 @@ class Start(Resource):
         msg = ""
         global projector  # Indicar que estamos modificando la variable global
         with projector_lock:
-            if projector.is_alive():
+            if projector or projector.is_alive():
                 print("El hilo ya está en ejecución.")
                 msg += "Ok, projector already started\n"
             else:
