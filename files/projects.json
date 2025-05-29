@@ -301,7 +301,7 @@
         "user": "Edisson",
         "thumbnail": "",
         "status": 0,
-        "timestamp": "2025-05-21 11:44:22",
+        "timestamp": "2025-05-29 11:16:00",
         "settings": {
             "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
             "rotation": [
@@ -344,8 +344,8 @@
                 10.0
             ],
             "dpi": 300,
-            "layer_depth": 0.5,
-            "delta_layer": 20.0,
+            "layer_depth": 2.0,
+            "delta_layer": 60.0,
             "plate": 1,
             "HOST": "127.0.0.1",
             "num_layers": 40,

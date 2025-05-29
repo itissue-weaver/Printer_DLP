@@ -28,6 +28,7 @@ from templates.models.printer_models import (
 
 # Definir la variable global
 projector = None
+projector_lock = threading.Lock()
 
 ns = Namespace("api/v1/printer")
 
@@ -121,13 +122,14 @@ class Start(Resource):
     def post(self):
         msg = ""
         global projector  # Indicar que estamos modificando la variable global
-        if projector and projector.is_alive():
-            print("El hilo ya está en ejecución.")
-            msg += "Ok, projector already started\n"
-        else:
-            projector = DlpViewer()  # Crear una nueva instancia accesible globalmente
-            projector.start_projecting()
-            msg += "Ok, projector started\n"
+        with projector_lock:
+            if projector and projector.is_alive():
+                print("El hilo ya está en ejecución.")
+                msg += "Ok, projector already started\n"
+            else:
+                projector = DlpViewer()  # Crear una nueva instancia accesible globalmente
+                projector.start_projecting()
+                msg += "Ok, projector started\n"
         return {
             "msg": msg,
             "data": projector.is_alive_projector(),
@@ -136,19 +138,20 @@ class Start(Resource):
 
 @ns.route("/stop")
 class Stop(Resource):
-    global projector
     def post(self):
         # stop the print
         global projector
         msg = ""
-        if projector:
-            msg += f"Ok, projector stopped -{projector}-\n"
-            projector.stop_projecting()
-            projector = None  # Resetear la referencia después de detenerlo
-            data = True
-        else:
-            msg += f"Ok, projector already stopped {projector}\n"
-            data = False
+        with projector_lock:
+            if projector and projector.is_alive():
+                msg += f"Ok, projector stopped -{projector}-\n"
+                projector.stop_projecting()
+                projector.join()
+                projector = None  # Resetear la referencia después de detenerlo
+                data = True
+            else:
+                msg += f"Ok, projector already stopped {projector}\n"
+                data = False
         return {
             "msg": msg,
             "data": data,
