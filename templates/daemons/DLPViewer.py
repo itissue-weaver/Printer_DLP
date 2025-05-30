@@ -147,6 +147,7 @@ class DlpViewer(threading.Thread):
         self.texture = self.load_texture()
         print(f"Texture ID: {self.texture}")
         self.layer_count += 1
+        update_flags(layer_count=self.layer_count)
 
     def init_motors(self):
         # "move_z_sw", "cw", "top", "z", 0,
@@ -272,16 +273,14 @@ class DlpViewer(threading.Thread):
                     thread_log.start()
         glDisable(GL_TEXTURE_2D)
         glDisable(GL_BLEND)
-        # try:
-        #     glDisable(GL_TEXTURE_2D)
-        #     glDisable(GL_BLEND)
-        # except Exception as e:
-        #     print(e)
-        # print("stop initiate")
-        # pygame.display.quit()
-        print("display quit")
         pygame.quit()
         turn_on_off_led()
+        try:
+            update_flags(stop_printing=True, is_printing=False, is_error=False, error="")
+        except  Exception as e:
+            print(e)
+            thread_log = threading.Thread(target=write_log, args=(f"Error update flags: {e}",))
+            thread_log.start()
         # pygame.display.quit()
         # pygame.quit()
 
@@ -316,8 +315,8 @@ class DlpViewer(threading.Thread):
         )
         print(steps, result)
         msg += f"change z motor: {steps}, {result}\n"
-        thread_log = threading.Thread(target=write_log, args=(msg,))
-        thread_log.start()
+        # thread_log = threading.Thread(target=write_log, args=(msg,))
+        # thread_log.start()
 
     def start_projecting(self):
         self.load_variables()
