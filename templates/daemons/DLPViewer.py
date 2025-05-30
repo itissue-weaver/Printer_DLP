@@ -260,9 +260,16 @@ class DlpViewer(threading.Thread):
                     break
         except Exception as e:
             print(e)
-            thread_log = threading.Thread(target=write_log, args=(f"Error: {e}",))
+            thread_log = threading.Thread(target=write_log, args=(f"Error printing: {e}",))
             thread_log.start()
-            update_flags(stop_printing=True, is_printing=False, is_error=True, error=str(e))
+            try:
+                update_flags(stop_printing=True, is_printing=False, is_error=True, error=str(e))
+            except  Exception as e:
+                print(e)
+                if thread_log.is_alive():
+                    thread_log.join()
+                    thread_log = threading.Thread(target=write_log, args=(f"Error update flags: {e}", ))
+                    thread_log.start()
         glDisable(GL_TEXTURE_2D)
         glDisable(GL_BLEND)
         # try:
