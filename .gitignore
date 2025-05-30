@@ -4,3 +4,4 @@
 files/img/extracted/*
 files/img/*.zip
 *_test.py
+files/*.json
