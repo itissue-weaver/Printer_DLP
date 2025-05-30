@@ -198,7 +198,8 @@ class DlpViewer(threading.Thread):
                         args=(f"{self.layer_count}, {self.num_layers}",),
                     )
                     thread_log.start()
-                    print(f"{self.layer_count}, {self.num_layers}")
+                    update_flags(layer_count= self.layer_count)
+                    # print(f"{self.layer_count}, {self.num_layers}")
                     if self.layer_count >= self.num_layers - 1:
                         self.running = False
                     self.reload_image(
@@ -261,6 +262,7 @@ class DlpViewer(threading.Thread):
             print(e)
             thread_log = threading.Thread(target=write_log, args=(f"Error: {e}",))
             thread_log.start()
+            update_flags(stop_printing=True, is_printing=False, is_error=True, error=str(e))
         glDisable(GL_TEXTURE_2D)
         glDisable(GL_BLEND)
         # try:
@@ -317,7 +319,7 @@ class DlpViewer(threading.Thread):
         self.running = True
         is_led_on = turn_on_off_led("on")
         if is_led_on:
-            update_flags(stop_printing=False, is_printing=True)
+            update_flags(stop_printing=False, is_printing=True, num_layers=self.num_layers, is_error=False, error="")
             self.start()
         else:
             print("Error al encender el led")
@@ -353,19 +355,6 @@ class DlpViewer(threading.Thread):
     def cleanup(self):
         if self.dlp is not None:
             self.dlp.cleanup()
-
-    def star_reload_from_api(self, image=None):
-        while self.running:
-            current_time = perf_counter()
-            elapsed_layer_time = current_time - self.last_time
-            if elapsed_layer_time < self.delta_layer:
-                print("waiting for next layer")
-                continue
-            self.last_time = current_time
-            break
-        self.flag_reload = True
-        self.image_path = image if image else self.image_path
-        print("image_path", self.image_path)
 
     def layer_count_fun(self):
         return self.layer_count

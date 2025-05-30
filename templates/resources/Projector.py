@@ -11,7 +11,7 @@ from flask_restx import Namespace, Resource
 from werkzeug.utils import secure_filename
 
 from files.constants import image_path_projector, zip_file_name, path_temp_zip
-from templates.AuxiliarFunctions import read_settings, update_settings, write_log, update_flags
+from templates.AuxiliarFunctions import read_settings, update_settings, write_log, update_flags, read_flags
 from templates.daemons.DLPViewer import DlpViewer
 from templates.midleware.MD_Printer import (
     uncompres_files_zip,
@@ -145,23 +145,17 @@ class Stop(Resource):
         }, 200
 
 
-@ns.route("/next/layer")
-class NextLayer(Resource):
-    def post(self):
-        # next layer
-        projector.star_reload_from_api()
-        return {"msg": "Ok, next layer", "data": projector.layer_count_fun()}, 200
-
-
 @ns.route("/status")
 class Status(Resource):
     def get(self):
         # status
-        flag = projector.is_alive_projector()
+        flags = read_flags()
+        settings =  read_settings()
+        flag = flags.get("is_printing", False)
         if flag:
-            return {"msg": "Ok, projector is alive", "data": flag}, 200
+            return {"msg": "Ok, projector is alive", "data": {"flags": flags, "settings": settings}}, 200
         else:
-            return {"msg": "Ok, projector is not alive", "data": flag}, 200
+            return {"msg": "Ok, projector is not alive", "data": {"flags": flags, "settings": settings}}, 200
 
 
 @ns.route("/test_motor")

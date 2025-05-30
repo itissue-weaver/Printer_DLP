@@ -14,7 +14,7 @@ from files.constants import (
     font_entry,
     font_tabs,
 )
-from templates.AuxiliarFunctions import read_settings, save_settings_to_project
+from templates.AuxiliarFunctions import read_settings, save_settings_to_project, update_settings, update_flags
 from templates.GUI.FrameBiomaterials import FrameBiomaterials
 from templates.GUI.FrameHome import HomePage
 from templates.GUI.FramePrinting import FramePrinting
@@ -23,7 +23,7 @@ from templates.GUI.Frame_ManualControl import ManualControlFrame
 from templates.GUI.Frame_ReadFile import ReadFile
 from templates.GUI.FrameConfig import FrameConfig
 from templates.GUI.SubFrameInit import GifFrameApp
-from templates.midleware.MD_Printer import get_settings_printer
+from templates.midleware.MD_Printer import get_settings_printer, ask_status
 
 
 def configure_styles():
@@ -233,7 +233,13 @@ class MainGUI(ttk.Window):
 
     def test_connection(self):
         try:
-            code, data = get_settings_printer()
+            code, data = ask_status()
+            settings = data.get("settings")
+            flags = data.get("flags")
+            if settings is not None:
+                update_settings(**settings)
+            if flags is not None:
+                update_flags(**flags)
         except Exception as e:
             print(e)
             code = 500

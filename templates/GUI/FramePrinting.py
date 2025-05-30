@@ -7,8 +7,8 @@ import queue
 import threading
 import time
 
-from PIL import Image, ImageTk
 import ttkbootstrap as ttk
+from PIL import Image
 from ttkbootstrap.dialogs import Messagebox
 
 from files.constants import zip_file_name, font_tabs
@@ -19,7 +19,7 @@ from templates.GUI.SubFramePrinting import FramePrintingProcess
 from templates.daemons.TempFilesHandler import TempFilesHandler
 from templates.daemons.constants import response_queue
 from templates.midleware.MD_Printer import send_start_print, send_stop_print
-
+Image.CUBIC = Image.BICUBIC
 
 def create_widgets_status(master):
     widgets = []
@@ -357,32 +357,6 @@ class FramePrinting(ttk.Frame):
             self.monitor_running = True
             self.thread_monitor = threading.Thread(target=self.monitor_response)
             self.thread_monitor.start()
-
-    # def print_callback(self):
-    #     if not self.is_sliced:
-    #         Messagebox.show_error("Settings not sent", "Error")
-    #         return
-    #     self.is_printing = not self.is_printing
-    #     if self.is_printing:
-    #         self.print_button.config(text="Stop printing")
-    #         self.print_button.config(bootstyle="danger")
-    #         if self.thread_start_print is not None:
-    #             self.thread_start_print.join()
-    #         # self.thread_start_print = threading.Thread(target=simulate_printing, args=(self,))
-    #         self.thread_start_print = threading.Thread(target=send_start_print, args=())
-    #         self.thread_start_print.start()
-    #         self.thread_monitor = threading.Thread(target=self.monitor_response)
-    #         self.thread_monitor.start()
-    #     else:
-    #         self.print_button.config(text="Print")
-    #         self.print_button.config(bootstyle="success")
-    #         if (
-    #             self.thread_start_print is not None
-    #             and self.thread_start_print.is_alive()
-    #         ):
-    #             self.thread_start_print.join()
-    #             self.thread_start_print = None
-    #             self.is_settings_sent = False
 
     def monitor_response(self):
         """Monitorea la respuesta sin crear múltiples hilos innecesarios"""
