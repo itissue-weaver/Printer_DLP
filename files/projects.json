@@ -466,7 +466,7 @@
         "user": "prueba",
         "thumbnail": "",
         "status": 0,
-        "timestamp": "2025-05-21 10:55:25",
+        "timestamp": "2025-05-30 12:00:32",
         "settings": {
             "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
             "rotation": [
@@ -509,11 +509,11 @@
                 10.0
             ],
             "dpi": 300,
-            "layer_depth": 1.0,
-            "delta_layer": 10.0,
+            "layer_depth": 0.05,
+            "delta_layer": 2.3,
             "plate": 1,
             "HOST": "127.0.0.1",
-            "num_layers": 20,
+            "num_layers": 400,
             "material1": "Solucion1",
             "quantity1": 50.0,
             "material2": "Solution 2",
@@ -622,8 +622,167 @@
             "mode_biomaterial": "mode_1",
             "delay_z": 0.005,
             "delay_n": 0.01,
-            "b_layers": 1,
-            "e_time_b_layers": 40.0
+            "b_layers": 3,
+            "e_time_b_layers": 30.0,
+            "data": {
+                "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "translation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "width_part": 20.0,
+                "height_part": 20.0,
+                "depth_part": 20.0,
+                "hatcher_type": "Base",
+                "hatch_angle": 10.0,
+                "volume_offset_hatch": 0.0,
+                "spot_compensation": 0.0,
+                "num_inner_contours": 2,
+                "num_outer_contours": 1,
+                "hatch_spacing": 0.5,
+                "stripe_width": 0.5,
+                "projector_dimension": [
+                    48.0,
+                    48.0
+                ],
+                "projector_resolution": [
+                    3840,
+                    2160
+                ],
+                "projector_offset": [
+                    0.0,
+                    0.0,
+                    10.0
+                ],
+                "dpi": 300,
+                "layer_depth": 2.0,
+                "delta_layer": 60.0,
+                "plate": 1,
+                "HOST": "127.0.0.1",
+                "num_layers": 10,
+                "material1": "Solucion1",
+                "quantity1": 50.0,
+                "material2": "Solution 2",
+                "quantity2": 70.0,
+                "material3": "Water",
+                "quantity3": 100.0,
+                "material4": "Water",
+                "quantity4": 100.0,
+                "max_level1": 100.0,
+                "shape1": "Cylinder",
+                "dimensions1": [
+                    0.0,
+                    1.0,
+                    1.0
+                ],
+                "max_level2": 100.0,
+                "shape2": "Cylinder",
+                "dimensions2": [
+                    0.0,
+                    1.0,
+                    1.0
+                ],
+                "max_level3": 100.0,
+                "shape3": "Rectangle",
+                "dimensions3": [
+                    0.0,
+                    1.0,
+                    1.0
+                ],
+                "max_level4": 100.0,
+                "shape4": "Cylinder",
+                "dimensions4": [
+                    0.0,
+                    1.0,
+                    1.0
+                ],
+                "centroide": [
+                    0.0,
+                    10.0,
+                    0.0
+                ],
+                "sequence": [
+                    {
+                        "deposit": "1",
+                        "height_z": 10.0,
+                        "index": 0
+                    }
+                ],
+                "min_x_part": -10.0,
+                "min_y_part": 0.0,
+                "min_z_part": 0.0,
+                "max_x_part": 10.0,
+                "max_y_part": 20.0,
+                "max_z_part": 20.0,
+                "status_frames": [
+                    1,
+                    1,
+                    1,
+                    0
+                ],
+                "materials": [
+                    {
+                        "layer": "Superficial",
+                        "components": [
+                            "PEGDA + (5-10)% Bioglass",
+                            "Condrocyte",
+                            "TGF-\beta 0.1 ng/ml"
+                        ],
+                        "layer_depth": 0.5,
+                        "layer_delta": 1,
+                        "max_volume": 100
+                    },
+                    {
+                        "layer": "Intermediate",
+                        "components": [
+                            "PEGDA + (10-15)% Bioglass",
+                            "TGF-\beta 0.5 ng/ml"
+                        ],
+                        "layer_depth": 0.5,
+                        "layer_delta": 1,
+                        "max_volume": 100
+                    },
+                    {
+                        "layer": "Deep",
+                        "components": [
+                            "PEGDA + (15-20)% Bioglass",
+                            "Condrocyte",
+                            "TGF-\beta (1-5) ng/ml / BMP (1-10) ng/ml"
+                        ],
+                        "layer_depth": 0.5,
+                        "layer_delta": 1,
+                        "max_volume": 100
+                    },
+                    {
+                        "layer": "Interphase (osteochondrial)",
+                        "components": [
+                            "PEGDA + (20-30)% Bioglass",
+                            "Inorganic salts (calcium or phosphorus)",
+                            "TGF-\beta 0.1 ng/ml"
+                        ],
+                        "layer_depth": 0.5,
+                        "layer_delta": 1,
+                        "max_volume": 100
+                    }
+                ],
+                "mode_biomaterial": "mode_1",
+                "delay_z": 0.005,
+                "delay_n": 0.01,
+                "b_layers": 1,
+                "e_time_b_layers": 40.0
+            },
+            "msg": "Ok"
         }
     },
     "meniscoprueba": {

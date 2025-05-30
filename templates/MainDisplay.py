@@ -3,10 +3,12 @@ __author__ = "Edisson A. Naula"
 __date__ = "$ 24/may/2025  at 11:38 $"
 
 import threading
+from time import sleep
 from tkinter import filedialog
 
 import ttkbootstrap as ttk
 from PIL import Image, ImageTk
+from matplotlib.dates import set_epoch
 
 from files.constants import (
     font_tabs,
@@ -71,7 +73,11 @@ def load_images():
 class MainGUIDisplay(ttk.Window):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.settings = None
+        self.flags = None
+        self.running_monitor = True
         self.connected = ttk.BooleanVar(value=False)
+        self.thread_monitor =  None
         self.title("DLP Bioprinter Control")
         self.style_gui = configure_styles()
         self.after(0, self.maximize_window)
@@ -99,10 +105,10 @@ class MainGUIDisplay(ttk.Window):
         self.notebook.rowconfigure(0, weight=1)
         self.notebook.configure(style="Custom.TNotebook")
 
-        frame_1 = DisplayStatus(self.notebook, **kwargs)
-        self.notebook.add(frame_1, text="Status")
-        frame_2 = DisplayControl(self.notebook, **kwargs)
-        self.notebook.add(frame_2, text="Control")
+        self.frame_1 = DisplayStatus(self.notebook, **kwargs)
+        self.notebook.add(self.frame_1, text="Status")
+        self.frame_2 = DisplayControl(self.notebook, **kwargs)
+        self.notebook.add(self.frame_2, text="Control")
         # --------------------footer-------------------
         self.frame_footer = ttk.Frame(self)
         self.frame_footer.grid(row=2, column=0, sticky="nsew", padx=15, pady=15)
@@ -132,9 +138,13 @@ class MainGUIDisplay(ttk.Window):
             image=self.images.get("close"),
         )
         self.button_config.grid(row=0, column=2, sticky="e", padx=15, pady=15)
+        self.thread_monitor = threading.Thread(target=self.monitor_projector)
+        self.thread_monitor.start()
 
 
     def on_close(self):
+        self.running_monitor = False
+        self.thread_monitor.join()
         self.destroy()
         self.quit()
 
@@ -150,12 +160,12 @@ class MainGUIDisplay(ttk.Window):
         try:
             code, data = ask_status()
             print(code, data)
-            settings = data.get("settings")
-            flags = data.get("flags")
-            if settings is not None:
-                update_settings(**settings)
-            if flags is not None:
-                update_flags(**flags)
+            self.settings = data.get("data", {}).get("settings")
+            self.flags = data.get("data", {}).get("flags")
+            if self.settings is not None:
+                update_settings(**data.get("settings", {}))
+            if self.flags is not None:
+                update_flags(**data.get("flags", {}))
         except Exception as e:
             print(e)
             code = 500
@@ -167,3 +177,13 @@ class MainGUIDisplay(ttk.Window):
             self.connected.set(False)
             self.txt_connected.set("Disconnected")
             self.button_test.configure(style="danger.TButton")
+
+
+    def monitor_projector(self):
+        if self.thread_connection.is_alive():
+            self.thread_connection.join()
+        delta_layer = self.settings.get("delta_layer")
+        while self.running_monitor:
+            self.frame_1.on_update_status(self.settings, self.flags)
+            self.test_connection()
+            sleep(delta_layer/2.5)

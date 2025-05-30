@@ -106,3 +106,13 @@ class DisplayStatus(ttk.Frame):
         self.frame_tanks.columnconfigure(0, weight=1)
         self.frame_tanks.rowconfigure((0, 1, 2, 3, 4, 5, 6, 7), weight=1)
         self.frame_tanks.grid(row=3, column=0, sticky="nsew", padx=15, pady=15)
+
+    def on_update_status(self, settings, flags):
+        num_layers = flags.get("num_layers", 1)
+        layer_count = flags.get("layer_count", 0)
+        percentage = int((layer_count / num_layers) * 100)
+        is_printin = flags.get("is_printin", False)
+        # update meter status
+        self.status_widgets[0].configure(amountused=percentage)
+
+
