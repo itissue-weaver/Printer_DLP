@@ -91,7 +91,7 @@ class DisplayStatus(ttk.Frame):
         self.frame_tanks_and_plot.columnconfigure(0, weight=1)
         self.frame_tanks_and_plot.rowconfigure((0, 1, 2, 3), weight=1)
         ttk.Label(
-            self.frame_tanks_and_plot, text="Status", style="Custom.TLabel"
+            self.frame_tanks_and_plot, text="Status", style="TCustom.TLabel"
         ).grid(row=0, column=0, sticky="w", padx=5, pady=5)
         self.frame_status = ttk.Frame(self.frame_tanks_and_plot)
         self.frame_status.grid(row=1, column=0, sticky="nsew", padx=15, pady=15)
@@ -100,7 +100,7 @@ class DisplayStatus(ttk.Frame):
         self.status_widgets = create_widgets_status(self.frame_status)
 
         ttk.Label(
-            self.frame_tanks_and_plot, text="Materials", style="Custom.TLabel"
+            self.frame_tanks_and_plot, text="Materials", style="TCustom.TLabel"
         ).grid(row=2, column=0, sticky="w", padx=5, pady=5)
         self.frame_tanks = SubFrameBars(self.frame_tanks_and_plot)
         self.frame_tanks.columnconfigure(0, weight=1)

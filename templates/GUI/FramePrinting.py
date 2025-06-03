@@ -11,7 +11,7 @@ import ttkbootstrap as ttk
 from PIL import Image
 from ttkbootstrap.dialogs import Messagebox
 
-from files.constants import zip_file_name, font_tabs
+from files.constants import zip_file_name, font_tabs, font_entry
 from templates.AuxFunctionsPlots import read_stl
 from templates.AuxiliarFunctions import read_settings, update_settings
 from templates.GUI.PlotFrame import SolidViewer
@@ -46,7 +46,7 @@ def create_widgets_resume(master):
     )
     filepath = settings.get("filepath", "Not filepath")
     entry_file_name = ttk.StringVar(value=os.path.basename(filepath))
-    ttk.Entry(master, textvariable=entry_file_name, state="readonly").grid(
+    ttk.Entry(master, textvariable=entry_file_name, state="readonly", font=font_entry).grid(
         row=0, column=1, sticky="we", padx=5, pady=5
     )
     widgets.append(entry_file_name)
@@ -54,7 +54,7 @@ def create_widgets_resume(master):
         row=1, column=0, sticky="w", padx=5, pady=5
     )
     entry_width = ttk.StringVar(value=str(settings.get("width_part", "0.0")))
-    ttk.Entry(master, textvariable=entry_width, state="readonly").grid(
+    ttk.Entry(master, textvariable=entry_width, state="readonly", font=font_entry).grid(
         row=1, column=1, sticky="we", padx=5, pady=5
     )
     widgets.append(entry_width)
@@ -62,7 +62,7 @@ def create_widgets_resume(master):
         row=2, column=0, sticky="w", padx=5, pady=5
     )
     entry_height = ttk.StringVar(value=str(settings.get("height_part", "0.0")))
-    ttk.Entry(master, textvariable=entry_height, state="readonly").grid(
+    ttk.Entry(master, textvariable=entry_height, state="readonly", font=font_entry).grid(
         row=2, column=1, sticky="we", padx=5, pady=5
     )
     widgets.append(entry_height)
@@ -70,7 +70,7 @@ def create_widgets_resume(master):
         row=3, column=0, sticky="w", padx=5, pady=5
     )
     entry_length = ttk.StringVar(value=str(settings.get("depth_part", "0.0")))
-    ttk.Entry(master, textvariable=entry_length, state="readonly").grid(
+    ttk.Entry(master, textvariable=entry_length, state="readonly", font=font_entry).grid(
         row=3, column=1, sticky="we", padx=5, pady=5
     )
     widgets.append(entry_length)
@@ -86,7 +86,7 @@ def create_widgets_resume(master):
     entry_estimated_time = ttk.StringVar(
         value=f"{hours} hours, {minutes} minutes, {seconds:.2f} seconds"
     )
-    ttk.Entry(master, textvariable=entry_estimated_time, state="readonly").grid(
+    ttk.Entry(master, textvariable=entry_estimated_time, state="readonly", font=font_entry).grid(
         row=4, column=1, sticky="we", padx=5, pady=5
     )
     widgets.append(entry_estimated_time)
@@ -103,7 +103,7 @@ def create_widgets_resume(master):
         columns=("Deposit", "Height Z"),
         show="headings",
         height=4,
-        style="info.Treeview",
+        style="Custom.Treeview",
     )
     tree.heading("Deposit", text="Deposit", anchor="center")
     tree.heading("Height Z", text="Height Z [mm]", anchor="center")
@@ -458,25 +458,27 @@ class SubFrameBars(ttk.Frame):
         self.rowconfigure((0, 1), weight=1)
 
         # ----------------------widgets----------------------
-        ttk.Label(self, text="Tank 1").grid(row=0, column=0, sticky="w", padx=5, pady=5)
+        ttk.Label(self, text="Tank 1", style="Custom.TLabel").grid(row=0, column=0, sticky="w", padx=5, pady=5)
         self.tank1 = ttk.Progressbar(
             self,
             orient="horizontal",
             mode="determinate",
             maximum=100,
             value=0,
+            style="Custom.Horizontal.TProgressbar",
         )
         self.tank1.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
-        ttk.Label(self, text="Tank 2").grid(row=2, column=0, sticky="w", padx=5, pady=5)
+        ttk.Label(self, text="Tank 2", style="Custom.TLabel").grid(row=2, column=0, sticky="w", padx=5, pady=5)
         self.tank2 = ttk.Progressbar(
             self,
             orient="horizontal",
             mode="determinate",
             maximum=100,
             value=0,
+            style="Custom.Horizontal.TProgressbar",
         )
         self.tank2.grid(row=3, column=0, sticky="nsew", padx=10, pady=10)
-        ttk.Label(self, text="Tank 3").grid(row=4, column=0, sticky="w", padx=5, pady=5)
+        ttk.Label(self, text="Tank 3", style="Custom.TLabel").grid(row=4, column=0, sticky="w", padx=5, pady=5)
         self.tank3 = ttk.Progressbar(
             self,
             orient="horizontal",
@@ -485,7 +487,7 @@ class SubFrameBars(ttk.Frame):
             value=0,
         )
         self.tank3.grid(row=5, column=0, sticky="nsew", padx=10, pady=10)
-        ttk.Label(self, text="Tank 4").grid(row=6, column=0, sticky="w", padx=5, pady=5)
+        ttk.Label(self, text="Tank 4", style="Custom.TLabel").grid(row=6, column=0, sticky="w", padx=5, pady=5)
         self.tank4 = ttk.Progressbar(
             self,
             orient="horizontal",

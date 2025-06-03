@@ -31,6 +31,7 @@ def configure_styles():
     style = ttk.Style()
     style.configure("Custom.TButton", font=font_buttons)
     style.configure("Custom.TLabel", font=("Sylfaen", 20, "normal"))
+    style.configure("TCustom.TLabel", font=("Sylfaen", 20, "bold"))
     style.configure("Custom.TEntry", font=font_entry_display)
     style.configure("Custom.TLabelframe.Label", font=("Sylfaen", 24, "normal"))
     style.configure("Custom.TNotebook.Tab", font=font_tabs)
@@ -43,6 +44,7 @@ def configure_styles():
     style.configure("success.TButton", font=font_buttons)
     style.configure("primary.TButton", font=font_buttons)
     style.configure("secondary.TButton", font=font_buttons)
+    style.configure("custom.Horizontal.TProgressbar", font=font_entry_display)
     return style
 
 
@@ -138,15 +140,19 @@ class MainGUIDisplay(ttk.Window):
             image=self.images.get("close"),
         )
         self.button_config.grid(row=0, column=2, sticky="e", padx=15, pady=15)
-        self.thread_monitor = threading.Thread(target=self.monitor_projector)
+        self.thread_monitor = threading.Thread(target=self.monitor_projector, daemon=True)
         self.thread_monitor.start()
 
 
     def on_close(self):
         self.running_monitor = False
         print("closing")
-        self.thread_monitor.join()
-        self.thread_connection.join()
+        # if self.thread_monitor.is_alive():
+        #     try:
+        #         self.thread_monitor.join()
+        #     except Exception as e:
+        #         print(e)
+        # self.thread_connection.join()
         print("closed")
         self.destroy()
         self.quit()
@@ -181,6 +187,31 @@ class MainGUIDisplay(ttk.Window):
             self.txt_connected.set("Disconnected")
             self.button_test.configure(style="danger.TButton")
 
+    # def test_connection_md(self):
+    #     def fetch_status():
+    #         try:
+    #             code, data = ask_status()
+    #             print(code, data)
+    #             self.settings = data.get("data", {}).get("settings")
+    #             self.flags = data.get("data", {}).get("flags")
+    #             if self.settings is not None:
+    #                 update_settings(**data.get("settings", {}))
+    #             if self.flags is not None:
+    #                 update_flags(**data.get("flags", {}))
+    #         except Exception as e:
+    #             print(e)
+    #             code = 500
+    #
+    #         if code == 200:
+    #             self.connected.set(True)
+    #             self.txt_connected.set("Connected")
+    #             self.button_test.configure(style="success.TButton")
+    #         else:
+    #             self.connected.set(False)
+    #             self.txt_connected.set("Disconnected")
+    #             self.button_test.configure(style="danger.TButton")
+    #
+    #     threading.Thread(target=fetch_status, daemon=True).start()
 
     def monitor_projector(self):
         if self.thread_connection.is_alive():
@@ -191,6 +222,8 @@ class MainGUIDisplay(ttk.Window):
         delta_layer = self.settings.get("delta_layer")
         while self.running_monitor:
             print("is monitor running: ", self.running_monitor)
+            if not self.running_monitor:  # Salida inmediata si se detiene el monitor
+                break
             self.frame_1.on_update_status(self.settings, self.flags)
             self.test_connection_md()
             sleep(delta_layer/2.5)
