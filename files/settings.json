@@ -27,12 +27,12 @@
     "hatch_spacing": 0.5,
     "stripe_width": 0.5,
     "projector_dimension": [
-        48.0,
-        48.0
+        30.0,
+        20.0
     ],
     "projector_resolution": [
-        3840,
-        2160
+        1920,
+        1080
     ],
     "projector_offset": [
         0.0,
@@ -40,11 +40,11 @@
         10.0
     ],
     "dpi": 300,
-    "layer_depth": 0.05,
+    "layer_depth": 0.1,
     "delta_layer": 2.3,
     "plate": 1,
     "HOST": "127.0.0.1",
-    "num_layers": 400,
+    "num_layers": 200,
     "material1": "Solucion1",
     "quantity1": 50.0,
     "material2": "Solution 2",
@@ -153,8 +153,8 @@
     "mode_biomaterial": "mode_1",
     "delay_z": 0.005,
     "delay_n": 0.01,
-    "b_layers": 3,
-    "e_time_b_layers": 30.0,
+    "b_layers": 4,
+    "e_time_b_layers": 20.0,
     "data": {
         "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
         "rotation": [

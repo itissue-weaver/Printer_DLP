@@ -15,7 +15,7 @@ from files.constants import (
     delay_z,
     delay_n, font_entry_display,
 )
-from templates.AuxiliarFunctions import update_settings, update_flags
+from templates.AuxiliarFunctions import update_settings, update_flags, read_settings, read_flags
 from templates.GUI.Frame_DisplayControl import DisplayControl
 from templates.GUI.Frame_DisplayStatus import DisplayStatus
 from templates.midleware.MD_Printer import (
@@ -88,7 +88,7 @@ class MainGUIDisplay(ttk.Window):
             "images": self.images,
         }
         # ----------------------test connection-------------------
-        self.thread_connection = threading.Thread(target=self.test_connection)
+        self.thread_connection = threading.Thread(target=self.test_connection_md)
         self.thread_connection.start()
         # --------------------header-------------------
         self.frame_header = ttk.Frame(self)
@@ -116,7 +116,7 @@ class MainGUIDisplay(ttk.Window):
         self.button_test = ttk.Button(
             self.frame_footer,
             text="Test Connection",
-            command=self.test_connection,
+            command=self.test_connection_md,
             style="danger.TButton",
             compound="left",
             image=self.images["link"],
@@ -144,7 +144,10 @@ class MainGUIDisplay(ttk.Window):
 
     def on_close(self):
         self.running_monitor = False
+        print("closing")
         self.thread_monitor.join()
+        self.thread_connection.join()
+        print("closed")
         self.destroy()
         self.quit()
 
@@ -156,7 +159,7 @@ class MainGUIDisplay(ttk.Window):
             self.attributes("-zoomed", True) # maximize
             # self.attributes("-fullscreen", True) # hide title bar
 
-    def test_connection(self):
+    def test_connection_md(self):
         try:
             code, data = ask_status()
             print(code, data)
@@ -182,8 +185,12 @@ class MainGUIDisplay(ttk.Window):
     def monitor_projector(self):
         if self.thread_connection.is_alive():
             self.thread_connection.join()
+        if self.settings is None:
+            self.settings = read_settings()
+            self.flags = read_flags()
         delta_layer = self.settings.get("delta_layer")
         while self.running_monitor:
+            print("is monitor running: ", self.running_monitor)
             self.frame_1.on_update_status(self.settings, self.flags)
-            self.test_connection()
+            self.test_connection_md()
             sleep(delta_layer/2.5)

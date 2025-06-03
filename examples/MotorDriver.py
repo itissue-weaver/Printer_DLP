@@ -1,4 +1,5 @@
 import argparse
+import json
 from time import sleep
 import RPi.GPIO as GPIO
 
@@ -19,9 +20,21 @@ delay_z = 0.005
 delay_n = 0.01
 
 
+def read_flags():
+    with open("files/flags.json", "r") as f:
+        flags = json.load(f)
+    return flags
+
+
+def check_stop():
+    flags = read_flags()
+    return flags.get("stop_printing", False)
+
+
 class MotorController:
     def __init__(self, pins=None, mode_spr="Full"):
         self.thread_test = None
+        self.is_running = True
         if pins is None:
             pins = default_pins
         self.pins = pins
@@ -64,6 +77,8 @@ class MotorController:
                 sleep(self.delay)
                 GPIO.output(step_pin, GPIO.LOW)
                 sleep(self.delay)
+                if check_stop():
+                    break
         except Exception as e:
             print(f"Error: {e}")
         finally:
@@ -78,6 +93,8 @@ class MotorController:
                 sleep(self.delay_z)
                 GPIO.output(self.pins["STEP_Z"], GPIO.LOW)
                 sleep(self.delay_z)
+                if check_stop():
+                    break
         except Exception as e:
             print(f"Error: {e}")
         finally:
@@ -92,6 +109,8 @@ class MotorController:
                 sleep(self.delay_z)
                 GPIO.output(self.pins["STEP_Z"], GPIO.LOW)
                 sleep(self.delay_z)
+                if check_stop():
+                    break
         except Exception as e:
             print(f"Error: {e}")
         finally:
@@ -106,6 +125,8 @@ class MotorController:
                 sleep(self.delay)
                 GPIO.output(self.pins["STEP_PLATE"], GPIO.LOW)
                 sleep(self.delay)
+                if check_stop():
+                    break
         except Exception as e:
             print(f"Error: {e}")
         finally:
