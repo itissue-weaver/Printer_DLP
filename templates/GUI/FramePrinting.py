@@ -266,6 +266,7 @@ class FramePrinting(ttk.Frame):
         n_parts = len(settings.get("sequence", []))
         try:
             os.path.exists(filepath_stl)
+            from templates.AuxFunctionsPlots import read_stl
             solid_trimesh_part, solid_part = read_stl(
                 file_path=settings.get("filepath", "files/pyramid_test.stl"),
                 scale=settings.get("scale"),

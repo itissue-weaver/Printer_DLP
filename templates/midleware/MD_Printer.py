@@ -319,6 +319,7 @@ def subprocess_control_motor(action, direction, location_z, motor, steps, delayz
     return resultado.stdout
 
 
+
 def subprocess_control_led(state):
     argumentos = ["--state", state]
     resultado = subprocess.run(
