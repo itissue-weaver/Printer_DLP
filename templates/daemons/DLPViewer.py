@@ -277,7 +277,7 @@ class DlpViewer(threading.Thread):
         pygame.quit()
         turn_on_off_led()
         try:
-            update_flags(stop_printing=True, is_printing=False, is_error=False, error="")
+            update_flags(stop_printing=True, is_printing=False, is_error=False, error="", layer_count=0)
         except  Exception as e:
             print(e)
             thread_log = threading.Thread(target=write_log, args=(f"Error update flags: {e}",))

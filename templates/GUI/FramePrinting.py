@@ -339,14 +339,14 @@ class FramePrinting(ttk.Frame):
             num_layers  = num_layers if num_layers > 0 else 1
             layer_count = self.flags.get("layer_count", 0)
             is_complete = self.flags.get("is_complete", False)
-            layer_count = layer_count if is_complete else 0
             percentage = int((layer_count / num_layers) * 100)
             is_printing = self.flags.get("is_printing", False)
-            if num_layers >= layer_count and is_printing:
+            if layer_count >= num_layers and not is_printing:
+                print("Printing completed")
                 self.running_monitor_thread = False
             # update meter status
             self.status_widgets[0].configure(amountused=percentage)
-            print(num_layers, layer_count, percentage, is_printing)
+            print(num_layers, layer_count, percentage, is_printing, is_complete)
             self.test_connection()
             self.flags = read_flags()
             time.sleep(delta_layer / 2.5)
