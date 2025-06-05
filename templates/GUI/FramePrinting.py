@@ -328,6 +328,8 @@ class FramePrinting(ttk.Frame):
     def monitor_projector(self):
         if self.flags is None:
             self.flags = read_flags()
+            self.flags["is_printing"] = True
+            self.flags["is_complete"] = False
         self.running_monitor_thread = True
         settings = read_settings()
         delta_layer = settings.get("delta_layer")
@@ -335,20 +337,21 @@ class FramePrinting(ttk.Frame):
             print("is monitor running: ", self.running_monitor_thread)
             if not self.running_monitor_thread:  # Salida inmediata si se detiene el monitor
                 break
+            self.test_connection()
+            self.flags = read_flags()
             num_layers = self.flags.get("num_layers", 1)
             num_layers  = num_layers if num_layers > 0 else 1
             layer_count = self.flags.get("layer_count", 0)
             is_complete = self.flags.get("is_complete", False)
             percentage = int((layer_count / num_layers) * 100)
             is_printing = self.flags.get("is_printing", False)
-            if layer_count >= num_layers and not is_printing:
-                print("Printing completed")
-                self.running_monitor_thread = False
             # update meter status
             self.status_widgets[0].configure(amountused=percentage)
             print(num_layers, layer_count, percentage, is_printing, is_complete)
-            self.test_connection()
-            self.flags = read_flags()
+            if is_complete and not is_printing:
+                print("Printing completed")
+                percentage = 100
+                self.running_monitor_thread = False
             time.sleep(delta_layer / 2.5)
 
     def stop_callback(self):
