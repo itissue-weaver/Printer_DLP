@@ -126,7 +126,7 @@ class Start(Resource):
         else:
             projector = DlpViewer()  # Crear una nueva instancia accesible globalmente
             projector.start_projecting()
-            update_flags(is_printing=True)
+            update_flags(is_printing=True, is_complete=False)
             msg += "Ok, projector started\n"
 
         return {
