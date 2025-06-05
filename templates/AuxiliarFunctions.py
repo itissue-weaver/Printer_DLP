@@ -11,8 +11,12 @@ import os
 
 
 def update_settings(**kwargs):
-    with open(settings_path, "r", encoding="utf-8") as f:
-        settings = json.load(f)
+    try:
+        with open(settings_path, "r", encoding="utf-8") as f:
+            settings = json.load(f)
+    except FileNotFoundError:
+        with open("files/default_settings.json", "r", encoding="utf-8") as f:
+            settings = json.load(f)
     for key, value in kwargs.items():
         settings[key] = value
     with open(settings_path, "w") as f:
@@ -53,8 +57,12 @@ def read_flags():
 
 
 def update_flags(**kwargs):
-    with open(flags_path, "r") as f:
-        flags = json.load(f)
+    try:
+        with open(flags_path, "r") as f:
+            flags = json.load(f)
+    except FileNotFoundError:
+        with open("files/default_flags.json", "r") as f:
+            flags = json.load(f)
     for key, value in kwargs.items():
         flags[key] = value
     with open(flags_path, "w") as f:
