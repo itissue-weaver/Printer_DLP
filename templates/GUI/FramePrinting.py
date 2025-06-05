@@ -13,7 +13,7 @@ from ttkbootstrap.dialogs import Messagebox
 
 from files.constants import zip_file_name, font_tabs, font_entry
 from templates.AuxFunctionsPlots import read_stl
-from templates.AuxiliarFunctions import read_settings, update_settings
+from templates.AuxiliarFunctions import read_settings, update_settings, read_flags
 from templates.GUI.PlotFrame import SolidViewer
 from templates.GUI.SubFramePrinting import FramePrintingProcess
 from templates.daemons.TempFilesHandler import TempFilesHandler
@@ -136,6 +136,8 @@ def simulate_printing(master):
 class FramePrinting(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
+        self.running_monitor_thread = False
+        self.flags = None
         self.thread_stop_print = None
         self.monitor_running = False
         self.thread_monitor = None
@@ -154,6 +156,7 @@ class FramePrinting(ttk.Frame):
         self.is_sending = False
         self.frame_process_print = None
         self.is_process_set = False
+        self.test_connection = kwargs.get("callbacks", {}).get("test_connection_callback", None)
         # image_capture = Image.open(r"files/img/capture.png")
         # image_capture = image_capture.resize((40, 40))
         # self.icon_capture = ImageTk.PhotoImage(image_capture)
@@ -162,27 +165,7 @@ class FramePrinting(ttk.Frame):
         self.frame_main_info.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
         self.frame_main_info.columnconfigure((0, 1, 2), weight=1)
         self.frame_main_info.rowconfigure(0, weight=1)
-        # try:
-        #     filepath_stl = settings.get("filepath", "files/pyramid_test.stl")
-        #     os.path.exists(filepath_stl)
-        #     solid_trimesh_part, solid_part = read_stl(
-        #         file_path=settings.get("filepath", "files/pyramid_test.stl"),
-        #         scale=settings.get("scale"),
-        #         rotation=settings.get("rotation"),
-        #         traslation=settings.get("traslation"),
-        #     )
-        #     self.frame_plot = SolidViewer(
-        #         self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=4
-        #     )
-        #     self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
-        # except Exception as e:
-        #     self.button_refresh = ttk.Button(
-        #         self.frame_main_info,
-        #         text="Read STL",
-        #         command=self.import_file_stl
-        #     )
-        #     self.button_refresh.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
-        #     print(e)
+
         self.load_solid_viewer()
         self.frame_resume = ttk.Frame(self.frame_main_info)
         self.frame_resume.grid(row=0, column=1, sticky="nsew", padx=15, pady=15)
@@ -333,6 +316,8 @@ class FramePrinting(ttk.Frame):
         # Iniciar nuevo hilo de impresión
         self.thread_start_print = threading.Thread(target=send_start_print)
         self.thread_start_print.start()
+        self.thread_monitor = threading.Thread(target=self.monitor_projector, daemon=True)
+        self.thread_monitor.start()
 
         # Iniciar el hilo de monitoreo
         if not self.monitor_running:
@@ -340,10 +325,32 @@ class FramePrinting(ttk.Frame):
             self.thread_monitor = threading.Thread(target=self.monitor_response)
             self.thread_monitor.start()
 
+    def monitor_projector(self):
+        if self.flags is None:
+            self.flags = read_flags()
+        self.running_monitor_thread = True
+        settings = read_settings()
+        delta_layer = settings.get("delta_layer")
+        while self.running_monitor_thread:
+            print("is monitor running: ", self.running_monitor_thread)
+            if not self.running_monitor_thread:  # Salida inmediata si se detiene el monitor
+                break
+            num_layers = self.flags.get("num_layers", 1)
+            layer_count = self.flags.get("layer_count", 0)
+            percentage = int((layer_count / num_layers) * 100)
+            is_printing = self.flags.get("is_printing", False)
+            # update meter status
+            self.status_widgets[0].configure(amountused=percentage)
+            print(num_layers, layer_count, percentage, is_printing)
+            self.test_connection()
+            self.flags = read_flags()
+            time.sleep(delta_layer / 2.5)
+
     def stop_callback(self):
         if not self.is_printing:
             print("Print not in progress")
         print("Stop printing init")
+        self.running_monitor_thread = False
         # Asegurar que no haya otro hilo `stop print` en ejecución
         if self.thread_stop_print and self.thread_stop_print.is_alive():
             print("Esperando a que termine el hilo anterior...")

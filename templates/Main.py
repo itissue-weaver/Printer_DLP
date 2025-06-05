@@ -100,6 +100,7 @@ class MainGUI(ttk.Window):
             "change_title": self.change_title,
             "init_tabs": self.init_tabs,
             "change_project": self.change_project_key,
+            "test_connection_callback":  self.test_connection,
         }
         print("init tabs")
         self.tab0 = HomePage(self.notebook, callbacks=self.callbacks)
@@ -234,8 +235,8 @@ class MainGUI(ttk.Window):
     def test_connection(self):
         try:
             code, data = ask_status()
-            settings = data.get("settings")
-            flags = data.get("flags")
+            settings = data.get("data", {}).get("settings")
+            flags = data.get("data", {}).get("flags")
             if settings is not None:
                 update_settings(**settings)
             if flags is not None:
