@@ -4,4 +4,5 @@
 files/img/extracted/*
 files/img/*.zip
 *_test.py
-files/*.json
+files/settings.json
+files/flags.json

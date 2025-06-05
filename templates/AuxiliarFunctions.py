@@ -20,7 +20,10 @@ def update_settings(**kwargs):
 
 
 def read_settings():
-    settings = json.load(open(settings_path, "r"))
+    try:
+        settings = json.load(open(settings_path, "r"))
+    except  FileNotFoundError:
+        settings = json.load(open("files/default_settings.json", "r"))
     return settings
 
 
@@ -40,8 +43,12 @@ def read_projects():
 
 
 def read_flags():
-    with open(flags_path, "r") as f:
-        flags = json.load(f)
+    try:
+        with open(flags_path, "r") as f:
+            flags = json.load(f)
+    except FileNotFoundError:
+        with open("files/default_flags.json", "r") as f:
+            flags = json.load(f)
     return flags
 
 

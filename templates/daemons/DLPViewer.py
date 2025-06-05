@@ -42,7 +42,7 @@ from files.constants import image_path_projector, settings_path, delay_z, delay_
 
 import json
 
-from templates.AuxiliarFunctions import write_log, update_flags, read_flags
+from templates.AuxiliarFunctions import write_log, update_flags, read_flags, read_settings
 from templates.midleware.MD_Printer import (
     subprocess_control_led,
     subprocess_control_motor,
@@ -94,7 +94,7 @@ class DlpViewer(threading.Thread):
         self.start_time = 0.0
         self.last_time = 0.0
         self.flag_reload = False
-        self.settings = json.load(open(settings_path, "r"))
+        self.settings = read_settings()
         self.delta_layer = self.settings["delta_layer"]
         self.sequence = self.settings.get("sequence", [])  # Carga la secuencia
         self.layer_depth = self.settings.get("layer_depth", 1.0)  # Espesor de la capa
