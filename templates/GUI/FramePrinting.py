@@ -6,6 +6,7 @@ import os
 import queue
 import threading
 import time
+from time import sleep
 
 import ttkbootstrap as ttk
 from PIL import Image
@@ -333,6 +334,7 @@ class FramePrinting(ttk.Frame):
         self.running_monitor_thread = True
         settings = read_settings()
         delta_layer = settings.get("delta_layer")
+        sleep(1)
         while self.running_monitor_thread:
             print("is monitor running: ", self.running_monitor_thread)
             if not self.running_monitor_thread:  # Salida inmediata si se detiene el monitor
@@ -344,15 +346,15 @@ class FramePrinting(ttk.Frame):
             percentage = int((layer_count / num_layers) * 100)
             is_printing = self.flags.get("is_printing")
             # update meter status
-            self.status_widgets[0].configure(amountused=percentage)
-            print(num_layers, layer_count, percentage, is_printing, is_complete)
+            # print(num_layers, layer_count, percentage, is_printing, is_complete)
             if is_complete and not is_printing:
                 print("Printing completed")
                 percentage = 100
                 self.running_monitor_thread = False
+            self.status_widgets[0].configure(amountused=percentage)
             self.test_connection()
             self.flags = read_flags()
-            time.sleep(delta_layer / 2.5)
+            time.sleep(delta_layer / 2)
 
     def stop_callback(self):
         if not self.is_printing:
