@@ -13,7 +13,6 @@ from PIL import Image
 from ttkbootstrap.dialogs import Messagebox
 
 from files.constants import zip_file_name, font_tabs, font_entry
-from templates.AuxFunctionsPlots import read_stl
 from templates.AuxiliarFunctions import read_settings, update_settings, read_flags
 from templates.GUI.PlotFrame import SolidViewer
 from templates.GUI.SubFramePrinting import FramePrintingProcess
@@ -448,6 +447,7 @@ class FramePrinting(ttk.Frame):
         n_parts = len(settings.get("sequence", []))
         try:
             os.path.exists(filepath_stl)
+            from templates.AuxFunctionsPlots import read_stl
             solid_trimesh_part, solid_part = read_stl(
                 file_path=settings.get("filepath", "files/pyramid_test.stl"),
                 scale=settings.get("scale"),
