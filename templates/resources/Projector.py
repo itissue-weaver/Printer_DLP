@@ -173,6 +173,7 @@ class RotateMotor(Resource):
     @ns.expect(post_driver_motor_model)
     def post(self):
         data = ns.payload
+        update_flags(stop_printing=False)
         try:
             thread_subprocess = threading.Thread(
                 target=subprocess_control_motor,
