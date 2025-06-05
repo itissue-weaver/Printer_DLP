@@ -202,6 +202,7 @@ class DlpViewer(threading.Thread):
                     update_flags(layer_count= self.layer_count)
                     # print(f"{self.layer_count}, {self.num_layers}")
                     if self.layer_count > self.num_layers - 1:
+                        update_flags(layer_count=0, is_complete=True)
                         self.running = False
                     self.reload_image(
                         f"files/img/extracted/temp{self.layer_count}.png"
@@ -335,7 +336,7 @@ class DlpViewer(threading.Thread):
         thread_log.start()
         self.running = False
         self.layer_count = 1
-        update_flags(stop_printing=True, is_printing=False, is_error=False, error="",  layer_count=0)
+        update_flags(stop_printing=True, is_printing=False, is_error=False, error="",  layer_count=0, is_complete=False)
         # self.cleanup()
         # turn_on_off_led("off")
         # print("Projector stopped")
