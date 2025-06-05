@@ -15,7 +15,6 @@ from ttkbootstrap.dialogs import Messagebox
 from files.constants import zip_file_name, font_tabs, font_entry
 from templates.AuxiliarFunctions import read_settings, update_settings, read_flags
 from templates.GUI.SubFramePrinting import FramePrintingProcess
-from templates.daemons.TempFilesHandler import TempFilesHandler
 from templates.daemons.constants import response_queue
 from templates.midleware.MD_Printer import send_start_print, send_stop_print
 Image.CUBIC = Image.BICUBIC
@@ -287,6 +286,7 @@ class FramePrinting(ttk.Frame):
 
     def capture_screen_callback(self):
         if self.file_handler is None:
+            from templates.daemons.TempFilesHandler import TempFilesHandler
             self.file_handler = TempFilesHandler()
         self.file_handler.capture_screen()
 
@@ -436,6 +436,7 @@ class FramePrinting(ttk.Frame):
         total_z = max_z_part - min_z_part
         num_layers = int(total_z / layer_depth)
         update_settings(num_layers=num_layers)
+        from templates.daemons.TempFilesHandler import TempFilesHandler
         self.file_handler = TempFilesHandler(
             "files/img", zip_file_name, self, "compress"
         )
