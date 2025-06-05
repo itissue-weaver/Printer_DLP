@@ -14,7 +14,6 @@ from ttkbootstrap.dialogs import Messagebox
 
 from files.constants import zip_file_name, font_tabs, font_entry
 from templates.AuxiliarFunctions import read_settings, update_settings, read_flags
-from templates.GUI.PlotFrame import SolidViewer
 from templates.GUI.SubFramePrinting import FramePrintingProcess
 from templates.daemons.TempFilesHandler import TempFilesHandler
 from templates.daemons.constants import response_queue
@@ -272,6 +271,7 @@ class FramePrinting(ttk.Frame):
                 rotation=settings.get("rotation"),
                 traslation=settings.get("traslation"),
             )
+            from templates.GUI.PlotFrame import SolidViewer
             self.frame_plot = SolidViewer(
                 self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=n_parts
             )
@@ -454,6 +454,7 @@ class FramePrinting(ttk.Frame):
                 rotation=settings.get("rotation"),
                 traslation=settings.get("traslation"),
             )
+            from templates.GUI.PlotFrame import SolidViewer
             self.frame_plot = SolidViewer(
                 self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=n_parts
             )
