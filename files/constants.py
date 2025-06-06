@@ -44,4 +44,5 @@ path_solid_capture = "files/img/solid_capture.png"
 desired_width_slice_image = 800
 desired_width_thumbnail = 400
 delay_z = 0.005
+delay_z_lift = 0.01
 delay_n = 0.01

@@ -38,7 +38,7 @@ from OpenGL.raw.GL.VERSION.GL_1_1 import glBindTexture
 from OpenGL.raw.GL.VERSION.GL_4_0 import GL_QUADS
 from OpenGL.raw.GL._types import GL_UNSIGNED_BYTE
 from pygame import OPENGL, DOUBLEBUF, FULLSCREEN
-from files.constants import image_path_projector, delay_z, delay_n
+from files.constants import image_path_projector, delay_z, delay_n, delay_z_lift
 from templates.AuxiliarFunctions import write_log, update_flags, read_flags, read_settings
 from templates.midleware.MD_Printer import (
     subprocess_control_led,
@@ -62,21 +62,24 @@ def turn_on_off_led(state="off"):
 class DlpViewer(threading.Thread):
     def __init__(self, mode=60, image_path=image_path_projector):
         super().__init__()
+
         (
             self.num_layers,
             self.layer_count,
             self.layer_depth,
             self.sequence,
             self.delta_layer,
-            self.delay_z,
+            self.delay_z_retract,
+            self.delay_z_lift,
             self.delay_n,
             self.settings,
             self.dlp,
             self.texture,
             self.bottom_layers,
             self.delta_bottom,
-            self.one_layer_display
-        ) = (None,) * 13
+            self.one_layer_display,
+            self.lift_height
+        ) = (None,) * 15
         self.flag_reload = False
         self.mode = mode
         self.image_path = image_path
@@ -98,7 +101,9 @@ class DlpViewer(threading.Thread):
         self.layer_depth = self.settings.get("layer_depth", 1.0)  # Espesor de la capa
         self.layer_count = 0  # Contador de capas procesadas
         self.num_layers = self.settings.get("num_layers", 0)  # Número de capas
-        self.delay_z = self.settings.get("delay_z", delay_z)  # Retardo de movimiento
+        self.delay_z_retract = self.settings.get("delay_z", delay_z)  # Retardo de movimiento
+        self.delay_z_lift = self.settings.get("delay_z_lift", delay_z_lift)  # Retardo de movimiento
+        self.lift_height = self.settings.get("lift_height", 6)
         self.delay_n = self.settings.get("delay_n", delay_n)  # Retardo de movimiento
         self.bottom_layers = self.settings.get("b_layers", 1)
         self.delta_bottom  = self.settings.get("e_time_b_layers", 40)
@@ -151,12 +156,12 @@ class DlpViewer(threading.Thread):
         r = 8 / 200
         msg = ""
         result = subprocess_control_motor(
-            "move_z_sw", "ccw", "bottom", "z", 0, delayz=self.delay_z, delayn=self.delay_n
+            "move_z_sw", "ccw", "bottom", "z", 0, new_delay_z=self.delay_z_retract, new_delay_n=self.delay_n
         )
         msg += f"move z to sw {result}"
         steps = int(self.layer_depth / r)
         result = subprocess_control_motor(
-            "move_z", "cw", "top", "z", steps, delayz=self.delay_z, delayn=self.delay_n
+            "move_z", "cw", "top", "z", steps, new_delay_z=self.delay_z_retract, new_delay_n=self.delay_n
         )
         msg += f"move z {result}"
 
@@ -284,17 +289,17 @@ class DlpViewer(threading.Thread):
 
     def change_z_motor(self):
         r = 8 / 200
-        dist_free = 3  # 3 mm
+        dist_free = self.lift_height
         steps = int(dist_free / r)
         msg = ""
         result = subprocess_control_motor(
-            "move_z", "cw", "top", "z", steps, delayz=self.delay_z, delayn=self.delay_n
+            "move_z", "cw", "top", "z", steps, new_delay_z=self.delay_z_lift, new_delay_n=self.delay_n
         )
         print(steps, result)
         msg += f"change z motor: {steps}, {result} {dist_free} {self.layer_depth}\n"
         steps = int((dist_free - self.layer_depth) / r)
         result = subprocess_control_motor(
-            "move_z", "ccw", "top", "z", steps, delayz=self.delay_z, delayn=self.delay_n
+            "move_z", "ccw", "top", "z", steps, new_delay_z=self.delay_z_retract, new_delay_n=self.delay_n
         )
         print(steps, result)
         msg += f"change z motor: {steps}, {result}\n"
@@ -349,5 +354,5 @@ class DlpViewer(threading.Thread):
         return self.layer_count
 
     def set_delays(self, new_delay_z, new_delay_n):
-        self.delay_z = new_delay_z
+        self.delay_z_retract = new_delay_z
         self.delay_n = new_delay_n

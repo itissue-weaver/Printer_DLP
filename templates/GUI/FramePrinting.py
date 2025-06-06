@@ -16,7 +16,8 @@ from files.constants import zip_file_name, font_tabs, font_entry
 from templates.AuxiliarFunctions import read_settings, update_settings, read_flags
 from templates.GUI.SubFramePrinting import FramePrintingProcess
 from templates.daemons.constants import response_queue
-from templates.midleware.MD_Printer import send_start_print, send_stop_print
+from templates.midleware.MD_Printer import send_start_print, send_stop_print, send_settings_printer
+
 Image.CUBIC = Image.BICUBIC
 
 def create_widgets_status(master):
@@ -134,6 +135,7 @@ def simulate_printing(master):
 class FramePrinting(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
+        self.thread_send_settings = None
         self.running_monitor_thread = False
         self.flags = None
         self.thread_stop_print = None
@@ -194,7 +196,7 @@ class FramePrinting(ttk.Frame):
         # ----------------------Button----------------------
         self.frame_buttons = ttk.Frame(self)
         self.frame_buttons.grid(row=1, column=0, sticky="nsew", padx=15, pady=15)
-        self.frame_buttons.columnconfigure((0, 1, 2, 3), weight=1)
+        self.frame_buttons.columnconfigure((0, 1, 2, 3, 4), weight=1)
         # frame_btn_img = ttk.LabelFrame(self.frame_buttons)
         # frame_btn_img.grid(row=0, column=0, sticky="n", padx=15, pady=1)
         # ttk.Button(
@@ -216,20 +218,26 @@ class FramePrinting(ttk.Frame):
             command=self.send_settings_callback,
             style="primary.TButton",
         ).grid(row=0, column=1, sticky="n", padx=15, pady=15)
+        ttk.Button(
+            self.frame_buttons,
+            text="Send Settings and Files",
+            command=self.refresh_callback,
+            style="secondary.TButton",
+        ).grid(row=0, column=2, sticky="n", padx=15, pady=15)
         self.print_button = ttk.Button(
             self.frame_buttons,
             text="Print",
             command=self.print_callback,
             style="success.TButton",
         )
-        self.print_button.grid(row=0, column=2, sticky="n", padx=15, pady=15)
+        self.print_button.grid(row=0, column=3, sticky="n", padx=15, pady=15)
         self.stop_button = ttk.Button(
             self.frame_buttons,
             text="Stop",
             command=self.stop_callback,
             style="danger.TButton",
         )
-        self.stop_button.grid(row=0, column=3, sticky="n", padx=15, pady=15)
+        self.stop_button.grid(row=0, column=4, sticky="n", padx=15, pady=15)
         # ---------------------progress bar --------------------
         self.frame_progress = ttk.Frame(self)
         self.frame_progress.grid(row=2, column=0, sticky="nsew", padx=15, pady=15)
@@ -422,6 +430,30 @@ class FramePrinting(ttk.Frame):
             self.frame_progress.grid_forget()
 
     def send_settings_callback(self):
+        if self.thread_send_settings and self.thread_send_settings.is_alive():
+            print("Esperando a que termine el hilo anterior...")
+            self.thread_send_settings.join()
+        # ---------------------calculate_layers--------------
+        self.is_sliced = False
+        settings = read_settings()
+        depth_part = settings.get("depth_part")
+        layer_depth = settings.get("layer_depth")
+        max_z_part = settings.get("max_z_part")
+        min_z_part = settings.get("min_z_part")
+        if depth_part is None:
+            msg = "No depth part found"
+            Messagebox.show_error(msg, "Error")
+            return None
+        total_z = max_z_part - min_z_part
+        num_layers = int(total_z / layer_depth)
+        update_settings(num_layers=num_layers)
+        self.thread_send_settings = threading.Thread(target=send_settings_printer)
+        self.thread_send_settings.start()
+
+        self.is_sliced = True
+        return 200, "ok"
+
+    def refresh_callback(self):
         # ---------------------calculate_layers--------------
         self.is_sliced = False
         settings = read_settings()
@@ -441,6 +473,7 @@ class FramePrinting(ttk.Frame):
             "files/img", zip_file_name, self, "compress"
         )
         self.file_handler.start()
+        return 200, "ok"
 
     def import_file_stl(self):
         settings = read_settings()

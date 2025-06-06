@@ -7,7 +7,8 @@ import threading
 import ttkbootstrap as ttk
 
 from files.constants import font_title, delay_z, delay_n
-from templates.midleware.MD_Printer import control_motor_from_gui, control_led_from_gui
+from templates.midleware.MD_Printer import control_motor_from_gui, control_led_from_gui, send_start_print_one_image, \
+    send_stop_print
 
 from tkinter import filedialog
 
@@ -28,7 +29,7 @@ class ManualControlFrame(ttk.Toplevel):
         self.destroy()
 
 
-def create_widgets_manual(master, icon_a_up, icon_a_down, icon_rotate, kwargs):
+def create_widgets_manual(master, icon_a_up, icon_a_down, icon_rotate, icon_rotate_sw, kwargs):
     entries = []
     frame_platform = ttk.LabelFrame(
         master, text="Platform Control", style="Custom.TLabelframe", padding=3
@@ -120,7 +121,7 @@ def create_widgets_manual(master, icon_a_up, icon_a_down, icon_rotate, kwargs):
     entries.append(svar_rotation)
     ttk.Button(
         frame_vat,
-        image=icon_rotate,
+        image=icon_rotate_sw,
         command=lambda: kwargs.get("vat_sw_callback")(svar_delay_n.get()),
         text="Rotation sw",
         style="success.TButton",
@@ -155,20 +156,35 @@ def create_widgets_manual(master, icon_a_up, icon_a_down, icon_rotate, kwargs):
         row=1, column=1, sticky="nsew"
     )
     entries.append(svar_layer)
+    ttk.Button(
+        frame_led,
+        text="Send and start printing",
+        command=lambda: kwargs.get("print_callback"),
+        style="success.TButton",
+    ).grid(row=2, column=0, sticky="n", pady=10)
+    ttk.Button(
+        frame_led,
+        text="Stop",
+        command=lambda: kwargs.get("stop_callback")(),
+        style="danger.TButton",
+    ).grid(row=2, column=1, sticky="n", pady=10, padx=10)
     return entries
 
 
 class ManualControl(ttk.Frame):
     def __init__(self, parent, **kwargs):
         super().__init__(parent)
+        self.thread_stop_print = None
+        self.thread_start_print = None
         self.parent = parent
         self.thread_led = None
         self.thread_motor = None
         self.columnconfigure(0, weight=1)
-        self.imgs = kwargs.get("imgs")
-        self.icon_a_up = self.imgs["arrow_up"]
-        self.icon_a_down = self.imgs["arrow_down"]
-        self.icon_rotate = self.imgs["rotate"]
+        self.images = kwargs.get("images")
+        self.icon_a_up = self.images["arrow_up"]
+        self.icon_a_down = self.images["arrow_down"]
+        self.icon_rotate = self.images["rotate"]
+        self.icon_rotate_sw = self.images["rotate_end"]
         ttk.Label(self, text="Manual Control", font=font_title).grid(
             row=0, column=0, sticky="nsew"
         )
@@ -184,12 +200,15 @@ class ManualControl(ttk.Frame):
             "up_top_callback": self.up_top_callback,
             "down_bottom_callback": self.down_bottom_callback,
             "vat_sw_callback": self.vat_sw_callback,
+            "print_callback": self.print_callback,
+            "stop_callback": self.stop_callback
         }
         self.entries = create_widgets_manual(
             entries_frame,
             self.icon_a_up,
             self.icon_a_down,
             self.icon_rotate,
+            self.icon_rotate_sw,
             kwargs=kwargs,
         )
 
@@ -204,9 +223,31 @@ class ManualControl(ttk.Frame):
             ),
         )
         if path:
-            self.entries[3].set(path)
+            self.entries[3].set(path.split("/")[-1])
         else:
             self.entries[3].set("No file selected")
+
+
+    def print_callback(self, layer, led):
+        if self.entries[3].get() == "No file selected":
+            print("No file selected")
+            return
+        try:
+            if self.thread_start_print and self.thread_start_print.is_alive():
+                print("Esperando a que termine el hilo anterior...")
+                self.thread_start_print.join()
+            self.thread_start_print = threading.Thread(target=send_start_print_one_image, args=(self.entries[3].get()))
+            self.thread_start_print.start()
+        except Exception as e:
+            print("Error al iniciar el hilo:", e)
+
+    def stop_callback(self):
+        if self.thread_stop_print and self.thread_stop_print.is_alive():
+            print("Esperando a que termine el hilo anterior...")
+            self.thread_stop_print.join()
+        # Iniciar nuevo hilo de impresión
+        self.thread_stop_print = threading.Thread(target=send_stop_print)
+        self.thread_stop_print.start()
 
     def up_callback(self, displacement, delayz):
         if self.thread_motor is None or not self.thread_motor.is_alive():

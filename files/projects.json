@@ -625,7 +625,7 @@
         "user": "prueba",
         "thumbnail": "",
         "status": 0,
-        "timestamp": "2025-06-05 12:57:35",
+        "timestamp": "2025-06-06 10:46:21",
         "settings": {
             "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
             "rotation": [
@@ -779,10 +779,10 @@
                 }
             ],
             "mode_biomaterial": "mode_1",
-            "delay_z": 0.005,
+            "delay_z": 0.006,
             "delay_n": 0.01,
             "b_layers": 3,
-            "e_time_b_layers": 4.0,
+            "e_time_b_layers": 6.0,
             "data": {
                 "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
                 "rotation": [
@@ -941,7 +941,9 @@
                 "b_layers": 1,
                 "e_time_b_layers": 40.0
             },
-            "msg": "Ok"
+            "msg": "Ok",
+            "delay_z_lift": 0.01,
+            "lift_height": 6.0
         }
     },
     "meniscoprueba": {

@@ -46,26 +46,28 @@ def configure_styles():
 
 
 def load_images():
-    imgs_path = {
+    img_path_dict = {
         "arrow_up": r"files/img/arrow_up.png",
         "arrow_down": r"files/img/arrow_down.png",
         "rotate": r"files/img/rotate-icon.png",
+        "rotate_end": r"files/img/rotate-icon-tope.png",
         "config": r"files/img/config.png",
         "save": r"files/img/save_btn.png",
         "control": r"files/img/remote-control.jpg",
         "link": r"files/img/link.png",
         "default": r"files/img/no_image.png",
     }
-    imgs = {}
-    for key, path in imgs_path.items():
+    images = {}
+    for key, path in img_path_dict.items():
         try:
             img = Image.open(path)
+            print(key, path)
         except FileNotFoundError:
-            path = imgs_path["default"]
+            path = img_path_dict["default"]
             img = Image.open(path)
         img = img.resize((50, 50))
-        imgs[key] = ImageTk.PhotoImage(img)
-    return imgs
+        images[key] = ImageTk.PhotoImage(img)
+    return images
 
 
 class MainGUI(ttk.Window):
@@ -78,7 +80,7 @@ class MainGUI(ttk.Window):
         self.after(0, lambda: self.state("zoomed"))
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
-        self.imgs = load_images()
+        self.images = load_images()
         self.frame_config = None
         self.connected = ttk.BooleanVar(value=False)
         # --------------------Start Animation -------------------
@@ -128,7 +130,7 @@ class MainGUI(ttk.Window):
         ttk.Button(
             self.frame_footer,
             text="Configuration",
-            image=self.imgs["config"],
+            image=self.images["config"],
             compound="left",
             command=self.click_config,
             style="secondary.TButton",
@@ -139,7 +141,7 @@ class MainGUI(ttk.Window):
             command=self.test_connection,
             style="danger.TButton",
             compound="left",
-            image=self.imgs["link"],
+            image=self.images["link"],
         )
         self.button_test.grid(row=0, column=1, sticky="e", padx=15, pady=15)
         self.txt_connected = ttk.StringVar(value="Disconnected")
@@ -152,7 +154,7 @@ class MainGUI(ttk.Window):
         self.button_save = ttk.Button(
             self.frame_footer,
             text="Save project",
-            image=self.imgs["save"],
+            image=self.images["save"],
             command=self.save_project,
             style="success.TButton",
             compound="left",
@@ -163,7 +165,7 @@ class MainGUI(ttk.Window):
             text="Manual Control",
             command=self.click_manual_control,
             style="primary.TButton",
-            image=self.imgs["control"],
+            image=self.images["control"],
             compound="left",
         )
         self.button_mControl.grid(row=0, column=4, sticky="e", padx=15, pady=15)
@@ -192,12 +194,13 @@ class MainGUI(ttk.Window):
 
     def click_manual_control(self):
         if self.frame_m_control is None:
-            imgs = {
-                "arrow_up": self.imgs["arrow_up"],
-                "arrow_down": self.imgs["arrow_down"],
-                "rotate": self.imgs["rotate"],
+            images = {
+                "arrow_up": self.images["arrow_up"],
+                "arrow_down": self.images["arrow_down"],
+                "rotate": self.images["rotate"],
+                "rotate_end": self.images["rotate_end"],
             }
-            self.frame_m_control = ManualControlFrame(self, imgs=imgs)
+            self.frame_m_control = ManualControlFrame(self, images=images)
 
     def on_m_control_close(self):
         self.frame_m_control = None

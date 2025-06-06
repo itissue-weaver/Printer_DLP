@@ -42,6 +42,22 @@ def send_start_print():
         return response.status_code, None
 
 
+def send_start_print_one_image(image_path):
+    with open(image_path, "rb") as image_file:
+        files = {"file": image_file}
+        response = requests.post(f"{server_domain + base_url}/manual_start", files=files)
+    if response.status_code == 200:
+        data = response.json()
+        response_queue.put((200, data))
+        print(200, data)
+        return 200, data
+    else:
+        response_queue.put((response.status_code, None))
+        print(response.status_code, None)
+        return response.status_code, None
+
+
+
 def send_stop_print():
     response = requests.post(
         f"{server_domain + base_url}/stop", data=json.dumps({}), headers=headers
@@ -291,7 +307,7 @@ def subprocess_test():
     return resultado.stdout
 
 
-def subprocess_control_motor(action, direction, location_z, motor, steps, delayz, delayn):
+def subprocess_control_motor(action, direction, location_z, motor, steps, new_delay_z, new_delay_n):
     argumentos = [
         "--action",
         action,
@@ -304,11 +320,11 @@ def subprocess_control_motor(action, direction, location_z, motor, steps, delayz
         "--steps",
         str(steps),
         "--delay_z",
-        str(delayz),
+        str(new_delay_z),
         "--delay_n",
-        str(delayn)
+        str(new_delay_n)
     ]
-    thread_log = threading.Thread(target=write_log, args=(f"Motorsubpro: {argumentos}",))
+    thread_log = threading.Thread(target=write_log, args=(f"Motor sub-pro: {argumentos}",))
     thread_log.start()
     resultado = subprocess.run(
         ["python3", ruta_script_motor] + argumentos, capture_output=True, text=True

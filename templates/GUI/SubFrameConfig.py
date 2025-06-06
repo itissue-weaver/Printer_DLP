@@ -108,7 +108,7 @@ def create_input_widgets_print(master):
         row=0, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_layer_depth)
-    ttk.Label(frame_inputs, text="Delta layer [s]:").grid(
+    ttk.Label(frame_inputs, text="Exposure normal layer [s]:").grid(
         row=1, column=0, sticky="w", padx=10, pady=10
     )
     entry_delta_layer = ttk.StringVar(value=str(settings.get("delta_layer", "0.5")))
@@ -146,6 +146,22 @@ def create_input_widgets_print(master):
         row=5, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_e_time_b_layers)
+    ttk.Label(frame_inputs, text="Delay z lift [s]:").grid(
+        row=6, column=0, sticky="w", padx=10, pady=10
+    )
+    entry_delay_z_lift = ttk.StringVar(value=str(settings.get("delay_z_lift", "0.01")))
+    ttk.Entry(frame_inputs, textvariable=entry_delay_z_lift).grid(
+        row=6, column=1, sticky="w", padx=5, pady=5
+    )
+    entries.append(entry_delay_z_lift)
+    ttk.Label(frame_inputs, text="Lift height [mm]:").grid(
+        row=7, column=0, sticky="w", padx=10, pady=10
+    )
+    entry_lift_height = ttk.StringVar(value=str(settings.get("lift_height", "6")))
+    ttk.Entry(frame_inputs, textvariable=entry_lift_height).grid(
+        row=7, column=1, sticky="w", padx=5, pady=5
+    )
+    entries.append(entry_lift_height)
     return entries
 
 
@@ -168,6 +184,8 @@ class PrinterConfig(ttk.Frame):
         delay_n = float(self.entries[3].get())
         b_layers = int(self.entries[4].get())
         e_time_b_layers = float(self.entries[5].get())
+        delay_z_lift = float(self.entries[6].get())
+        lift_height = float(self.entries[7].get())
         update_settings(
             layer_depth=layer_depth,
             delta_layer=delta_layer,
@@ -175,4 +193,6 @@ class PrinterConfig(ttk.Frame):
             delay_n=delay_n,
             b_layers=b_layers,
             e_time_b_layers=e_time_b_layers,
+            delay_z_lift = float(delay_z_lift),
+            lift_height=lift_height
         )
