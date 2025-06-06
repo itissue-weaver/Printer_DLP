@@ -135,6 +135,40 @@ class Start(Resource):
         }, 200
 
 
+@ns.route("/manual_start")
+class ManualStart(Resource):
+    def post(self):
+        msg = ""
+        file = request.files.get("file")
+        if not file:
+            return {"msg": "No file found"}, 400
+        filename = secure_filename(file.filename)
+        # check if file is an image
+        if not filename.lower().endswith((".jpg", ".jpeg")):
+            return {"msg": "File is not an image"}, 400
+        try:
+            file.save(image_path_projector)
+            msg = "Ok, file uploaded\n"
+        except Exception as e:
+            print(e)
+            return {"data": str(e), "msg": "Error at file structure"}, 400
+        global projector  # Indicar que estamos modificando la variable global
+        if projector and projector.is_alive():
+            print("El hilo ya está en ejecución.")
+            msg += "Ok, projector already started\n"
+        else:
+            projector = DlpViewer()  # Crear una nueva instancia accesible globalmente
+            projector.start_projecting(image_path=image_path_projector)
+            update_flags(is_printing=True, is_complete=False)
+            msg += "Ok, projector started\n"
+
+        return {
+            "msg": msg,
+            "data": projector.is_alive_projector(),
+        }, 200
+
+
+
 @ns.route("/stop")
 class Stop(Resource):
     def post(self):

@@ -38,10 +38,7 @@ from OpenGL.raw.GL.VERSION.GL_1_1 import glBindTexture
 from OpenGL.raw.GL.VERSION.GL_4_0 import GL_QUADS
 from OpenGL.raw.GL._types import GL_UNSIGNED_BYTE
 from pygame import OPENGL, DOUBLEBUF, FULLSCREEN
-from files.constants import image_path_projector, settings_path, delay_z, delay_n
-
-import json
-
+from files.constants import image_path_projector, delay_z, delay_n
 from templates.AuxiliarFunctions import write_log, update_flags, read_flags, read_settings
 from templates.midleware.MD_Printer import (
     subprocess_control_led,
@@ -77,8 +74,9 @@ class DlpViewer(threading.Thread):
             self.dlp,
             self.texture,
             self.bottom_layers,
-            self.delta_bottom
-        ) = (None,) * 12
+            self.delta_bottom,
+            self.one_layer_display
+        ) = (None,) * 13
         self.flag_reload = False
         self.mode = mode
         self.image_path = image_path
@@ -104,15 +102,16 @@ class DlpViewer(threading.Thread):
         self.delay_n = self.settings.get("delay_n", delay_n)  # Retardo de movimiento
         self.bottom_layers = self.settings.get("b_layers", 1)
         self.delta_bottom  = self.settings.get("e_time_b_layers", 40)
+        self.one_layer_display = False
 
     def load_texture(self):
         texture = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, texture)
         image = pygame.image.load(self.image_path).convert_alpha()
-        thread_log = threading.Thread(
-            target=write_log, args=(f"{self.image_path} {self.layer_count}",)
-        )
-        thread_log.start()
+        # thread_log = threading.Thread(
+        #     target=write_log, args=(f"{self.image_path} {self.layer_count}",)
+        # )
+        # thread_log.start()
         image = pygame.transform.flip(image, False, False)  # Flip the image vertically
         image_data = pygame.image.tostring(image, "RGBA", True)
         width, height = image.get_rect().size
@@ -135,17 +134,15 @@ class DlpViewer(threading.Thread):
     def init_display(self):
         pygame.init()
         screen = pygame.display.set_mode((0, 0), OPENGL | DOUBLEBUF | FULLSCREEN)
-        W, H = screen.get_size()
+        w_s, h_s = screen.get_size()
         width = 1.0
-        height = (float(H) / W) * width
+        height = (float(h_s) / w_s) * width
         glMatrixMode(GL_PROJECTION)
         glOrtho(
             -width / 2, +width / 2, -height / 2, +height / 2, -height / 2, +height / 2
         )
-        print(f"Width: {W}, Height: {H}")
         glMatrixMode(GL_MODELVIEW)
         self.texture = self.load_texture()
-        print(f"Texture ID: {self.texture}")
         self.layer_count += 1
         update_flags(layer_count=self.layer_count)
 
@@ -165,8 +162,8 @@ class DlpViewer(threading.Thread):
 
     def run(self):
         try:
-            self.init_display()
             self.init_motors()
+            self.init_display()
             # Enable blending and set the blend function
             glEnable(GL_BLEND)
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -174,6 +171,8 @@ class DlpViewer(threading.Thread):
             self.last_time = perf_counter()
             self.running = True
             while self.running:
+                if not self.running:
+                    break
                 flags = read_flags()
                 if flags["stop_printing"]:
                     self.running = False
@@ -183,6 +182,8 @@ class DlpViewer(threading.Thread):
                 if self.paused:
                     # Si está pausado, espera un momento antes de verificar de nuevo
                     time.sleep(0.1)
+                    continue
+                if self.one_layer_display:    # mostrar solo una capa
                     continue
                 # Calcular tiempo transcurrido
                 current_time = perf_counter()
@@ -206,29 +207,13 @@ class DlpViewer(threading.Thread):
                         self.running = False
                     self.reload_image(
                         f"files/img/extracted/temp{self.layer_count}.png"
-                    )  # Recargar imagen poner el path aqui
-                    self.last_time = current_time  # Resetear el temporizador
-                    thread_log = threading.Thread(
-                        target=write_log, args=(f"Layer {self.layer_count} loaded",)
                     )
-                    thread_log.start()
-                    print(f"Layer {self.layer_count} loaded")
-                # self.dlp.clear()
+                    self.last_time = current_time  # Resetear el temporizador
                 glClearColor(0.0, 0.0, 0.0, 1.0)  # Set the clear color to black
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)  #
                 glPushMatrix()
                 glEnable(GL_TEXTURE_2D)
                 glBindTexture(GL_TEXTURE_2D, self.texture)
-                # glBegin(GL_QUADS)
-                # glTexCoord2f(0, 0)
-                # glVertex2f(-0.1, -0.1)
-                # glTexCoord2f(1, 0)
-                # glVertex2f(+0.1, -0.1)
-                # glTexCoord2f(1, 1)
-                # glVertex2f(+0.1, +0.1)
-                # glTexCoord2f(0, 1)
-                # glVertex2f(-0.1, +0.1)
-                # glEnd()
                 offset_x = (
                     0.00  # Ajusta este valor para mover la imagen hacia la derecha
                 )
@@ -258,8 +243,7 @@ class DlpViewer(threading.Thread):
                 glDisable(GL_TEXTURE_2D)
                 glPopMatrix()
                 pygame.display.flip()
-                if not self.running:
-                    break
+
         except Exception as e:
             print(e)
             thread_log = threading.Thread(target=write_log, args=(f"Error printing: {e}",))
@@ -282,8 +266,6 @@ class DlpViewer(threading.Thread):
             print(e)
             thread_log = threading.Thread(target=write_log, args=(f"Error update flags: {e}",))
             thread_log.start()
-        # pygame.display.quit()
-        # pygame.quit()
 
     def process_sequence(self):
         """Controla el proceso basado en la secuencia."""
@@ -319,7 +301,7 @@ class DlpViewer(threading.Thread):
         # thread_log = threading.Thread(target=write_log, args=(msg,))
         # thread_log.start()
 
-    def start_projecting(self):
+    def start_projecting(self, image_path=None):
         self.load_variables()
         thread_log = threading.Thread(target=write_log, args=("start command",))
         thread_log.start()
@@ -327,6 +309,9 @@ class DlpViewer(threading.Thread):
         is_led_on = turn_on_off_led("on")
         if is_led_on:
             update_flags(stop_printing=False, is_printing=True, num_layers=self.num_layers, is_error=False, error="")
+            if image_path is not None:
+                self.reload_image(image_path)
+                self.one_layer_display = True
             self.start()
         else:
             print("Error al encender el led")
@@ -357,11 +342,8 @@ class DlpViewer(threading.Thread):
         thread_log.start()
         if image_path:
             self.image_path = image_path
-        self.texture = self.load_texture()
 
-    def cleanup(self):
-        if self.dlp is not None:
-            self.dlp.cleanup()
+        self.texture = self.load_texture()
 
     def layer_count_fun(self):
         return self.layer_count
