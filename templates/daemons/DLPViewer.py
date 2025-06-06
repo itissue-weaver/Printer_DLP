@@ -270,7 +270,7 @@ class DlpViewer(threading.Thread):
     def process_sequence(self):
         """Controla el proceso basado en la secuencia."""
         for step in self.sequence:
-            target_layers = int(step["height_z"] / self.layer_depth)  # Capas objetivo
+            target_layers = int(step["height_z"] / self.layer_depth)
             if self.layer_count == target_layers:
                 print(
                     f"Procesando depósito {step['deposit']} en capa {self.layer_count}"
@@ -348,6 +348,6 @@ class DlpViewer(threading.Thread):
     def layer_count_fun(self):
         return self.layer_count
 
-    def set_delays(self, delayz, delayn):
-        self.delay_z = delayz
-        self.delay_n = delayn
+    def set_delays(self, new_delay_z, new_delay_n):
+        self.delay_z = new_delay_z
+        self.delay_n = new_delay_n
