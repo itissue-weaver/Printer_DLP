@@ -18,6 +18,7 @@ from files.constants import (
 from templates.AuxiliarFunctions import update_settings, update_flags, read_settings, read_flags
 from templates.GUI.Frame_DisplayControl import DisplayControl
 from templates.GUI.Frame_DisplayStatus import DisplayStatus
+from templates.GUI.SubFrameInit import StartImageFrame
 from templates.midleware.MD_Printer import (
     control_led_from_gui,
     control_motor_from_gui,
@@ -89,6 +90,8 @@ class MainGUIDisplay(ttk.Window):
         kwargs = {
             "images": self.images,
         }
+        # ---------------------start animation-------------------
+        self.show_gif_toplevel()
         # ----------------------test connection-------------------
         self.thread_connection = threading.Thread(target=self.test_connection_md)
         self.thread_connection.start()
@@ -143,6 +146,8 @@ class MainGUIDisplay(ttk.Window):
         self.thread_monitor = threading.Thread(target=self.monitor_projector, daemon=True)
         self.thread_monitor.start()
 
+    def show_gif_toplevel(self):
+        StartImageFrame(self)
 
     def on_close(self):
         self.running_monitor = False
