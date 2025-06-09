@@ -10,6 +10,7 @@ from time import sleep
 
 import ttkbootstrap as ttk
 from PIL import Image
+from tifffile.tifffile import sequence
 from ttkbootstrap.dialogs import Messagebox
 
 from files.constants import zip_file_name, font_tabs, font_entry
@@ -221,7 +222,7 @@ class FramePrinting(ttk.Frame):
         ttk.Button(
             self.frame_buttons,
             text="Send Settings and Files",
-            command=self.refresh_callback,
+            command=self.resend_callback,
             style="secondary.TButton",
         ).grid(row=0, column=2, sticky="n", padx=15, pady=15)
         self.print_button = ttk.Button(
@@ -292,6 +293,34 @@ class FramePrinting(ttk.Frame):
             self.button_refresh.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
             print("error reading solid viewer", e)
 
+    def import_file_stl(self):
+        settings = read_settings()
+        filepath_stl = settings.get("filepath", "files/pyramid_test.stl")
+        n_parts = len(settings.get("sequence", []))
+        try:
+            os.path.exists(filepath_stl)
+            from templates.AuxFunctionsPlots import read_stl
+            solid_trimesh_part, solid_part = read_stl(
+                file_path=settings.get("filepath", "files/pyramid_test.stl"),
+                scale=settings.get("scale"),
+                rotation=settings.get("rotation"),
+                traslation=settings.get("traslation"),
+            )
+            from templates.GUI.PlotFrame import SolidViewer
+            self.frame_plot = SolidViewer(
+                self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=n_parts
+            )
+            self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+            if self.button_refresh is not None:
+                self.button_refresh.destroy()
+        except Exception as e:
+            if self.button_refresh is not None:
+                return
+            self.button_refresh = ttk.Button(
+                self.frame_main_info, text="Read STL", command=self.import_file_stl
+            )
+            print(e)
+
     def capture_screen_callback(self):
         if self.file_handler is None:
             from templates.daemons.TempFilesHandler import TempFilesHandler
@@ -359,6 +388,12 @@ class FramePrinting(ttk.Frame):
                 print("Printing completed")
                 percentage = 100
                 self.running_monitor_thread = False
+                status_frames = settings.get("status_frames")
+                status_frames[3] = 1
+                update_settings(status_frames=status_frames)
+                self.callbacks["change_tab_text"](status_frames, "from complete")
+                self.callbacks["save_project_callback"]()
+                break
             self.status_widgets[0].configure(amountused=percentage)
             self.test_connection()
             self.flags = read_flags()
@@ -453,7 +488,7 @@ class FramePrinting(ttk.Frame):
         self.is_sliced = True
         return 200, "ok"
 
-    def refresh_callback(self):
+    def resend_callback(self):
         # ---------------------calculate_layers--------------
         self.is_sliced = False
         settings = read_settings()
@@ -475,33 +510,26 @@ class FramePrinting(ttk.Frame):
         self.file_handler.start()
         return 200, "ok"
 
-    def import_file_stl(self):
+    def refresh_resume_widgets(self):
         settings = read_settings()
-        filepath_stl = settings.get("filepath", "files/pyramid_test.stl")
-        n_parts = len(settings.get("sequence", []))
-        try:
-            os.path.exists(filepath_stl)
-            from templates.AuxFunctionsPlots import read_stl
-            solid_trimesh_part, solid_part = read_stl(
-                file_path=settings.get("filepath", "files/pyramid_test.stl"),
-                scale=settings.get("scale"),
-                rotation=settings.get("rotation"),
-                traslation=settings.get("traslation"),
+        filepath = settings.get("filepath", "No filepath")
+        self.resume_widgets[0].set(value=filepath.split("/")[-1])
+        self.resume_widgets[1].set(value=str(settings.get("width_part", "0.0")))
+        self.resume_widgets[2].set(value=str(settings.get("height_part", "0.0")))
+        self.resume_widgets[3].set(value=str(settings.get("depth_part", "0.0")))
+        delta_layer = settings.get("delta_layer", 0.5)  # seconds
+        layers = settings.get("num_layers", 1)
+        estimated_time = delta_layer * layers
+        hours = int(estimated_time / 3600)
+        minutes = int((estimated_time % 3600) / 60)
+        seconds = int(estimated_time % 60)
+        self.resume_widgets[4].set(value=f"{hours} hours, {minutes} minutes, {seconds:.2f} seconds")
+        sequence = settings.get("sequence", [])
+        self.resume_widgets[-1].delete(*self.resume_widgets[-1].get_children())
+        for step in sequence:
+            self.resume_widgets[-1].insert(
+                "", "end", values=(step["deposit"], step["height_z"])
             )
-            from templates.GUI.PlotFrame import SolidViewer
-            self.frame_plot = SolidViewer(
-                self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=n_parts
-            )
-            self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
-            if self.button_refresh is not None:
-                self.button_refresh.destroy()
-        except Exception as e:
-            if self.button_refresh is not None:
-                return
-            self.button_refresh = ttk.Button(
-                self.frame_main_info, text="Read STL", command=self.import_file_stl
-            )
-            print(e)
 
 
 class SubFrameBars(ttk.Frame):

@@ -625,7 +625,7 @@
         "user": "prueba",
         "thumbnail": "",
         "status": 0,
-        "timestamp": "2025-06-06 10:46:21",
+        "timestamp": "2025-06-06 12:13:21",
         "settings": {
             "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
             "rotation": [
@@ -782,7 +782,7 @@
             "delay_z": 0.006,
             "delay_n": 0.01,
             "b_layers": 3,
-            "e_time_b_layers": 6.0,
+            "e_time_b_layers": 40.0,
             "data": {
                 "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
                 "rotation": [

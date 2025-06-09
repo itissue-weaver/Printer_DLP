@@ -22,7 +22,7 @@ from templates.GUI.FrameSliceFile import SliceFile
 from templates.GUI.Frame_ManualControl import ManualControlFrame
 from templates.GUI.Frame_ReadFile import ReadFile
 from templates.GUI.FrameConfig import FrameConfig
-from templates.GUI.SubFrameInit import GifFrameApp
+from templates.GUI.SubFrameInit import GifFrameApp, StartImageFrame
 from templates.midleware.MD_Printer import get_settings_printer, ask_status
 
 
@@ -61,7 +61,6 @@ def load_images():
     for key, path in img_path_dict.items():
         try:
             img = Image.open(path)
-            print(key, path)
         except FileNotFoundError:
             path = img_path_dict["default"]
             img = Image.open(path)
@@ -84,7 +83,7 @@ class MainGUI(ttk.Window):
         self.frame_config = None
         self.connected = ttk.BooleanVar(value=False)
         # --------------------Start Animation -------------------
-        # self.show_gif_toplevel()
+        self.show_gif_toplevel()
         # --------------------notebook-------------------
         self.frame_content = ttk.Frame(self)
         self.frame_content.grid(
@@ -103,6 +102,7 @@ class MainGUI(ttk.Window):
             "init_tabs": self.init_tabs,
             "change_project": self.change_project_key,
             "test_connection_callback":  self.test_connection,
+            "save_project_callback": self.save_project
         }
         print("init tabs")
         self.tab0 = HomePage(self.notebook, callbacks=self.callbacks)
@@ -191,6 +191,7 @@ class MainGUI(ttk.Window):
 
     def on_config_close(self):
         self.frame_config = None
+        self.tab4.refresh_resume_widgets()
 
     def click_manual_control(self):
         if self.frame_m_control is None:
@@ -206,7 +207,8 @@ class MainGUI(ttk.Window):
         self.frame_m_control = None
 
     def show_gif_toplevel(self):
-        GifFrameApp(self)
+        # GifFrameApp(self)
+        StartImageFrame(self)
 
     def change_tab_text(self, status_frame, from_s=""):
         # print(status_frame,  from_s)
