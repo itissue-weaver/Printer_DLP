@@ -10,7 +10,6 @@ from time import sleep
 
 import ttkbootstrap as ttk
 from PIL import Image
-from tifffile.tifffile import sequence
 from ttkbootstrap.dialogs import Messagebox
 
 from files.constants import zip_file_name, font_tabs, font_entry
