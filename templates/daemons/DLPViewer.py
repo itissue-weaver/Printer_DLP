@@ -168,6 +168,7 @@ class DlpViewer(threading.Thread):
     def run(self):
         try:
             self.init_motors()
+            turn_on_off_led(state="on")
             self.init_display()
             # Enable blending and set the blend function
             glEnable(GL_BLEND)
@@ -311,15 +312,12 @@ class DlpViewer(threading.Thread):
         thread_log = threading.Thread(target=write_log, args=("start command",))
         thread_log.start()
         self.running = True
-        is_led_on = turn_on_off_led("on")
-        if is_led_on:
-            update_flags(stop_printing=False, is_printing=True, num_layers=self.num_layers, is_error=False, error="")
-            if image_path is not None:
-                self.reload_image(image_path)
-                self.one_layer_display = True
-            self.start()
-        else:
-            print("Error al encender el led")
+        # is_led_on = turn_on_off_led("on")
+        update_flags(stop_printing=False, is_printing=True, num_layers=self.num_layers, is_error=False, error="")
+        if image_path is not None:
+            self.reload_image(image_path)
+            self.one_layer_display = True
+        self.start()
 
     def stop_projecting(self):
         thread_log = threading.Thread(target=write_log, args=("stop command",))

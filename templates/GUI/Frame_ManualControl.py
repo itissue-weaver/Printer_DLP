@@ -174,6 +174,7 @@ def create_widgets_manual(master, icon_a_up, icon_a_down, icon_rotate, icon_rota
 class ManualControl(ttk.Frame):
     def __init__(self, parent, **kwargs):
         super().__init__(parent)
+        self.path_image = None
         self.thread_stop_print = None
         self.thread_start_print = None
         self.parent = parent
@@ -223,20 +224,22 @@ class ManualControl(ttk.Frame):
             ),
         )
         if path:
+            self.path_image = path
             self.entries[3].set(path.split("/")[-1])
         else:
+            self.path_image = None
             self.entries[3].set("No file selected")
 
 
     def print_callback(self, layer, led):
-        if self.entries[3].get() == "No file selected":
+        if self.entries[3].get() == "No file selected" and self.path_image is None:
             print("No file selected")
             return
         try:
             if self.thread_start_print and self.thread_start_print.is_alive():
                 print("Esperando a que termine el hilo anterior...")
                 self.thread_start_print.join()
-            self.thread_start_print = threading.Thread(target=send_start_print_one_image, args=(self.entries[3].get()))
+            self.thread_start_print = threading.Thread(target=send_start_print_one_image, args=self.path_image)
             self.thread_start_print.start()
         except Exception as e:
             print("Error al iniciar el hilo:", e)

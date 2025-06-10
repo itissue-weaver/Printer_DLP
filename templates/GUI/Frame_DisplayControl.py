@@ -14,7 +14,7 @@ from files.constants import (
 from templates.midleware.MD_Printer import (
     control_led_from_gui,
     control_motor_from_gui,
-    get_settings_printer,
+    get_settings_printer, send_start_print_one_image,
 )
 
 font_buttons = ("Sylfaen", 22, "normal")
@@ -227,12 +227,20 @@ def create_widgets(master, **kwargs):
         row=1, column=1, sticky="nsew"
     )
     entries.append(svar_layer)
+    ttk.Button(
+        frame_led,
+        text="Print",
+        command=lambda: kwargs.get("print_callback")(),
+        style="success.TButton",
+    ).grid(row=2, column=0, sticky="nswe", pady=10, padx=10, columnspan=2)
     return entries
 
 
 class DisplayControl(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master)
+        self.path = None
+        self.thread_start_print = None
         self.thread_led = None
         self.thread_motor = None
         self.frame_m_control = None
@@ -256,6 +264,7 @@ class DisplayControl(ttk.Frame):
             "change_value_callback": self.change_value_callback,
             "images": self.images,
             "layer_callback": self.layer_callback,
+            "print_callback": self.print_callback,
         }
         # --------------------header-------------------
         self.frame_header = ttk.Frame(self)
@@ -400,8 +409,30 @@ class DisplayControl(ttk.Frame):
 
     def layer_callback(self):
         path = filedialog.askopenfilename(
-            title="Select an  image file",
-            filetypes=[("Image files", "*.png *.jpg *.jpeg"), ("All files", "*.*")],
+            initialdir="/",
+            title="Select file",
+            filetypes=(
+                ("Image files", ["*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp"]),
+                ("all files", "*.*"),
+            ),
         )
         if path:
-            print(path)
+            self.path = path
+            self.entries[2].set(path.split("/")[-1])
+        else:
+            self.path = None
+            self.entries[2].set("No file selected")
+
+
+    def print_callback(self):
+        if self.entries[2].get() == "No file selected" and self.path is None:
+            print("No file selected")
+            return
+        try:
+            if self.thread_start_print and self.thread_start_print.is_alive():
+                print("Esperando a que termine el hilo anterior...")
+                self.thread_start_print.join()
+            self.thread_start_print = threading.Thread(target=send_start_print_one_image, args=self.path)
+            self.thread_start_print.start()
+        except Exception as e:
+            print("Error al iniciar el hilo:", e)
