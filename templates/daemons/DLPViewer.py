@@ -155,8 +155,8 @@ class DlpViewer(threading.Thread):
         # "move_z_sw", "cw", "top", "z", 0,
         r = 8 / 200
         msg = ""
-        settings = read_settings()
-        delay_retract_init = settings.get("delay_z_retract_init", self.delay_z_retract)
+        # settings = read_settings()
+        # delay_retract_init = settings.get("delay_z_retract_init", self.delay_z_retract)
         result = subprocess_control_motor(
             "move_z_sw", "ccw", "bottom", "z", 0, new_delay_z=self.delay_z_retract, new_delay_n=self.delay_n
         )
