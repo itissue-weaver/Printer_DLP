@@ -85,8 +85,10 @@ def send_settings_printer():
     # print(f"{server_domain + base_url}/settings")
     if response.status_code == 200:
         data = response.json()
+        print(200, data)
         return 200, data
     else:
+        print(response.status_code, None)
         return response.status_code, f"Error settings sender: {response}"
 
 

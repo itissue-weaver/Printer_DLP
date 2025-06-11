@@ -483,6 +483,7 @@ class FramePrinting(ttk.Frame):
         update_settings(num_layers=num_layers)
         self.thread_send_settings = threading.Thread(target=send_settings_printer)
         self.thread_send_settings.start()
+        print("Start sending settings")
 
         self.is_sliced = True
         return 200, "ok"
