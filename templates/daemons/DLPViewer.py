@@ -151,12 +151,14 @@ class DlpViewer(threading.Thread):
         self.layer_count += 1
         update_flags(layer_count=self.layer_count)
 
-    def init_motors(self):
+    def init_motors(self, delay_retract_init=None):
         # "move_z_sw", "cw", "top", "z", 0,
         r = 8 / 200
         msg = ""
+        settings = read_settings()
+        delay_retract_init = settings.get("delay_z_retract_init", 0.01)
         result = subprocess_control_motor(
-            "move_z_sw", "ccw", "bottom", "z", 0, new_delay_z=self.delay_z_retract, new_delay_n=self.delay_n
+            "move_z_sw", "ccw", "bottom", "z", 0, new_delay_z=delay_retract_init, new_delay_n=self.delay_n
         )
         msg += f"move z to sw {result}"
         steps = int(self.layer_depth / r)

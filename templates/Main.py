@@ -188,6 +188,8 @@ class MainGUI(ttk.Window):
     def click_config(self):
         if self.frame_config is None:
             self.frame_config = FrameConfig(self)
+        else:
+            self.frame_config.lift()
 
     def on_config_close(self):
         self.frame_config = None
@@ -202,6 +204,8 @@ class MainGUI(ttk.Window):
                 "rotate_end": self.images["rotate_end"],
             }
             self.frame_m_control = ManualControlFrame(self, images=images)
+        else:
+            self.frame_m_control.lift()
 
     def on_m_control_close(self):
         self.frame_m_control = None

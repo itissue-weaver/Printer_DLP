@@ -516,9 +516,11 @@ class FramePrinting(ttk.Frame):
         self.resume_widgets[1].set(value=str(settings.get("width_part", "0.0")))
         self.resume_widgets[2].set(value=str(settings.get("height_part", "0.0")))
         self.resume_widgets[3].set(value=str(settings.get("depth_part", "0.0")))
-        delta_layer = settings.get("delta_layer", 0.5)  # seconds
-        layers = settings.get("num_layers", 1)
-        estimated_time = delta_layer * layers
+        delta_layer = settings.get("delta_layer")  # seconds
+        layers = settings.get("num_layers")
+        b_layers = settings.get("b_layers")
+        e_time_b_layers = settings.get("e_time_b_layers")
+        estimated_time = delta_layer * (layers-b_layers) + b_layers * e_time_b_layers
         hours = int(estimated_time / 3600)
         minutes = int((estimated_time % 3600) / 60)
         seconds = int(estimated_time % 60)

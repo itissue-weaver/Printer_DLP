@@ -162,6 +162,14 @@ def create_input_widgets_print(master):
         row=7, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_lift_height)
+    ttk.Label(frame_inputs, text="Initial delay retract [s]:").grid(
+        row=8, column=0, sticky="w", padx=10, pady=10
+    )
+    entry_initial_d_r_ini = ttk.StringVar(value=str(settings.get("delay_retract_init", 0.01)))
+    ttk.Entry(frame_inputs, textvariable=entry_initial_d_r_ini).grid(
+        row=8, column=1, sticky="w", padx=5, pady=5
+    )
+    entries.append(entry_initial_d_r_ini)
     return entries
 
 
@@ -178,6 +186,7 @@ class PrinterConfig(ttk.Frame):
 
     def on_close(self):
         # Obtener los valores de las entradas
+        settings = read_settings()
         layer_depth = float(self.entries[0].get())
         delta_layer = float(self.entries[1].get())
         delay_z = float(self.entries[2].get())
@@ -186,6 +195,11 @@ class PrinterConfig(ttk.Frame):
         e_time_b_layers = float(self.entries[5].get())
         delay_z_lift = float(self.entries[6].get())
         lift_height = float(self.entries[7].get())
+        delay_retract_init = float(self.entries[8].get())
+        max_z_part = settings.get("max_z_part")
+        min_z_part = settings.get("min_z_part")
+        total_z = max_z_part - min_z_part
+        num_layers = int(total_z / layer_depth)
         update_settings(
             layer_depth=layer_depth,
             delta_layer=delta_layer,
@@ -194,5 +208,7 @@ class PrinterConfig(ttk.Frame):
             b_layers=b_layers,
             e_time_b_layers=e_time_b_layers,
             delay_z_lift = float(delay_z_lift),
-            lift_height=lift_height
+            lift_height=lift_height,
+            delay_retract_init=delay_retract_init,
+            num_layers=num_layers
         )
