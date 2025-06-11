@@ -112,6 +112,7 @@ class Settings(Resource):
         if not data:
             return {"msg": "No data found"}, 400
         update_settings(**data)
+        update_flags(is_printing=True, is_complete=False)
         return {"msg": "Ok"}, 200
 
 
