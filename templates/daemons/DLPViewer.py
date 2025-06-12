@@ -95,7 +95,6 @@ class DlpViewer(threading.Thread):
         self.start_time = 0.0
         self.last_time = 0.0
         self.flag_reload = False
-        self.settings = read_settings()
         self.delta_layer = self.settings["delta_layer"]
         self.sequence = self.settings.get("sequence", [])  # Carga la secuencia
         self.layer_depth = self.settings.get("layer_depth", 1.0)  # Espesor de la capa
@@ -108,6 +107,7 @@ class DlpViewer(threading.Thread):
         self.bottom_layers = self.settings.get("b_layers", 1)
         self.delta_bottom  = self.settings.get("e_time_b_layers", 40)
         self.one_layer_display = False
+        self.settings = read_settings()
 
     def load_texture(self):
         texture = glGenTextures(1)
@@ -155,8 +155,6 @@ class DlpViewer(threading.Thread):
         # "move_z_sw", "cw", "top", "z", 0,
         r = 8 / 200
         msg = ""
-        # settings = read_settings()
-        # delay_retract_init = settings.get("delay_z_retract_init", self.delay_z_retract)
         result = subprocess_control_motor(
             "move_z_sw", "ccw", "bottom", "z", 0, new_delay_z=self.delay_z_retract, new_delay_n=self.delay_n
         )
