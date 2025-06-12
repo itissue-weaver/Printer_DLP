@@ -158,6 +158,8 @@ class ManualStart(Resource):
             print("El hilo ya está en ejecución.")
             msg += "Ok, projector already started\n"
         else:
+            thread_log = threading.Thread(target=write_log, args=("start command manual",))
+            thread_log.start()
             projector = DlpViewer()  # Crear una nueva instancia accesible globalmente
             projector.start_projecting(image_path=image_path_projector)
             update_flags(is_printing=True, is_complete=False)
