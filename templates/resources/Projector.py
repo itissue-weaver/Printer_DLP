@@ -145,8 +145,8 @@ class ManualStart(Resource):
             return {"msg": "No file found"}, 400
         filename = secure_filename(file.filename)
         # check if file is an image
-        if not filename.lower().endswith(("*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp")):
-            return {"msg": "File is not an image"}, 400
+        if not filename.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".bmp")):
+            return {"msg": f"File is not an image: {filename}"}, 400
         try:
             file.save(image_path_projector)
             msg = "Ok, file uploaded\n"
