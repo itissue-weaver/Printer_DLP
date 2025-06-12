@@ -231,4 +231,4 @@ class MainGUIDisplay(ttk.Window):
                 break
             self.frame_1.on_update_status(self.settings, self.flags)
             self.test_connection_md()
-            sleep(delta_layer/2.5)
+            sleep(delta_layer/1.5)
