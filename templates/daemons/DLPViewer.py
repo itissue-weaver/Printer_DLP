@@ -90,6 +90,7 @@ class DlpViewer(threading.Thread):
         self.load_variables()
 
     def load_variables(self):
+        self.settings = read_settings()
         self.running = False
         self.paused = False
         self.start_time = 0.0
@@ -107,7 +108,6 @@ class DlpViewer(threading.Thread):
         self.bottom_layers = self.settings.get("b_layers", 1)
         self.delta_bottom  = self.settings.get("e_time_b_layers", 40)
         self.one_layer_display = False
-        self.settings = read_settings()
 
     def load_texture(self):
         texture = glGenTextures(1)

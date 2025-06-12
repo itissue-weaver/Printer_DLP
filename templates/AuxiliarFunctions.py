@@ -25,14 +25,18 @@ def update_settings(**kwargs):
 
 def read_settings():
     try:
-        settings = json.load(open(settings_path, "r"))
+        with open(settings_path, "r") as f:
+            settings = json.load(f)
     except  FileNotFoundError:
-        settings = json.load(open("files/default_settings.json", "r"))
+        print("settings file not found")
+        with open("files/default_settings.json", "r") as f:
+            settings = json.load(f)
     return settings
 
 
 def read_materials():
-    materials = json.load(open(materials_path, "r"))
+    with open(materials_path, "r") as f:
+        materials = json.load(f)
     return materials
 
 
@@ -42,7 +46,8 @@ def update_materials(materials):
 
 
 def read_projects():
-    projects = json.load(open(projects_path, "r"))
+    with open(projects_path, "r") as f:
+        projects = json.load(f)
     return projects
 
 
