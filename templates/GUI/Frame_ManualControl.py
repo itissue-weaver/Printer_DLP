@@ -159,7 +159,7 @@ def create_widgets_manual(master, icon_a_up, icon_a_down, icon_rotate, icon_rota
     ttk.Button(
         frame_led,
         text="Send and start printing",
-        command=lambda: kwargs.get("print_callback"),
+        command=lambda: kwargs.get("print_callback")(),
         style="success.TButton",
     ).grid(row=2, column=0, sticky="n", pady=10)
     ttk.Button(
@@ -231,7 +231,7 @@ class ManualControl(ttk.Frame):
             self.entries[3].set("No file selected")
 
 
-    def print_callback(self, layer, led):
+    def print_callback(self):
         if self.entries[3].get() == "No file selected" and self.path_image is None:
             print("No file selected")
             return
@@ -239,7 +239,7 @@ class ManualControl(ttk.Frame):
             if self.thread_start_print and self.thread_start_print.is_alive():
                 print("Esperando a que termine el hilo anterior...")
                 self.thread_start_print.join()
-            self.thread_start_print = threading.Thread(target=send_start_print_one_image, args=self.path_image)
+            self.thread_start_print = threading.Thread(target=send_start_print_one_image, args=(self.path_image,))
             self.thread_start_print.start()
         except Exception as e:
             print("Error al iniciar el hilo:", e)

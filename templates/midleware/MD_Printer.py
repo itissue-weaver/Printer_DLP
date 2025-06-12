@@ -43,9 +43,14 @@ def send_start_print():
 
 
 def send_start_print_one_image(image_path):
-    with open(image_path, "rb") as image_file:
-        files = {"file": image_file}
-        response = requests.post(f"{server_domain + base_url}/manual_start", files=files)
+    print("manual start", image_path)
+    try:
+        with open(image_path, "rb") as image_file:
+            files = {"file": image_file}
+            response = requests.post(f"{server_domain + base_url}/manual_start", files=files)
+    except Exception as e:
+        print("error", e)
+        return 400, None
     if response.status_code == 200:
         data = response.json()
         response_queue.put((200, data))
@@ -54,7 +59,7 @@ def send_start_print_one_image(image_path):
         return 200, data
     else:
         response_queue.put((response.status_code, None))
-        print(response.status_code, None)
+        print(response.status_code, response.json())
         return response.status_code, None
 
 
