@@ -301,7 +301,7 @@
         "user": "Edisson",
         "thumbnail": "",
         "status": 0,
-        "timestamp": "2025-06-11 10:09:37",
+        "timestamp": "2025-06-12 09:56:52",
         "settings": {
             "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
             "rotation": [
@@ -345,7 +345,7 @@
             ],
             "dpi": 300,
             "layer_depth": 1.0,
-            "delta_layer": 10.0,
+            "delta_layer": 2.0,
             "plate": 1,
             "HOST": "127.0.0.1",
             "num_layers": 20,
@@ -458,7 +458,7 @@
             "delay_z": 0.005,
             "delay_n": 0.01,
             "b_layers": 1,
-            "e_time_b_layers": 40.0,
+            "e_time_b_layers": 2.0,
             "data": {
                 "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
                 "rotation": [

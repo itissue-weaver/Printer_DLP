@@ -78,8 +78,9 @@ class DlpViewer(threading.Thread):
             self.bottom_layers,
             self.delta_bottom,
             self.one_layer_display,
-            self.lift_height
-        ) = (None,) * 15
+            self.lift_height,
+            self.delay_retract_init,
+        ) = (None,) * 16
         self.flag_reload = False
         self.mode = mode
         self.image_path = image_path
@@ -97,6 +98,7 @@ class DlpViewer(threading.Thread):
         self.last_time = 0.0
         self.flag_reload = False
         self.delta_layer = self.settings["delta_layer"]
+        self.delay_retract_init = self.settings.get("delay_retract_init")
         self.sequence = self.settings.get("sequence", [])  # Carga la secuencia
         self.layer_depth = self.settings.get("layer_depth", 1.0)  # Espesor de la capa
         self.layer_count = 0  # Contador de capas procesadas
@@ -152,11 +154,10 @@ class DlpViewer(threading.Thread):
         update_flags(layer_count=self.layer_count)
 
     def init_motors(self, delay_retract_init=None):
-        # "move_z_sw", "cw", "top", "z", 0,
         r = 8 / 200
         msg = ""
         result = subprocess_control_motor(
-            "move_z_sw", "ccw", "bottom", "z", 0, new_delay_z=self.delay_z_retract, new_delay_n=self.delay_n
+            "move_z_sw", "ccw", "bottom", "z", 0, new_delay_z=self.delay_retract_init, new_delay_n=self.delay_n
         )
         msg += f"move z to sw {result}"
         steps = int(self.layer_depth / r)
