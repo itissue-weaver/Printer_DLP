@@ -11,6 +11,7 @@ from time import sleep
 import ttkbootstrap as ttk
 from PIL import Image
 from ttkbootstrap.dialogs import Messagebox
+from ttkbootstrap.toast import ToastNotification
 
 from files.constants import zip_file_name, font_tabs, font_entry
 from templates.AuxiliarFunctions import read_settings, update_settings, read_flags
@@ -339,29 +340,6 @@ class FramePrinting(ttk.Frame):
         update_settings(status_frames=status_frames)
         self.load_solid_viewer()
 
-    def print_callback(self):
-        if not self.is_sliced:
-            Messagebox.show_error("Settings not sent", "Error")
-            return
-        if self.is_printing:
-           print("Print already in progress")
-        # Asegurar que no haya otro hilo `start print` en ejecución
-        print("Start printing init")
-        if self.thread_start_print and self.thread_start_print.is_alive():
-            print("Esperando a que termine el hilo anterior...")
-            self.thread_start_print.join()
-        # Iniciar nuevo hilo de impresión
-        self.thread_start_print = threading.Thread(target=send_start_print)
-        self.thread_start_print.start()
-        self.thread_monitor = threading.Thread(target=self.monitor_projector, daemon=True)
-        self.thread_monitor.start()
-
-        # Iniciar el hilo de monitoreo
-        if not self.monitor_running:
-            self.monitor_running = True
-            self.thread_monitor = threading.Thread(target=self.monitor_response)
-            self.thread_monitor.start()
-
     def monitor_projector(self):
         if self.flags is None:
             self.flags = read_flags()
@@ -397,25 +375,6 @@ class FramePrinting(ttk.Frame):
             self.test_connection()
             self.flags = read_flags()
             time.sleep(delta_layer / 2)
-
-    def stop_callback(self):
-        if not self.is_printing:
-            print("Print not in progress")
-        print("Stop printing init")
-        self.running_monitor_thread = False
-        # Asegurar que no haya otro hilo `stop print` en ejecución
-        if self.thread_stop_print and self.thread_stop_print.is_alive():
-            print("Esperando a que termine el hilo anterior...")
-            self.thread_stop_print.join()
-        # Iniciar nuevo hilo de impresión
-        self.thread_stop_print = threading.Thread(target=send_stop_print)
-        self.thread_stop_print.start()
-
-        # Iniciar el hilo de monitoreo
-        if not self.monitor_running:
-            self.monitor_running = True
-            self.thread_monitor = threading.Thread(target=self.monitor_response)
-            self.thread_monitor.start()
 
     def monitor_response(self):
         """Monitorea la respuesta sin crear múltiples hilos innecesarios"""
@@ -463,6 +422,60 @@ class FramePrinting(ttk.Frame):
             self.is_sending = False
             self.frame_progress.grid_forget()
 
+    def print_callback(self):
+        if not self.is_sliced:
+            Messagebox.show_error("Settings not sent", "Error")
+            return
+        if self.is_printing:
+            print("Print already in progress")
+        # Asegurar que no haya otro hilo `start print` en ejecución
+        print("Start printing init")
+        if self.thread_start_print and self.thread_start_print.is_alive():
+            print("Esperando a que termine el hilo anterior...")
+            self.thread_start_print.join()
+        # Iniciar nuevo hilo de impresión
+        self.thread_start_print = threading.Thread(target=send_start_print)
+        self.thread_start_print.start()
+        self.thread_monitor = threading.Thread(target=self.monitor_projector, daemon=True)
+        self.thread_monitor.start()
+
+        # Iniciar el hilo de monitoreo
+        if not self.monitor_running:
+            self.monitor_running = True
+            self.thread_monitor = threading.Thread(target=self.monitor_response)
+            self.thread_monitor.start()
+        toast = ToastNotification(
+            title="Printing",
+            message="Printing command sent.",
+            duration=1000,
+        )
+        toast.show_toast()
+
+    def stop_callback(self):
+        if not self.is_printing:
+            print("Print not in progress")
+        print("Stop printing init")
+        self.running_monitor_thread = False
+        # Asegurar que no haya otro hilo `stop print` en ejecución
+        if self.thread_stop_print and self.thread_stop_print.is_alive():
+            print("Esperando a que termine el hilo anterior...")
+            self.thread_stop_print.join()
+        # Iniciar nuevo hilo de impresión
+        self.thread_stop_print = threading.Thread(target=send_stop_print)
+        self.thread_stop_print.start()
+
+        # Iniciar el hilo de monitoreo
+        if not self.monitor_running:
+            self.monitor_running = True
+            self.thread_monitor = threading.Thread(target=self.monitor_response)
+            self.thread_monitor.start()
+        toast = ToastNotification(
+            title="Printing",
+            message="Stop printing command sent.",
+            duration=1000,
+        )
+        toast.show_toast()
+
     def send_settings_callback(self):
         if self.thread_send_settings and self.thread_send_settings.is_alive():
             print("Esperando a que termine el hilo anterior...")
@@ -484,7 +497,12 @@ class FramePrinting(ttk.Frame):
         self.thread_send_settings = threading.Thread(target=send_settings_printer)
         self.thread_send_settings.start()
         print("Start sending settings")
-
+        toast = ToastNotification(
+            title="Settings Sender",
+            message="The settings file have been sent to the printer.",
+            duration=1000,
+        )
+        toast.show_toast()
         self.is_sliced = True
         return 200, "ok"
 
@@ -508,6 +526,12 @@ class FramePrinting(ttk.Frame):
             "files/img", zip_file_name, self, "compress"
         )
         self.file_handler.start()
+        toast = ToastNotification(
+            title="Settings and Files Sender",
+            message="The settings and files have been sent to the printer.",
+            duratio=1000
+        )
+        toast.show_toast()
         return 200, "ok"
 
     def refresh_resume_widgets(self):
