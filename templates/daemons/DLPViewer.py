@@ -160,11 +160,11 @@ class DlpViewer(threading.Thread):
             "move_z_sw", "ccw", "bottom", "z", 0, new_delay_z=self.delay_retract_init, new_delay_n=self.delay_n
         )
         msg += f"move z to sw {result}"
-        steps = int(self.layer_depth / r)
-        result = subprocess_control_motor(
-            "move_z", "cw", "top", "z", steps, new_delay_z=self.delay_z_retract, new_delay_n=self.delay_n
-        )
-        msg += f"move z {result}"
+        # steps = int(self.layer_depth / r)
+        # result = subprocess_control_motor(
+        #     "move_z", "cw", "top", "z", steps, new_delay_z=self.delay_z_retract, new_delay_n=self.delay_n
+        # )
+        # msg += f"move z {result}"
 
     def run(self):
         try:
