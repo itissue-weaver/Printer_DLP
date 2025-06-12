@@ -319,7 +319,7 @@ class DlpViewer(threading.Thread):
         # is_led_on = turn_on_off_led("on")
         update_flags(stop_printing=False, is_printing=True, num_layers=self.num_layers, is_error=False, error="")
         if image_path is not None:
-            self.reload_image(image_path)
+            # self.reload_image(image_path)
             self.one_layer_display = True
         self.start()
 
