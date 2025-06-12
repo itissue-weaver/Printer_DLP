@@ -448,6 +448,7 @@ class FramePrinting(ttk.Frame):
             title="Printing",
             message="Printing command sent.",
             duration=1000,
+            bootstyle="success",
         )
         toast.show_toast()
 
@@ -473,6 +474,7 @@ class FramePrinting(ttk.Frame):
             title="Printing",
             message="Stop printing command sent.",
             duration=1000,
+            bootstyle="success",
         )
         toast.show_toast()
 
@@ -501,6 +503,7 @@ class FramePrinting(ttk.Frame):
             title="Settings Sender",
             message="The settings file have been sent to the printer.",
             duration=1000,
+            bootstyle="success",
         )
         toast.show_toast()
         self.is_sliced = True
@@ -529,7 +532,8 @@ class FramePrinting(ttk.Frame):
         toast = ToastNotification(
             title="Settings and Files Sender",
             message="The settings and files have been sent to the printer.",
-            duratio=1000
+            duratio=1000,
+            bootstyle="success",
         )
         toast.show_toast()
         return 200, "ok"

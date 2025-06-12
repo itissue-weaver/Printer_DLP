@@ -628,7 +628,7 @@
         "user": "prueba",
         "thumbnail": "",
         "status": 0,
-        "timestamp": "2025-06-11 11:56:11",
+        "timestamp": "2025-06-12 10:25:47",
         "settings": {
             "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
             "rotation": [
@@ -671,11 +671,11 @@
                 10.0
             ],
             "dpi": 300,
-            "layer_depth": 0.1,
+            "layer_depth": 0.05,
             "delta_layer": 2.3,
             "plate": 1,
             "HOST": "127.0.0.1",
-            "num_layers": 200,
+            "num_layers": 400,
             "material1": "Solucion1",
             "quantity1": 50.0,
             "material2": "Solution 2",
