@@ -171,6 +171,9 @@ class DlpViewer(threading.Thread):
             self.init_motors()
             self.init_display()
             turn_on_off_led(state="on")
+            flags = read_flags()
+            if flags["stop_printing"]:
+                self.running = False
             # Enable blending and set the blend function
             glEnable(GL_BLEND)
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
