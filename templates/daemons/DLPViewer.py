@@ -98,7 +98,7 @@ class DlpViewer(threading.Thread):
         self.last_time = 0.0
         self.flag_reload = False
         self.delta_layer = self.settings["delta_layer"]
-        self.delay_retract_init = self.settings.get("delay_retract_init")
+        self.delay_retract_init = self.settings.get("delay_retract_init", 0.01)
         self.sequence = self.settings.get("sequence", [])  # Carga la secuencia
         self.layer_depth = self.settings.get("layer_depth", 1.0)  # Espesor de la capa
         self.layer_count = 0  # Contador de capas procesadas
