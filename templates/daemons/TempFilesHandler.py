@@ -90,7 +90,7 @@ class TempFilesHandler(threading.Thread):
                 centroide = settings.get("centroide", [0, 0, 0])
                 width = settings.get("width_part", 0.0)
                 height = settings.get("height_part", 0.0)
-                self.ploter.plotLayer(
+                self.ploter.plot_layer(
                     dpi,
                     layer,
                     projector_dimension[0],

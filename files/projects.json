@@ -628,7 +628,7 @@
         "user": "prueba",
         "thumbnail": "",
         "status": 0,
-        "timestamp": "2025-06-12 16:56:07",
+        "timestamp": "2025-06-16 10:53:38",
         "settings": {
             "filepath": "C:/Users/Weaver4/Downloads/W v1.stl",
             "rotation": [
@@ -637,9 +637,9 @@
                 0.0
             ],
             "scale": [
-                1.0,
-                1.0,
-                1.0
+                0.0,
+                0.0,
+                0.0
             ],
             "translation": [
                 0.0,
@@ -658,7 +658,7 @@
             "hatch_spacing": 0.5,
             "stripe_width": 0.5,
             "projector_dimension": [
-                30.0,
+                20.0,
                 20.0
             ],
             "projector_resolution": [
@@ -713,9 +713,9 @@
                 1.0
             ],
             "centroide": [
-                -1.5935268352838223e-09,
-                9.436989743029436,
-                2.9975792509206943e-16
+                -0.0,
+                9.437,
+                0.0
             ],
             "sequence": [
                 {
