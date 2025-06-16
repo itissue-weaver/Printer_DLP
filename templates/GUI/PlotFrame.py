@@ -25,6 +25,7 @@ class PlotSTL(ttk.Frame):
         self.save_temp_flag = kwargs.get("save_temp_flag", False)
         self.path_to_save = kwargs.get("path_to_save", image_path_projector)
         self.dpi = kwargs.get("dpi", 300)
+        self._from = kwargs.get("_from", "FrameSlice")
         self.figure = Figure(figsize=(5, 5), dpi=self.dpi)
         self.axes = self.figure.add_subplot(111)
         match self.type_plot:
@@ -48,6 +49,13 @@ class PlotSTL(ttk.Frame):
                     self.axes.set_ylabel("Y")
                     self.axes.set_zlabel("Z")
                     # self.axes.set_title("3D Part")
+                if self._from == "FramePrinting":
+                    self.axes.set_axis_off()
+                    self.save_capture()
+
+    def save_capture(self, filename=path_solid_capture):
+        self.figure.savefig(filename, dpi=300, bbox_inches='tight')
+        print(f"Imagen guardada como {filename}")
 
     def plot_layer(
         self,

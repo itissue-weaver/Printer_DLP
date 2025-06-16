@@ -280,10 +280,16 @@ class FramePrinting(ttk.Frame):
                 traslation=settings.get("traslation"),
             )
             from templates.GUI.PlotFrame import SolidViewer
-            self.frame_plot = SolidViewer(
-                self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=n_parts
-            )
-            self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+            sequence = settings.get("sequence", [1])
+            if len(sequence)==1:
+                from templates.GUI.PlotFrame import PlotSTL
+                self.frame_plot = PlotSTL(self.frame_main_info, solid_trimesh_part=solid_trimesh_part, _from="FramePrinting")
+                self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+            else:
+                self.frame_plot = SolidViewer(
+                    self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=n_parts
+                )
+                self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
         except Exception as e:
             if self.button_refresh is not None:
                 self.button_refresh.destroy()
@@ -292,6 +298,7 @@ class FramePrinting(ttk.Frame):
             )
             self.button_refresh.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
             print("error reading solid viewer", e)
+
 
     def import_file_stl(self):
         settings = read_settings()
@@ -307,10 +314,16 @@ class FramePrinting(ttk.Frame):
                 traslation=settings.get("traslation"),
             )
             from templates.GUI.PlotFrame import SolidViewer
-            self.frame_plot = SolidViewer(
-                self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=n_parts
-            )
-            self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+            sequence = settings.get("sequence", [1])
+            if len(sequence) == 1:
+                from templates.GUI.PlotFrame import PlotSTL
+                self.frame_plot = PlotSTL(self.frame_main_info, solid_trimesh_part=solid_trimesh_part, _from="FramePrinting")
+                self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+            else:
+                self.frame_plot = SolidViewer(
+                    self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=n_parts
+                )
+                self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
             if self.button_refresh is not None:
                 self.button_refresh.destroy()
         except Exception as e:
