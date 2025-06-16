@@ -628,18 +628,18 @@
         "user": "prueba",
         "thumbnail": "",
         "status": 0,
-        "timestamp": "2025-06-12 10:25:47",
+        "timestamp": "2025-06-12 16:56:07",
         "settings": {
-            "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
+            "filepath": "C:/Users/Weaver4/Downloads/W v1.stl",
             "rotation": [
                 0.0,
                 0.0,
                 0.0
             ],
             "scale": [
-                0.0,
-                0.0,
-                0.0
+                1.0,
+                1.0,
+                1.0
             ],
             "translation": [
                 0.0,
@@ -647,8 +647,8 @@
                 0.0
             ],
             "width_part": 20.0,
-            "height_part": 20.0,
-            "depth_part": 20.0,
+            "height_part": 19.991,
+            "depth_part": 10.0,
             "hatcher_type": "Base",
             "hatch_angle": 10.0,
             "volume_offset_hatch": 0.0,
@@ -672,10 +672,10 @@
             ],
             "dpi": 300,
             "layer_depth": 0.05,
-            "delta_layer": 2.3,
+            "delta_layer": 20.0,
             "plate": 1,
             "HOST": "127.0.0.1",
-            "num_layers": 400,
+            "num_layers": 200,
             "material1": "Solucion1",
             "quantity1": 50.0,
             "material2": "Solution 2",
@@ -713,9 +713,9 @@
                 1.0
             ],
             "centroide": [
-                0.0,
-                10.0,
-                0.0
+                -1.5935268352838223e-09,
+                9.436989743029436,
+                2.9975792509206943e-16
             ],
             "sequence": [
                 {
@@ -725,11 +725,11 @@
                 }
             ],
             "min_x_part": -10.0,
-            "min_y_part": 0.0,
+            "min_y_part": 0.004742803052067757,
             "min_z_part": 0.0,
             "max_x_part": 10.0,
-            "max_y_part": 20.0,
-            "max_z_part": 20.0,
+            "max_y_part": 19.995256423950195,
+            "max_z_part": 10.0,
             "status_frames": [
                 1,
                 1,
@@ -785,7 +785,7 @@
             "delay_z": 0.006,
             "delay_n": 0.01,
             "b_layers": 5,
-            "e_time_b_layers": 90.0,
+            "e_time_b_layers": 130.0,
             "data": {
                 "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
                 "rotation": [

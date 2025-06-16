@@ -74,7 +74,7 @@ class MainGUI(ttk.Window):
         super().__init__(*args, **kwargs)
         self.frame_m_control = None
         self.project_key = None
-        self.title("DLP Bioprinter")
+        self.title("Weaver 4")
         self.style_gui = configure_styles()
         self.after(0, lambda: self.state("zoomed"))
         self.columnconfigure(0, weight=1)
