@@ -66,10 +66,10 @@ def move_motor(action, direction, location_z, motor, steps, new_delay_z, new_del
 
 def calculate_rotation_plate(new_deposit, current_deposit):
     dict_deposits = {
-        1: 0,
-        2: 90,
-        3: 180,
-        4: 270,
+        "1": 0,
+        "2": 90,
+        "3": 180,
+        "4": 270,
     }
     rotation = dict_deposits[new_deposit] - dict_deposits[current_deposit]
     if rotation < 0:
@@ -82,6 +82,7 @@ class DlpViewer(threading.Thread):
     def __init__(self, mode=60, image_path=image_path_projector):
         super().__init__()
 
+        self.is_error = False
         (
             self.num_layers,
             self.layer_count,
@@ -206,6 +207,8 @@ class DlpViewer(threading.Thread):
             self.start_time = perf_counter()
             self.last_time = perf_counter()
             self.running = True
+            self.is_error = False
+            error = ""
             while self.running:
                 if not self.running:
                     break
@@ -284,20 +287,14 @@ class DlpViewer(threading.Thread):
             print(e)
             thread_log = threading.Thread(target=write_log, args=(f"Error printing: {e}",))
             thread_log.start()
-            try:
-                update_flags(stop_printing=True, is_printing=False, is_error=True, error=str(e))
-            except  Exception as e:
-                print(e)
-                if thread_log.is_alive():
-                    thread_log.join()
-                    thread_log = threading.Thread(target=write_log, args=(f"Error update flags: {e}", ))
-                    thread_log.start()
+            self.is_error = True
+            error = str(e)
         glDisable(GL_TEXTURE_2D)
         glDisable(GL_BLEND)
         pygame.quit()
         turn_on_off_led()
         try:
-            update_flags(stop_printing=True, is_printing=False, is_error=False, error="", layer_count=0)
+            update_flags(stop_printing=True, is_printing=False, is_error=self.is_error, error=error, layer_count=0)
         except  Exception as e:
             print(e)
             thread_log = threading.Thread(target=write_log, args=(f"Error update flags: {e}",))
