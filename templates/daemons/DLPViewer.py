@@ -59,9 +59,9 @@ def turn_on_off_led(state="off"):
         return False
 
 
-def move_motor(axis, direction, location_z, steps, new_delay_z, new_delay_n):
-    result = subprocess_control_motor(axis, direction, location_z, axis, steps, new_delay_z=new_delay_z, new_delay_n=new_delay_n)
-    return f"Move {axis}: {steps} steps, {result}\n"
+def move_motor(action, direction, location_z, motor, steps, new_delay_z, new_delay_n):
+    result = subprocess_control_motor(action, direction, location_z, motor, steps, new_delay_z, new_delay_n)
+    return f"Move {action}: {steps} steps, {result}\n"
 
 
 def calculate_rotation_plate(new_deposit, current_deposit):
@@ -341,15 +341,15 @@ class DlpViewer(threading.Thread):
         distance_free_vat = self.lift_height_vat-self.lift_height
         # Elevar la plataforma antes de mover lateralmente
         steps_up = int(distance_free_vat / r)
-        msg += move_motor("move_z", "cw", "top", steps_up, self.delay_z_lift, self.delay_n)
+        msg += move_motor("move_z", "cw", "top", "z", steps_up, self.delay_z_lift, self.delay_n)
 
         steps_lateral = calculate_rotation_plate(new_deposit, old_deposit)
         # Mover lateralmente para cambiar de vat
-        msg += move_motor("move_plate", "cw", "top", steps_lateral, self.delay_z_retract, self.delay_n)
+        msg += move_motor("move_plate", "cw", "top", "plate", steps_lateral, self.delay_z_retract, self.delay_n)
 
         # Descender la plataforma en la nueva posición
         steps_down = int(distance_free_vat / r)
-        msg += move_motor("move_z", "ccw", "bottom", steps_down, self.delay_z_retract, self.delay_n)
+        msg += move_motor("move_z", "ccw", "bottom", "z", steps_down, self.delay_z_retract, self.delay_n)
 
         return msg
 
