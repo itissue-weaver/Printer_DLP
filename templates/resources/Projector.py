@@ -229,7 +229,7 @@ class RotateMotor(Resource):
             thread_log.start()
         except Exception as e:
             return {"msg": f"Error, motor test initiated: {str(e)}"}, 400
-        return {"msg": "Ok, motor test initiated"}, 200
+        return {"msg": f"Ok, motor test initiated: {data}"}, 200
 
 
 @ns.route("/led")

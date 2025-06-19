@@ -252,12 +252,12 @@ class ManualControl(ttk.Frame):
         self.thread_stop_print = threading.Thread(target=send_stop_print)
         self.thread_stop_print.start()
 
-    def up_callback(self, displacement, delayz):
+    def up_callback(self, displacement, delay__z):
         if self.thread_motor is None or not self.thread_motor.is_alive():
             steps = 200 * int(displacement) / 8
             self.thread_motor = threading.Thread(
                 target=control_motor_from_gui,
-                args=("move_z", "cw", "top", "z", int(steps), float(delayz), delay_n),
+                args=("move_z", "cw", "top", "z", int(steps), float(delay__z), delay_n),
             )
             self.thread_motor.start()
         else:
@@ -267,11 +267,11 @@ class ManualControl(ttk.Frame):
                 self.thread_motor.join()
                 self.thread_motor = None
 
-    def up_top_callback(self, delayz):
+    def up_top_callback(self, delay__z):
         if self.thread_motor is None or not self.thread_motor.is_alive():
             self.thread_motor = threading.Thread(
                 target=control_motor_from_gui,
-                args=("move_z_sw", "cw", "top", "z", 0, float(delayz), delay_n),
+                args=("move_z_sw", "cw", "top", "z", 0, float(delay__z), delay_n),
             )
             self.thread_motor.start()
         else:
@@ -280,11 +280,11 @@ class ManualControl(ttk.Frame):
                 self.thread_motor.join()
                 self.thread_motor = None
 
-    def down_bottom_callback(self, delayz):
+    def down_bottom_callback(self, delay__z):
         if self.thread_motor is None or not self.thread_motor.is_alive():
             self.thread_motor = threading.Thread(
                 target=control_motor_from_gui,
-                args=("move_z_sw", "ccw", "bottom", "z", 0, float(delayz), delay_n),
+                args=("move_z_sw", "ccw", "bottom", "z", 0, float(delay__z), delay_n),
             )
             self.thread_motor.start()
         else:
@@ -293,7 +293,7 @@ class ManualControl(ttk.Frame):
                 self.thread_motor.join()
                 self.thread_motor = None
 
-    def down_callback(self, displacement, delayz):
+    def down_callback(self, displacement, delay__z):
         if self.thread_motor is None or not self.thread_motor.is_alive():
             steps = 200 * int(displacement) / 8
             self.thread_motor = threading.Thread(
@@ -304,7 +304,7 @@ class ManualControl(ttk.Frame):
                     "bottom",
                     "z",
                     int(steps),
-                    float(delayz),
+                    float(delay__z),
                     delay_n,
                 ),
             )
@@ -315,7 +315,7 @@ class ManualControl(ttk.Frame):
                 self.thread_motor.join()
                 self.thread_motor = None
 
-    def vat_callback(self, rotation, delayn):
+    def vat_callback(self, rotation, delay__n):
         if self.thread_motor is None or not self.thread_motor.is_alive():
             steps = 200 * int(rotation) / 360
             self.thread_motor = threading.Thread(
@@ -327,7 +327,7 @@ class ManualControl(ttk.Frame):
                     "plate",
                     int(steps),
                     delay_z,
-                    float(delayn),
+                    float(delay__n),
                 ),
             )
             self.thread_motor.start()
@@ -337,11 +337,11 @@ class ManualControl(ttk.Frame):
                 self.thread_motor.join()
                 self.thread_motor = None
 
-    def vat_sw_callback(self, delayn):
+    def vat_sw_callback(self, delay__n):
         if self.thread_motor is None or not self.thread_motor.is_alive():
             self.thread_motor = threading.Thread(
                 target=control_motor_from_gui,
-                args=("move_plate_sw", "cw", "top", "plate", 0, delay_z, float(delayn)),
+                args=("move_plate_sw", "cw", "top", "plate", 0, delay_z, float(delay__n)),
             )
             self.thread_motor.start()
         else:
