@@ -234,11 +234,11 @@ class DlpViewer(threading.Thread):
                     turn_on_off_led(state="off")
                     self.change_layer_motor_sequence()
                     turn_on_off_led(state="on")
-                    thread_log = threading.Thread(
-                        target=write_log,
-                        args=(f"{self.layer_count}, {self.num_layers}",),
-                    )
-                    thread_log.start()
+                    # thread_log = threading.Thread(
+                    #     target=write_log,
+                    #     args=(f"{self.layer_count}, {self.num_layers}",),
+                    # )
+                    # thread_log.start()
                     update_flags(layer_count= self.layer_count)
                     # print(f"{self.layer_count}, {self.num_layers}")
                     if self.layer_count > self.num_layers - 1:
@@ -354,8 +354,6 @@ class DlpViewer(threading.Thread):
         deposit = self.sequence[self.current_deposit_index]
         current_h = self.layer_count * self.layer_depth
         if current_h >= deposit["height_z"]:
-            thread_log = threading.Thread(target=write_log, args=("change vat",))
-            thread_log.start()
             if self.current_deposit_index+1 < len(self.sequence):
                 self.current_deposit_index += 1
                 new_deposit = self.sequence[self.current_deposit_index]
@@ -376,17 +374,17 @@ class DlpViewer(threading.Thread):
         steps = int(dist_free / r)
         result = subprocess_control_motor("move_z", "cw", "top", "z", steps, new_delay_z=self.delay_z_lift, new_delay_n=self.delay_n)
         msg += f"change z motor: {steps}, {result} {dist_free} {self.layer_depth}\n"
-        thread_log = threading.Thread(target=write_log, args=(msg,))
-        thread_log.start()
+        # thread_log = threading.Thread(target=write_log, args=(msg,))
+        # thread_log.start()
         # Verificar si se alcanzó la altura de cambio de vat
         msg = self.check_and_change_deposit(msg)
-        thread_log = threading.Thread(target=write_log, args=(msg,))
-        thread_log.start()
+        # thread_log = threading.Thread(target=write_log, args=(msg,))
+        # thread_log.start()
         steps = int((dist_free - self.layer_depth) / r)
         result = subprocess_control_motor("move_z", "ccw", "top", "z", steps, new_delay_z=self.delay_z_retract, new_delay_n=self.delay_n)
         msg += f"change z motor: {steps}, {result}\n"
-        thread_log = threading.Thread(target=write_log, args=(msg,))
-        thread_log.start()
+        # thread_log = threading.Thread(target=write_log, args=(msg,))
+        # thread_log.start()
         return msg
 
     def start_projecting(self, image_path=None):
