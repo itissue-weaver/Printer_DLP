@@ -217,7 +217,7 @@ if __name__ == "__main__":
                 sw = controller.pins["SWITCH_3"]
             else:
                 sw = controller.pins["SWITCH_2"]
-            controller.move_z(direction, args.steps)
+            controller.move_z(direction, args.steps, sw)
         case "move_plate":
             if args.direction == "cw":
                 direction = GPIO.HIGH
