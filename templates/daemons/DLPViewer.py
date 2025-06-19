@@ -59,6 +59,25 @@ def turn_on_off_led(state="off"):
         return False
 
 
+def move_motor(axis, direction, location_z, steps, new_delay_z, new_delay_n):
+    result = subprocess_control_motor(axis, direction, location_z, axis, steps, new_delay_z=new_delay_z, new_delay_n=new_delay_n)
+    return f"Move {axis}: {steps} steps, {result}\n"
+
+
+def calculate_rotation_plate(new_deposit, current_deposit):
+    dict_deposits = {
+        1: 0,
+        2: 90,
+        3: 180,
+        4: 270,
+    }
+    rotation = dict_deposits[new_deposit] - dict_deposits[current_deposit]
+    if rotation < 0:
+        rotation += 360
+    steps = int(200 * int(rotation) / 360)
+    return steps
+
+
 class DlpViewer(threading.Thread):
     def __init__(self, mode=60, image_path=image_path_projector):
         super().__init__()
@@ -79,10 +98,13 @@ class DlpViewer(threading.Thread):
             self.delta_bottom,
             self.one_layer_display,
             self.lift_height,
+            self.lift_height_vat,
             self.delay_retract_init,
-        ) = (None,) * 16
+        ) = (None,) * 17
         self.flag_reload = False
         self.mode = mode
+        self.current_deposit_index = 0
+        self.current_deposit = 1
         self.image_path = image_path
         self.running = False
         self.paused = False
@@ -106,10 +128,14 @@ class DlpViewer(threading.Thread):
         self.delay_z_retract = self.settings.get("delay_z", delay_z)  # Retardo de movimiento
         self.delay_z_lift = self.settings.get("delay_z_lift", delay_z_lift)  # Retardo de movimiento
         self.lift_height = self.settings.get("lift_height", 6)
+        self.lift_height_vat = self.settings.get("lift_height_vat", 30)
         self.delay_n = self.settings.get("delay_n", delay_n)  # Retardo de movimiento
         self.bottom_layers = self.settings.get("b_layers", 1)
         self.delta_bottom  = self.settings.get("e_time_b_layers", 40)
         self.one_layer_display = False
+        deposit = self.sequence[0] if len(self.sequence) > 0 else {}
+        self.current_deposit_index = deposit.get("index", 0)
+        self.current_deposit = deposit.get("deposit", 1)
 
     def load_texture(self):
         texture = glGenTextures(1)
@@ -203,7 +229,7 @@ class DlpViewer(threading.Thread):
                 if elapsed_time >= time_to_wait:
                     self.layer_count += 1
                     turn_on_off_led(state="off")
-                    self.change_z_motor()
+                    self.change_layer_motor_sequence()
                     turn_on_off_led(state="on")
                     thread_log = threading.Thread(
                         target=write_log,
@@ -292,24 +318,72 @@ class DlpViewer(threading.Thread):
     def is_alive_projector(self):
         return self.running
 
-    def change_z_motor(self):
-        r = 8 / 200
-        dist_free = self.lift_height
-        steps = int(dist_free / r)
+    # def change_z_motor(self):
+    #     r = 8 / 200
+    #     dist_free = self.lift_height
+    #     steps = int(dist_free / r)
+    #     msg = ""
+    #     result = subprocess_control_motor(
+    #         "move_z", "cw", "top", "z", steps, new_delay_z=self.delay_z_lift, new_delay_n=self.delay_n
+    #     )
+    #     msg += f"change z motor: {steps}, {result} {dist_free} {self.layer_depth}\n"
+    #     steps = int((dist_free - self.layer_depth) / r)
+    #     result = subprocess_control_motor(
+    #         "move_z", "ccw", "top", "z", steps, new_delay_z=self.delay_z_retract, new_delay_n=self.delay_n
+    #     )
+    #     msg += f"change z motor: {steps}, {result}\n"
+    #     # thread_log = threading.Thread(target=write_log, args=(msg,))
+    #     # thread_log.start()
+
+    def change_vat(self, old_deposit, new_deposit):
         msg = ""
-        result = subprocess_control_motor(
-            "move_z", "cw", "top", "z", steps, new_delay_z=self.delay_z_lift, new_delay_n=self.delay_n
-        )
-        print(steps, result)
+        r = 8 / 200  # Relación de pasos
+        distance_free_vat = self.lift_height_vat-self.lift_height
+        # Elevar la plataforma antes de mover lateralmente
+        steps_up = int(distance_free_vat / r)
+        msg += move_motor("move_z", "cw", "top", steps_up, self.delay_z_lift, self.delay_n)
+
+        steps_lateral = calculate_rotation_plate(new_deposit, old_deposit)
+        # Mover lateralmente para cambiar de vat
+        msg += move_motor("move_plate", "cw", "top", steps_lateral, self.delay_z_retract, self.delay_n)
+
+        # Descender la plataforma en la nueva posición
+        steps_down = int(distance_free_vat / r)
+        msg += move_motor("move_z", "ccw", "bottom", steps_down, self.delay_z_retract, self.delay_n)
+
+        return msg
+
+    def check_and_change_deposit(self, msg):
+        deposit = self.sequence[self.current_deposit_index]
+        current_h = self.layer_count * self.layer_depth
+        if current_h >= deposit["height_z"]:
+            if self.current_deposit_index+1 < len(self.sequence):
+                self.current_deposit_index += 1
+                new_deposit = self.sequence[self.current_deposit_index]
+                self.current_deposit = new_deposit["deposit"]
+                msg += self.change_vat(deposit["deposit"], self.current_deposit)
+        return msg
+
+    def change_layer_motor_sequence(self):
+        r = 8 / 200  # Relación de pasos
+        dist_free = self.lift_height   # altura establecida para cambiar de capa
+        msg = ""
+
+        # Elevar la plataforma según la altura establecida para cambiar de capa
+        steps = int(dist_free / r)
+        result = subprocess_control_motor("move_z", "cw", "top", "z", steps, new_delay_z=self.delay_z_lift, new_delay_n=self.delay_n)
         msg += f"change z motor: {steps}, {result} {dist_free} {self.layer_depth}\n"
+
+        # Verificar si se alcanzó la altura de cambio de vat
+        msg = self.check_and_change_deposit(msg)
+
         steps = int((dist_free - self.layer_depth) / r)
-        result = subprocess_control_motor(
-            "move_z", "ccw", "top", "z", steps, new_delay_z=self.delay_z_retract, new_delay_n=self.delay_n
-        )
-        print(steps, result)
+        result = subprocess_control_motor("move_z", "ccw", "top", "z", steps, new_delay_z=self.delay_z_retract, new_delay_n=self.delay_n)
         msg += f"change z motor: {steps}, {result}\n"
+        # Registrar la operación en logs
         # thread_log = threading.Thread(target=write_log, args=(msg,))
         # thread_log.start()
+        return msg
 
     def start_projecting(self, image_path=None):
         self.load_variables()

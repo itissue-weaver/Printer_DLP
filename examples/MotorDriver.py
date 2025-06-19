@@ -69,7 +69,7 @@ class MotorController:
         self.delay = delayn
         self.delay_z = delayz
 
-    def rotate_motor(self, pin_dir, step_pin, direction_rotation, steps):
+    def rotate_motor(self, pin_dir, step_pin, direction_rotation, steps, switch_pin):
         try:
             GPIO.output(pin_dir, direction_rotation)
             for _ in range(steps):
@@ -77,6 +77,8 @@ class MotorController:
                 sleep(self.delay)
                 GPIO.output(step_pin, GPIO.LOW)
                 sleep(self.delay)
+                if GPIO.input(switch_pin) != GPIO.HIGH:
+                    break
                 if check_stop():
                     break
         except Exception as e:
@@ -101,7 +103,7 @@ class MotorController:
             sleep(1)
             GPIO.cleanup()
 
-    def move_z(self, direction_rotation, steps):
+    def move_z(self, direction_rotation, steps, switch_pin):
         try:
             GPIO.output(self.pins["DIR_Z"], direction_rotation)
             for _ in range(steps):
@@ -109,6 +111,8 @@ class MotorController:
                 sleep(self.delay_z)
                 GPIO.output(self.pins["STEP_Z"], GPIO.LOW)
                 sleep(self.delay_z)
+                if GPIO.input(switch_pin) != GPIO.HIGH:
+                    break
                 if check_stop():
                     break
         except Exception as e:
@@ -209,17 +213,26 @@ if __name__ == "__main__":
                 direction = GPIO.HIGH
             else:
                 direction = GPIO.LOW
+            if args.location_z == "bottom":
+                sw = controller.pins["SWITCH_3"]
+            else:
+                sw = controller.pins["SWITCH_2"]
             controller.move_z(direction, args.steps)
         case "move_plate":
             if args.direction == "cw":
                 direction = GPIO.HIGH
             else:
                 direction = GPIO.LOW
+            if args.location_z == "bottom":
+                sw = controller.pins["SWITCH_3"]
+            else:
+                sw = controller.pins["SWITCH_2"]
             controller.rotate_motor(
                 controller.pins["DIR_PLATE"],
                 controller.pins["STEP_PLATE"],
                 direction,
                 args.steps,
+                sw
             )
         case "move_z_sw":
             if args.direction == "cw":
@@ -248,7 +261,11 @@ if __name__ == "__main__":
             else:
                 motor = controller.pins["STEP_Z"]
                 direction_pin = controller.pins["DIR_Z"]
-            controller.rotate_motor(direction_pin, motor, direction, args.steps)
+            if args.location_z == "bottom":
+                sw = controller.pins["SWITCH_3"]
+            else:
+                sw = controller.pins["SWITCH_2"]
+            controller.rotate_motor(direction_pin, motor, direction, args.steps, sw)
         case "empty":
             print(
                 "Empty action with default values: ",
