@@ -301,7 +301,7 @@
         "user": "Edisson",
         "thumbnail": "",
         "status": 0,
-        "timestamp": "2025-06-12 09:56:52",
+        "timestamp": "2025-06-19 10:00:48",
         "settings": {
             "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
             "rotation": [
@@ -393,8 +393,13 @@
             "sequence": [
                 {
                     "deposit": "1",
-                    "height_z": 10.0,
+                    "height_z": 5.0,
                     "index": 0
+                },
+                {
+                    "deposit": "2",
+                    "height_z": 10.0,
+                    "index": 1
                 }
             ],
             "min_x_part": -10.0,

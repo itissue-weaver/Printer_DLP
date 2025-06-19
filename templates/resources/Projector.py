@@ -243,5 +243,5 @@ class Led(Resource):
             )
             thread_subprocess.start()
         except Exception as e:
-            return {"msg": f"Error, led test initiated: {str(e)}"}, 400
-        return {"msg": "Ok, led test initiated"}, 200
+            return {"msg": f"Error, led initiated: {str(e)}"}, 400
+        return {"msg": "Ok, led initiated"}, 200
