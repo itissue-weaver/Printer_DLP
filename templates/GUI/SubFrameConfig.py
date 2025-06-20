@@ -4,6 +4,7 @@ __date__ = "$ 19/feb/2025  at 21:24 $"
 
 import ttkbootstrap as ttk
 
+from files.constants import font_entry
 from templates.AuxiliarFunctions import read_settings, update_settings
 
 
@@ -14,9 +15,9 @@ def create_input_widgets_display(master):
     frame_inputs = ttk.LabelFrame(master, text="Display")
     frame_inputs.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
     frame_inputs.columnconfigure(0, weight=1)
-
+    frame_inputs.configure(style="Custom.TLabelframe")
     # ------------------------parameters display--------------------------
-    ttk.Label(frame_inputs, text="Projector dimension [width_cm, height_cm]:").grid(
+    ttk.Label(frame_inputs, text="Projector dimension [width_cm, height_cm]:", style="Custom.TLabel").grid(
         row=0, column=0, sticky="w", padx=10, pady=10
     )
     entry_projector_dimension = ttk.StringVar(
@@ -24,12 +25,12 @@ def create_input_widgets_display(master):
             [str(i) for i in settings.get("projector_dimension", [30.0, 20.0])]
         )
     )
-    ttk.Entry(frame_inputs, textvariable=entry_projector_dimension).grid(
+    ttk.Entry(frame_inputs, textvariable=entry_projector_dimension, font=font_entry).grid(
         row=0, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_projector_dimension)
 
-    ttk.Label(frame_inputs, text="Projector resolution [width_px, height_px]:").grid(
+    ttk.Label(frame_inputs, text="Projector resolution [width_px, height_px]:", style="Custom.TLabel").grid(
         row=1, column=0, sticky="w", padx=10, pady=10
     )
     entry_projector_resolution = ttk.StringVar(
@@ -37,12 +38,12 @@ def create_input_widgets_display(master):
             [str(i) for i in settings.get("projector_resolution", [1920, 1080])]
         )
     )
-    ttk.Entry(frame_inputs, textvariable=entry_projector_resolution).grid(
+    ttk.Entry(frame_inputs, textvariable=entry_projector_resolution, font=font_entry).grid(
         row=1, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_projector_resolution)
 
-    ttk.Label(frame_inputs, text="Projector offset [x, y, z] cm:").grid(
+    ttk.Label(frame_inputs, text="Projector offset [x, y, z] cm:", style="Custom.TLabel").grid(
         row=2, column=0, sticky="w", padx=10, pady=10
     )
     entry_projector_offset = ttk.StringVar(
@@ -50,16 +51,16 @@ def create_input_widgets_display(master):
             [str(i) for i in settings.get("projector_offset", [0.0, 0.0, 10.0])]
         )
     )
-    ttk.Entry(frame_inputs, textvariable=entry_projector_offset).grid(
+    ttk.Entry(frame_inputs, textvariable=entry_projector_offset, font=font_entry).grid(
         row=2, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_projector_offset)
 
-    ttk.Label(frame_inputs, text="DPI:").grid(
+    ttk.Label(frame_inputs, text="DPI:", style="Custom.TLabel").grid(
         row=3, column=0, sticky="w", padx=10, pady=10
     )
     entry_dpi = ttk.StringVar(value=str(settings.get("dpi", "300")))
-    ttk.Entry(frame_inputs, textvariable=entry_dpi).grid(
+    ttk.Entry(frame_inputs, textvariable=entry_dpi, font=font_entry).grid(
         row=3, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_dpi)
@@ -99,74 +100,75 @@ def create_input_widgets_print(master):
     frame_inputs = ttk.LabelFrame(master, text="Printer")
     frame_inputs.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
     frame_inputs.columnconfigure(0, weight=1)
+    frame_inputs.configure(style="Custom.TLabelframe")
     # ----------------------parameters print--------------------
-    ttk.Label(frame_inputs, text="Layer thickness [mm]:").grid(
+    ttk.Label(frame_inputs, text="Layer thickness [mm]:", style="Custom.TLabel").grid(
         row=0, column=0, sticky="w", padx=10, pady=10
     )
     entry_layer_depth = ttk.StringVar(value=str(settings.get("layer_depth", "0.5")))
-    ttk.Entry(frame_inputs, textvariable=entry_layer_depth).grid(
+    ttk.Entry(frame_inputs, textvariable=entry_layer_depth, font=font_entry).grid(
         row=0, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_layer_depth)
-    ttk.Label(frame_inputs, text="Exposure normal layer [s]:").grid(
+    ttk.Label(frame_inputs, text="Exposure normal layer [s]:", style="Custom.TLabel").grid(
         row=1, column=0, sticky="w", padx=10, pady=10
     )
     entry_delta_layer = ttk.StringVar(value=str(settings.get("delta_layer", "0.5")))
-    ttk.Entry(frame_inputs, textvariable=entry_delta_layer).grid(
+    ttk.Entry(frame_inputs, textvariable=entry_delta_layer, font=font_entry).grid(
         row=1, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_delta_layer)
-    ttk.Label(frame_inputs, text="Delay steps z [s]:").grid(
+    ttk.Label(frame_inputs, text="Delay steps z [s]:", style="Custom.TLabel").grid(
         row=2, column=0, sticky="w", padx=10, pady=10
     )
     entry_delay_steps_z = ttk.StringVar(value=str(settings.get("delay_z", "0.005")))
-    ttk.Entry(frame_inputs, textvariable=entry_delay_steps_z).grid(
+    ttk.Entry(frame_inputs, textvariable=entry_delay_steps_z, font=font_entry).grid(
         row=2, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_delay_steps_z)
-    ttk.Label(frame_inputs, text="Delay steps plate [s]:").grid(
+    ttk.Label(frame_inputs, text="Delay steps plate [s]:", style="Custom.TLabel").grid(
         row=3, column=0, sticky="w", padx=10, pady=10
     )
     entry_delay_steps_plate = ttk.StringVar(value=str(settings.get("delay_n", "0.01")))
-    ttk.Entry(frame_inputs, textvariable=entry_delay_steps_plate).grid(
+    ttk.Entry(frame_inputs, textvariable=entry_delay_steps_plate, font=font_entry).grid(
         row=3, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_delay_steps_plate)
-    ttk.Label(frame_inputs, text="# Bottom Layers:").grid(row=4, column=0, sticky="w", padx=10, pady=10)
+    ttk.Label(frame_inputs, text="# Bottom Layers:", style="Custom.TLabel").grid(row=4, column=0, sticky="w", padx=10, pady=10)
     entry_bottom_layers = ttk.StringVar(value=str(settings.get("b_layers", "1")))
-    ttk.Entry(frame_inputs, textvariable=entry_bottom_layers).grid(
+    ttk.Entry(frame_inputs, textvariable=entry_bottom_layers, font=font_entry).grid(
         row=4, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_bottom_layers)
-    ttk.Label(frame_inputs, text="Exposure time B. Layers [s]:").grid(
+    ttk.Label(frame_inputs, text="Exposure time B. Layers [s]:", style="Custom.TLabel").grid(
         row=5, column=0, sticky="w", padx=10, pady=10
     )
     entry_e_time_b_layers = ttk.StringVar(value=str(settings.get("e_time_b_layers", "40")))
-    ttk.Entry(frame_inputs, textvariable=entry_e_time_b_layers).grid(
+    ttk.Entry(frame_inputs, textvariable=entry_e_time_b_layers, font=font_entry).grid(
         row=5, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_e_time_b_layers)
-    ttk.Label(frame_inputs, text="Delay z lift [s]:").grid(
+    ttk.Label(frame_inputs, text="Delay z lift [s]:", style="Custom.TLabel").grid(
         row=6, column=0, sticky="w", padx=10, pady=10
     )
     entry_delay_z_lift = ttk.StringVar(value=str(settings.get("delay_z_lift", "0.01")))
-    ttk.Entry(frame_inputs, textvariable=entry_delay_z_lift).grid(
+    ttk.Entry(frame_inputs, textvariable=entry_delay_z_lift, font=font_entry).grid(
         row=6, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_delay_z_lift)
-    ttk.Label(frame_inputs, text="Lift height [mm]:").grid(
+    ttk.Label(frame_inputs, text="Lift height [mm]:", style="Custom.TLabel").grid(
         row=7, column=0, sticky="w", padx=10, pady=10
     )
     entry_lift_height = ttk.StringVar(value=str(settings.get("lift_height", "6")))
-    ttk.Entry(frame_inputs, textvariable=entry_lift_height).grid(
+    ttk.Entry(frame_inputs, textvariable=entry_lift_height, font=font_entry).grid(
         row=7, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_lift_height)
-    ttk.Label(frame_inputs, text="Initial delay retract [s]:").grid(
+    ttk.Label(frame_inputs, text="Initial delay retract [s]:", style="Custom.TLabel").grid(
         row=8, column=0, sticky="w", padx=10, pady=10
     )
     entry_initial_d_r_ini = ttk.StringVar(value=str(settings.get("delay_retract_init", 0.01)))
-    ttk.Entry(frame_inputs, textvariable=entry_initial_d_r_ini).grid(
+    ttk.Entry(frame_inputs, textvariable=entry_initial_d_r_ini, font=font_entry).grid(
         row=8, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_initial_d_r_ini)

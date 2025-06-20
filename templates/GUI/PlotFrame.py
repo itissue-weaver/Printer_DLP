@@ -158,6 +158,7 @@ class SolidViewer(ttk.Frame):
         from matplotlib import cm
 
         self.ax.clear()
+        self.ax.set_axis_off()
         layers = hatch_for_plot(solid_part, self.layer_thickness)
         num_blocks = self.parts
         n = 4
@@ -181,7 +182,7 @@ class SolidViewer(ttk.Frame):
                     self.ax.plot(x, y, zs=z, zdir='z', color=color, linewidth=0.5)
                     self.ax.view_init(elev=15, azim=0)  # Vista desde arriba
         self.canvas.draw()
-        self.ax.set_axis_off()
+
         self.save_image()
 
 
