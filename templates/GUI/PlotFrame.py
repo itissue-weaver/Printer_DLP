@@ -187,8 +187,8 @@ class SolidViewer(ttk.Frame):
 
     def save_image(self, filename=path_solid_capture):
         self.figure.savefig(filename, dpi=300, bbox_inches='tight')
-        print(f"Imagen guardada como {filename}")
-        self.callbacks["render_thumbnails"]()
+        # print(f"Imagen guardada como {filename}")
+        self.callbacks["render_thumbnails"](filename)
 
 class ImageFrameApp(ttk.Frame):
     def __init__(self, master):

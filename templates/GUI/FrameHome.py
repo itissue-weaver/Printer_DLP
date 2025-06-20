@@ -185,7 +185,7 @@ class HomePage(ttk.Frame):
         data = json.loads(values[-1])
         self.current_project_key = values[0]
         self.current_p_text.set(f"Current Project: {data.get('name')}")
-        self.callbacks["change_title"](f"Weaver4 --> Project: {data.get('name')}")
+        self.callbacks["change_title"](f"Weaver 4 --> Project: {data.get('name')}")
         update_settings(**data.get("settings", {}))
         self.current_data_p = data
         self.callbacks["change_tab_text"](
