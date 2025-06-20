@@ -122,7 +122,7 @@ class HomePage(ttk.Frame):
         self.frame_thumbnails.columnconfigure(0, weight=1)
         self.render_thumbnails(path_solid_capture)
 
-    def render_thumbnails(self, filepath):
+    def render_thumbnails(self, filepath=path_solid_capture):
         for child in self.frame_thumbnails.winfo_children():
             child.destroy()
         try:
@@ -193,7 +193,7 @@ class HomePage(ttk.Frame):
         )
         self.callbacks["init_tabs"]()
         self.callbacks["change_project"](self.current_project_key)
-        self.render_thumbnails(path_solid_capture)
+        # self.render_thumbnails(path_solid_capture)
 
 
 class NewProjectWindow(ttk.Toplevel):

@@ -279,17 +279,15 @@ class FramePrinting(ttk.Frame):
                 rotation=settings.get("rotation"),
                 traslation=settings.get("traslation"),
             )
-            from templates.GUI.PlotFrame import SolidViewer
             sequence = settings.get("sequence", [1])
+            layer_depth = settings.get("layer_depth", 0.1)
             if len(sequence)==1:
                 from templates.GUI.PlotFrame import PlotSTL
-                self.frame_plot = PlotSTL(self.frame_main_info, solid_trimesh_part=solid_trimesh_part, _from="FramePrinting")
+                self.frame_plot = PlotSTL(self.frame_main_info, solid_trimesh_part=solid_trimesh_part, _from="FramePrinting", callbacks={"render_thumbnails": self.callbacks["render_thumbnails"]})
                 self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
             else:
-                self.frame_plot = SolidViewer(
-                    self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=n_parts
-                )
-                self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+                threa_plot_parts = threading.Thread(target=self.plot_multiple_parts, kwargs={"solid_trimesh_part": solid_trimesh_part, "solid_part": solid_part, "n_parts": n_parts,"layer_depth": layer_depth })
+                threa_plot_parts.start()
         except Exception as e:
             if self.button_refresh is not None:
                 self.button_refresh.destroy()
@@ -299,6 +297,14 @@ class FramePrinting(ttk.Frame):
             self.button_refresh.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
             print("error reading solid viewer", e)
 
+    def plot_multiple_parts(self, solid_trimesh_part, solid_part, n_parts, layer_depth):
+        from templates.GUI.PlotFrame import SolidViewer
+
+        self.frame_plot = SolidViewer(
+            self.frame_main_info, solid_trimesh_part=solid_trimesh_part,solid_part=solid_part , parts=n_parts,
+            callbacks={"render_thumbnails": self.callbacks["render_thumbnails"]}, layer_thickness=layer_depth
+        )
+        self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
 
     def import_file_stl(self):
         settings = read_settings()
@@ -315,15 +321,14 @@ class FramePrinting(ttk.Frame):
             )
             from templates.GUI.PlotFrame import SolidViewer
             sequence = settings.get("sequence", [1])
+            layer_depth = settings.get("layer_depth", 0.1)
             if len(sequence) == 1:
                 from templates.GUI.PlotFrame import PlotSTL
-                self.frame_plot = PlotSTL(self.frame_main_info, solid_trimesh_part=solid_trimesh_part, _from="FramePrinting")
+                self.frame_plot = PlotSTL(self.frame_main_info, solid_trimesh_part=solid_trimesh_part, _from="FramePrinting", callbacks={"render_thumbnails": self.callbacks["render_thumbnails"]})
                 self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
             else:
-                self.frame_plot = SolidViewer(
-                    self.frame_main_info, solid_trimesh_part=solid_trimesh_part, parts=n_parts
-                )
-                self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+                thread_plot_parts = threading.Thread(target=self.plot_multiple_parts, kwargs={"solid_trimesh_part": solid_trimesh_part, "solid_part": solid_part, "n_parts": n_parts, "layer_depth": layer_depth})
+                thread_plot_parts.start()
             if self.button_refresh is not None:
                 self.button_refresh.destroy()
         except Exception as e:
@@ -352,6 +357,13 @@ class FramePrinting(ttk.Frame):
         self.callbacks["change_tab_text"](status_frames, "from fprinting")
         update_settings(status_frames=status_frames)
         self.load_solid_viewer()
+        sequence = settings.get("sequence", [])
+        self.resume_widgets[-1].delete(*self.resume_widgets[-1].get_children())
+        for step in sequence:
+            self.resume_widgets[-1].insert(
+                "", "end", values=(step["deposit"], step["height_z"])
+            )
+
 
     def monitor_projector(self):
         if self.flags is None:
@@ -423,6 +435,7 @@ class FramePrinting(ttk.Frame):
         status_frames = settings.get("status_frames")
         status_frames[3] = 1
         self.callbacks["change_tab_text"](status_frames, "from print process")
+        self.load_solid_viewer()    
 
     def on_update_progress(self, progress):
         if not self.is_sending:

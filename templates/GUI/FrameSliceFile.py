@@ -307,6 +307,9 @@ class SliceFile(ttk.Frame):
         )
         print("init slice file")
 
+    def clean_image(self):
+        self.canvas_img.reload_clean_image()
+
     def check_parameter_settings(self, settings=None):
         settings = read_settings() if settings is None else settings
         param_list = [
@@ -417,7 +420,6 @@ class SliceFile(ttk.Frame):
                 msg = "z value out of range"
                 messagebox.showerror("Error", msg)
                 return None
-            # print("slicing: ", settings.get("filepath"), " at z=", current_z)
             my_hatcher = build_hatcher(
                 hatcher_type=hatcher_type,
                 hatch_angle=hatch_angle,
@@ -428,10 +430,9 @@ class SliceFile(ttk.Frame):
                 hatch_spacing=hatch_spacing,
                 stripe_width=stripe_width,
             )
-            # Slice the object at Z and get the boundaries
+            print("current z: ", current_z, "mm")
             geom_slice = solid_part.getVectorSlice(current_z, simplificationFactor=0.01, simplificationFactorMode="absolute", simplificationPreserveTopology=True)
-            # print("slicing: ", settings.get("filepath"), " at z=", current_z)
-            # Perform the hatching operations
+            print(geom_slice)
             layer = my_hatcher.hatch(geom_slice)
             dpi = settings.get("dpi")
             if self.plotter is None:
@@ -461,7 +462,7 @@ class SliceFile(ttk.Frame):
                 contour_coords=geom_slice,
                 is_final=True
             )
-            self.canvas_img.reaload_image()
+            self.canvas_img.reload_image()
             return layer
         except Exception as e:
             print("error at internal slicing: ", e)

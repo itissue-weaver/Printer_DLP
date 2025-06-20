@@ -12,7 +12,7 @@ from PIL import Image, ImageTk
 from matplotlib.patches import Polygon
 
 from files.constants import image_path_projector, path_solid_capture, desired_width_slice_image
-from templates.AuxFunctionsPlots import postprocessor_image
+from templates.AuxFunctionsPlots import postprocessor_image, hatch_for_plot
 from templates.AuxiliarHatcher import divide_solid_in_z_parts
 
 
@@ -24,6 +24,7 @@ class PlotSTL(ttk.Frame):
         self.type_plot = kwargs.get("type_plot", "mesh_3d")
         self.save_temp_flag = kwargs.get("save_temp_flag", False)
         self.path_to_save = kwargs.get("path_to_save", image_path_projector)
+        self.callbacks = kwargs.get("callbacks", {})
         self.dpi = kwargs.get("dpi", 300)
         self._from = kwargs.get("_from", "FrameSlice")
         self.figure = Figure(figsize=(5, 5), dpi=self.dpi)
@@ -31,6 +32,7 @@ class PlotSTL(ttk.Frame):
         match self.type_plot:
             case "mesh_3d":
                 solid_trimesh_part = kwargs.get("solid_trimesh_part")
+                solid_part = kwargs.get("solid_part")
                 self.figure = Figure(figsize=(5, 5), dpi=150)
                 self.axes = self.figure.add_subplot(111, projection="3d")
                 self.canvas = FigureCanvasTkAgg(self.figure, self)
@@ -41,8 +43,8 @@ class PlotSTL(ttk.Frame):
                     self.axes.plot_trisurf(
                         solid_trimesh_part.vertices[:, 0],
                         solid_trimesh_part.vertices[:, 1],
+                        solid_trimesh_part.vertices[:, 2],  # <- aquí va Z como argumento posicional
                         triangles=solid_trimesh_part.faces,
-                        Z=solid_trimesh_part.vertices[:, 2],
                         cmap="viridis",
                     )
                     self.axes.set_xlabel("X")
@@ -55,7 +57,7 @@ class PlotSTL(ttk.Frame):
 
     def save_capture(self, filename=path_solid_capture):
         self.figure.savefig(filename, dpi=300, bbox_inches='tight')
-        print(f"Imagen guardada como {filename}")
+        self.callbacks.get("render_thumbnails")()
 
     def plot_layer(
         self,
@@ -93,8 +95,6 @@ class PlotSTL(ttk.Frame):
         self.axes.set_ylim(
             (centroide[1] - height * 1.25 / 2, centroide[1] + height * 1.25 / 2)
         )
-        print("centroide", centroide)
-        print([centroide[0] - width * 1.25 / 2, centroide[0] + width * 1.25 / 2], [centroide[1] - height * 1.25 / 2, centroide[1] + height * 1.25 / 2])
         for line in self.axes.get_lines():
             line.set_color("white")
         # if contour_coords is not None:
@@ -145,41 +145,50 @@ class SolidViewer(ttk.Frame):
         self.figure = Figure(figsize=(10, 10), dpi=100)
         self.canvas = FigureCanvasTkAgg(self.figure, self)
         self.canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew")
+        self.callbacks = kwargs.get("callbacks", {})
         self.parts = parts
         self.solid = solid_trimesh_part
+        self.layer_thickness = kwargs.get("layer_thickness", 0.5)
+        self.solid_part = kwargs.get("solid_part", None)
         self.ax = self.figure.add_subplot(111, projection="3d")
-        self.plot_solid()
+        self.plot_solid(self.solid_part)
 
-    def plot_solid(self):
-        subsolids = divide_solid_in_z_parts(self.solid, self.parts)
-        colors = ["black", "blue", "yellow", "red"]
+    def plot_solid(self, solid_part):
+        import numpy as np
+        from matplotlib import cm
 
-        for subsolid, color in zip(subsolids, colors):
-            self.ax.plot_trisurf(
-                subsolid.vertices[:, 0],
-                subsolid.vertices[:, 1],
-                triangles=subsolid.faces,
-                Z=subsolid.vertices[:, 2],
-                color=color,
-            )
+        self.ax.clear()
+        layers = hatch_for_plot(solid_part, self.layer_thickness)
+        num_blocks = self.parts
+        n = 4
+        total_layers = len(layers)
+        layers_per_block = total_layers // num_blocks
+        colors = ['red', 'green', 'blue', 'orange']
+        for i in range(0, len(layers), n):  # n es el salto entre capas
+            layer = layers[i]
+            z = float(layer.z) / 1000.0
+            block_idx = min(i // layers_per_block, num_blocks - 1)
+            color = colors[block_idx]
+            # Extraemos hatches como coordenadas
+            sampling_rate = 5  # Muestra 1 de cada 7 segmentos
+            for hatch_geom in layer.getHatchGeometry():
+                coords = np.array(hatch_geom.coords).reshape(-1, 2, 2)
+                coords = coords[::sampling_rate]  # Submuestreo
+
+                for seg in coords:
+                    x = [seg[0][0], seg[1][0]]
+                    y = [seg[0][1], seg[1][1]]
+                    self.ax.plot(x, y, zs=z, zdir='z', color=color, linewidth=0.5)
+                    self.ax.view_init(elev=15, azim=0)  # Vista desde arriba
+        self.canvas.draw()
         self.ax.set_axis_off()
-        # self.ax.set_title("3D Part")
         self.save_image()
 
-    def change_solid(self, solid_trimesh_part):
-        self.ax.clear()
-        self.solid = solid_trimesh_part
-        self.plot_solid()
-        # self.canvas.draw()
-
-    def change_parts(self, parts):
-        self.ax.clear()
-        self.parts = parts
-        self.plot_solid()
 
     def save_image(self, filename=path_solid_capture):
         self.figure.savefig(filename, dpi=300, bbox_inches='tight')
         print(f"Imagen guardada como {filename}")
+        self.callbacks["render_thumbnails"]()
 
 class ImageFrameApp(ttk.Frame):
     def __init__(self, master):
@@ -192,9 +201,9 @@ class ImageFrameApp(ttk.Frame):
         # print("image loaded")
         self.create_widgets()
 
-    def load_image(self):
+    def load_image(self, filepath=r"files/img/temp.png"):
         try:
-            self.image = Image.open(r"files/img/temp.png")
+            self.image = Image.open(filepath)
         except Exception as e:
             print(f"Error loading image: {e}")
 
@@ -218,6 +227,10 @@ class ImageFrameApp(ttk.Frame):
         self.canvas.config(width=desired_width, height=new_height)
         self.canvas.create_image(0, 0, anchor="nw", image=self.image_start)
 
-    def reaload_image(self):
+    def reload_image(self):
         self.load_image()
+        self.show_image()
+
+    def reload_clean_image(self):
+        self.load_image(r"files/img/black_screen.png")
         self.show_image()

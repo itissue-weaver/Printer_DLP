@@ -108,6 +108,8 @@ class ReadFile(ttk.Frame):
             flag_error = True
         self.callbacks["change_tab_text"](status_frames, "from read file")
         update_settings(status_frames=status_frames)
+        if not is_init:
+            self.callbacks["on_geometry_changed"]()
         return solid_trimesh_part
 
     def init_frame_from_settings(self):

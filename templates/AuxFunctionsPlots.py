@@ -20,7 +20,7 @@ def read_stl(**kwargs):
     solid_part.setGeometry(filepath)
     solid_part.rotation = kwargs.get("rotation",  [0, 0, 0])
     solid_part.translation = kwargs.get("translation", [0, 0, 0])
-    solid_part.scale = kwargs.get("scale",  1)
+    solid_part.scale = kwargs.get("scale",  [1, 1, 1])
     solid_part.dropToPlatform()
     solid_trimesh_part = trimesh.load_mesh(filepath)
     # Get the bounding box dimensions
@@ -74,3 +74,39 @@ def postprocessor_image(path_image, is_final):
         print("error al procesar la imagen", e)
         return False
     return True
+
+
+def hatch_for_plot(solid_part, layer_thickness = 0.01):
+    from pyslm import hatching as hatching
+    # solid_part.origin[0] = 0.0
+    # solid_part.origin[1] = 0.0
+    # solid_part.scaleFactor = 1.0
+    # solid_part.rotation = [0, 0.0, 0]
+    # solid_part.dropToPlatform()
+
+    # Create a StripeHatcher object for performing any hatching operations
+    my_hatcher = hatching.Hatcher()
+
+    # Set the base hatching parameters which are generated within Hatcher
+    my_hatcher.hatchAngle = 10
+    my_hatcher.volumeOffsetHatch = 0.08
+    my_hatcher.spotCompensation = 0.01
+    my_hatcher.numInnerContours = 2
+    my_hatcher.numOuterContours = 1
+    my_hatcher.hatchSortMethod = hatching.AlternateSort()
+    # solid_part.dropToPlatform()
+    #Perform the hatching operations
+    if layer_thickness>0.1:
+        layer_thickness = 0.1
+    layers = []
+    for z in np.arange(0 + layer_thickness, solid_part.boundingBox[5], layer_thickness):
+        # Typically the hatch angle is globally rotated per layer by usually 66.7 degrees per layer
+        my_hatcher.hatchAngle += 66.7
+        # Slice the boundary
+        geom_slice = solid_part.getVectorSlice(z, simplificationFactor=0.1, simplificationFactorMode="absolute", simplificationPreserveTopology=True)
+        # Hatch the boundary using myHatcher
+        layer = my_hatcher.hatch(geom_slice)
+        # The layer height is set in integer increment of microns to ensure no rounding error during manufacturing
+        layer.z = int(z*1000)
+        layers.append(layer)
+    return layers

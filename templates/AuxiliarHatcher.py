@@ -40,7 +40,7 @@ def build_hatcher(
 def divide_solid_in_z_parts(solid_trimesh_part, parts):
     z_min, z_max = solid_trimesh_part.bounds[0][2], solid_trimesh_part.bounds[1][2]
     z_step = (z_max - z_min) / parts
-    subsolids = []
+    sub_solids = []
 
     for i in range(parts):
         z_lower = z_min + i * z_step
@@ -66,6 +66,6 @@ def divide_solid_in_z_parts(solid_trimesh_part, parts):
                 sub_faces.append([index_mapping[index] for index in face])
 
         subsolid = trimesh.Trimesh(vertices=sub_vertices, faces=np.array(sub_faces))
-        subsolids.append(subsolid)
+        sub_solids.append(subsolid)
 
-    return subsolids
+    return sub_solids

@@ -99,14 +99,16 @@ class MainGUI(ttk.Window):
         self.callbacks = {
             "change_tab_text": self.change_tab_text,
             "change_title": self.change_title,
-            "init_tabs": self.init_tabs,
+            "init_tabs": self.init_tabs_callback,
             "change_project": self.change_project_key,
             "test_connection_callback":  self.test_connection,
-            "save_project_callback": self.save_project
+            "save_project_callback": self.save_project,
+            "on_geometry_changed": self.on_geometry_changed,
         }
         print("init tabs")
         self.tab0 = HomePage(self.notebook, callbacks=self.callbacks)
         self.notebook.add(self.tab0, text="Home")
+        self.callbacks["render_thumbnails"] = self.tab0.render_thumbnails
         print("init tabs home")
         self.tab3 = FrameBiomaterials(self.notebook, callbacks=self.callbacks)
         self.notebook.add(self.tab3, text="Biomaterials")
@@ -235,10 +237,14 @@ class MainGUI(ttk.Window):
     def change_title(self, new_title):
         self.title(new_title)
 
-    def init_tabs(self):
+    def init_tabs_callback(self):
         self.tab3.load_biomaterial("", True)
         self.tab1.set_geometry_from_file(True)
         self.tab2.check_parameter_settings()
+        self.tab4.check_parameter_settings()
+
+    def on_geometry_changed(self):
+        self.tab2.clean_image()
         self.tab4.check_parameter_settings()
 
     def test_connection(self):
