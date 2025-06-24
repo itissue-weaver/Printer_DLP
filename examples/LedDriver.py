@@ -68,7 +68,7 @@ if __name__ == "__main__":
     print("Connected to the projector.")
     if args.send and args.send != "":
         command = args.send+"\r\n"
-        print(f">>>{command}<<<")
+        print(f"---{command}---")
         res = led_controller.send_command(command)
         print(f"<<<{res}>>>")
     else:

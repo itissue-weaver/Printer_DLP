@@ -2,6 +2,7 @@
 __author__ = "Edisson A. Naula"
 __date__ = "$ 09/April/2025  at 21:36 $"
 
+import re
 import threading
 
 import ttkbootstrap as ttk
@@ -399,7 +400,7 @@ def create_widget_commands(parent, **kwargs):
         frame_content,
         font=font_entry,
         width=40,
-        height=10,
+        height=30,
         wrap="word",
     )
     text_out.grid(row=0, column=0, sticky="nsew")
@@ -410,11 +411,12 @@ def create_widget_commands(parent, **kwargs):
     return entries
 
 
-def send_command(command: str):
-    if command:
-        return "answer"
-    else:
-        return "No command to send"
+def clean_answer(msg: str):
+    resultados = re.findall(r'<<<(.*?)>>>', msg, re.DOTALL)
+    print(resultados)
+    resultados_limpios = [r.strip() for r in resultados if r.strip()]
+    return "\n".join(resultados_limpios)
+
 
 
 class CommandsFrame(ttk.Frame):
@@ -433,7 +435,7 @@ class CommandsFrame(ttk.Frame):
             self.entries[1].see(ttk.END)
             self.entries[0].set("")
             code, data = send_command_from_gui("on", command)
-            self.entries[1].insert(ttk.END, f"<--R: {data}\n", "response")
+            self.entries[1].insert(ttk.END, f"<--R: {clean_answer(data["msg"])}\n", "response")
             self.entries[1].see(ttk.END)
         else:
             print("No command to send")
