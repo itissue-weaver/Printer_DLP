@@ -383,10 +383,35 @@ def create_widget_commands(parent, **kwargs):
     ttk.Label(frame_commands, text="Commands:", font=font_entry, style="Custom.TLabel").grid(
         row=0, column=0, sticky="nsew", padx=5, pady=5
     )
+    #* WT+LEDE=1: Habilitar LED
+    #* WT+LEDE=0: Deshabilitar LED
+    #* WT+LEDS=xxx: Establecer el nivel de brillo del LED, donde xxx es un valor entre 0 y 1023 para PRO4710LC y PRO4710A
+    #* WT+LEDR: Devolver el nivel de brillo del LED
+    #* WT+GTMP: Obtener la temperatura del LED en grados Celsius, con una precisión de 1°C y un rango de 0-100
+    # WT+SLED=1: El LED se enciende automáticamente después del encendido
+    #* WT+SLED=0: El LED permanece apagado después del encendido
+    #* WT+SBTN=xxx: Establecer el nivel de brillo predeterminado del LED, donde xxx es un valor de brillo
+    commands_list = [
+        "WT+LEDE=1",
+        "WT+LEDE=0",
+        "WT+LEDS=",
+        "WT+LEDR",
+        "WT+GTMP",
+        "WT+SLED=1",
+        "WT+SLED=0",
+        "WT+SBTN=",
+    ]
     entry_command = ttk.StringVar(value="")
-    ttk.Entry(frame_commands, textvariable=entry_command, font=font_entry).grid(
-        row=1, column=0, sticky="nsew", padx=5, pady=5
-    )
+    # ttk.Entry(frame_commands, textvariable=entry_command, font=font_entry).grid(
+    #     row=1, column=0, sticky="nsew", padx=5, pady=5
+    # )
+    ttk.Combobox(
+        frame_commands,
+        values=commands_list,
+        font=font_entry,
+        state="normal",
+        textvariable=entry_command,
+    ).grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
     entries.append(entry_command)
     ttk.Button(
         frame_inputs,
@@ -400,7 +425,7 @@ def create_widget_commands(parent, **kwargs):
         frame_content,
         font=font_entry,
         width=40,
-        height=30,
+        height=25,
         wrap="word",
     )
     text_out.grid(row=0, column=0, sticky="nsew")
@@ -413,7 +438,6 @@ def create_widget_commands(parent, **kwargs):
 
 def clean_answer(msg: str):
     resultados = re.findall(r'<<<(.*?)>>>', msg, re.DOTALL)
-    print(resultados)
     resultados_limpios = [r.strip() for r in resultados if r.strip()]
     return "\n".join(resultados_limpios)
 
