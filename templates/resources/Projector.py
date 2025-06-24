@@ -23,7 +23,7 @@ from templates.models.printer_models import (
     expected_files_almacen,
     post_settings_model,
     post_driver_motor_model,
-    post_driver_led_model,
+    post_driver_led_model, post_driver_led_command_model,
 )
 
 # Definir la variable global
@@ -249,7 +249,7 @@ class Led(Resource):
 
 @ns.route("/projector/command")
 class Led(Resource):
-    @ns.expect(post_driver_led_model)
+    @ns.expect(post_driver_led_command_model)
     def post(self):
         data = ns.payload
         try:

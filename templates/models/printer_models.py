@@ -79,3 +79,19 @@ post_driver_led_model = api.model(
         ),
     },
 )
+
+
+post_driver_led_command_model = api.model(
+    "PostDriverLed",
+    {
+        "state": fields.String(
+            description="State of the LED",
+            example="on",
+            enum=["on", "off"],
+        ),
+        "command": fields.String(
+            description="Command to perform",
+            example="WT+LEDE=1",
+        ),
+    },
+)
