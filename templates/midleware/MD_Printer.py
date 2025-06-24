@@ -372,4 +372,4 @@ def subprocess_control_led(state, command=None):
     resultado = subprocess.run(
         ["python3", ruta_script_led] + argumentos, capture_output=True, text=True
     )
-    return resultado.stdout
+    return resultado.stdout+resultado.stderr

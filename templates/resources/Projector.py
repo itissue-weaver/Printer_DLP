@@ -256,4 +256,4 @@ class ProjectorCommand(Resource):
             res =subprocess_control_led(data["state"], data["command"])
         except Exception as e:
             return {"msg": f"Error, led initiated: {str(e)}"}, 400
-        return {"msg": f"aw: {res}"}, 200
+        return {"msg": f"{res}"}, 200
