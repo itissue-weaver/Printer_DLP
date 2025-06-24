@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
     if args.send and args.send != "":
         print(f">>>{args.send+"\r\n"}<<<")
-        res = led_controller.send_command(args.send)
+        res = led_controller.send_command(args.send+"\r\n")
         print(f"<<<{res}>>>")
     else:
         if args.state == "on":
