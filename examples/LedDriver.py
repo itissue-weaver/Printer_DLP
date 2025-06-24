@@ -62,9 +62,10 @@ if __name__ == "__main__":
     parser.add_argument("--send", type=str, default="",
                         help="send a command to the projector")
     args = parser.parse_args()
+    print(args)
     led_controller = LEDController(port="/dev/ttyUSB0", baudrate=115200)
     led_controller.connect()
-
+    print("Connected to the projector.")
     if args.send and args.send != "":
         print(f">>>{args.send+"\r\n"}<<<")
         res = led_controller.send_command(args.send+"\r\n")
