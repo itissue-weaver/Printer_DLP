@@ -259,7 +259,7 @@ def control_led_from_gui(state):
 def send_command_from_gui(state, command):
     try:
         response = requests.post(
-            f"{server_domain + base_url}/projector/command/led",
+            f"{server_domain + base_url}/projector/command",
             json={
                 "state": state,
                 "command": command

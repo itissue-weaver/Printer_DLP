@@ -248,7 +248,7 @@ class Led(Resource):
 
 
 @ns.route("/projector/command")
-class Led(Resource):
+class ProjectorCommand(Resource):
     @ns.expect(post_driver_led_command_model)
     def post(self):
         data = ns.payload
