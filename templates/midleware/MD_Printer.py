@@ -256,6 +256,28 @@ def control_led_from_gui(state):
         return 500, str(e)
 
 
+def send_command_from_gui(state, command):
+    try:
+        response = requests.post(
+            f"{server_domain + base_url}/projector/command/led",
+            json={
+                "state": state,
+                "command": command
+            },
+            headers=headers,
+        )
+        if response.status_code == 200:
+            data = response.json()
+            print(200, data)
+            return 200, data
+        else:
+            print(response.status_code, None)
+            return response.status_code, None
+    except Exception as e:
+        print("Error at testing led:", e)
+        return 500, str(e)
+
+
 def subprocess_test():
     # argumentos = ["--speed", "150", "--direction", "backward"]
     argumentos = ["--action", "move_z_sw", "--direction", "cw", "--location_z", "top"]
@@ -344,10 +366,10 @@ def subprocess_control_motor(action, direction, location_z, motor, steps, new_de
 
 
 
-def subprocess_control_led(state):
-    argumentos = ["--state", state]
+def subprocess_control_led(state, command=None):
+    command = "" if command is None else command
+    argumentos = ["--state", state, "--send", command]
     resultado = subprocess.run(
         ["python3", ruta_script_led] + argumentos, capture_output=True, text=True
     )
-    print(resultado.stdout)
     return resultado.stdout

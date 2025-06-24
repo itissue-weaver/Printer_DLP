@@ -6,11 +6,12 @@ import threading
 
 import ttkbootstrap as ttk
 
-from files.constants import font_title, delay_z, delay_n
+from files.constants import font_title, delay_z, delay_n, font_entry
 from templates.midleware.MD_Printer import control_motor_from_gui, control_led_from_gui, send_start_print_one_image, \
-    send_stop_print
+    send_stop_print, send_command_from_gui
 
 from tkinter import filedialog
+
 
 
 class ManualControlFrame(ttk.Toplevel):
@@ -20,8 +21,15 @@ class ManualControlFrame(ttk.Toplevel):
         self.parent = parent
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
-        self.main_frame = ManualControl(self, **kwargs)
-        self.main_frame.grid(row=0, column=0, sticky="nsew", padx=20, pady=20)
+        self.notebook = ttk.Notebook(self)
+        self.notebook.grid(row=0, column=0, sticky="nsew")
+        self.notebook.columnconfigure(0, weight=1)
+        self.notebook.rowconfigure(0, weight=1)
+        self.notebook.configure(style="Custom.TNotebook")
+        self.tab0 = ManualControl(self, **kwargs)
+        self.notebook.add(self.tab0, text="Control")
+        self.tab1 = CommandsFrame(self, **kwargs)
+        self.notebook.add(self.tab1, text="Commands")
         self.protocol("WM_DELETE_WINDOW", self.close_callback)
 
     def close_callback(self):
@@ -362,3 +370,70 @@ class ManualControl(ttk.Frame):
             if not self.thread_led.is_alive():
                 self.thread_led.join()
                 self.thread_led = None
+
+
+def create_widget_commands(parent, **kwargs):
+    entries = []
+    frame_inputs = ttk.Frame(parent)
+    frame_inputs.columnconfigure((0, 1), weight=1)
+    frame_inputs.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+    frame_commands = ttk.Frame(frame_inputs)
+    frame_commands.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+    ttk.Label(frame_commands, text="Commands:", font=font_entry, style="Custom.TLabel").grid(
+        row=0, column=0, sticky="nsew", padx=5, pady=5
+    )
+    entry_command = ttk.StringVar(value="")
+    ttk.Entry(frame_commands, textvariable=entry_command, font=font_entry).grid(
+        row=1, column=0, sticky="nsew", padx=5, pady=5
+    )
+    entries.append(entry_command)
+    ttk.Button(
+        frame_inputs,
+        text="Send command",
+        command=lambda: kwargs.get("send_callback")(entry_command.get()),
+        style="success.TButton",
+    ).grid(row=0, column=1, sticky="we", pady=10)
+    frame_content = ttk.Frame(parent)
+    frame_content.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+    text_out = ttk.ScrolledText(
+        frame_content,
+        font=font_entry,
+        width=40,
+        height=10,
+        wrap="word",
+    )
+    text_out.grid(row=0, column=0, sticky="nsew")
+    text_out.tag_config("command", foreground="blue", font=("Segoe UI", font_entry[1], "bold"))
+    text_out.tag_config("response", foreground="green", font=("Segoe UI", font_entry[1], "italic"))
+    text_out.tag_config("error", foreground="red", font=("Segoe UI", font_entry[1], "bold"))
+    entries.append(text_out)
+    return entries
+
+
+def send_command(command: str):
+    if command:
+        return "answer"
+    else:
+        return "No command to send"
+
+
+class CommandsFrame(ttk.Frame):
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent)
+        self.master = parent
+        self.entries = create_widget_commands(
+            self,
+            send_callback=self.send_callback,
+        )
+
+
+    def send_callback(self, command: str):
+        if command:
+            self.entries[1].insert(ttk.END, f"-->S: {command}\n", "command")
+            self.entries[1].see(ttk.END)
+            self.entries[0].set("")
+            code, data = send_command_from_gui("on", command)
+            self.entries[1].insert(ttk.END, f"<--R: {data}\n", "response")
+            self.entries[1].see(ttk.END)
+        else:
+            print("No command to send")

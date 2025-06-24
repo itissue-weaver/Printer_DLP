@@ -21,15 +21,14 @@ class LEDController:
         if self.serial_connection and self.serial_connection.is_open:
             try:
                 self.serial_connection.write(command.encode())
-                print(f"Command sent: {command}")
                 time.sleep(0.5)  # Allow some time for a response
                 response = self.serial_connection.read_all().decode()
-                print(f"Response received: {response}")
                 return response
             except serial.SerialException as e:
                 print(f"Error sending command: {e}")
         else:
             print("Serial connection is not open.")
+            return None
 
     def turn_on_led(self):
         # Turn on the LED
@@ -60,17 +59,24 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Projector control")
     parser.add_argument("--state", type=str, choices=["on", "off"], default="off",
                         help="state of the led")
+    parser.add_argument("--send", type=str, default="",
+                        help="send a command to the projector")
     args = parser.parse_args()
     led_controller = LEDController(port="/dev/ttyUSB0", baudrate=115200)
     led_controller.connect()
-    if args.state == "on":
-        if led_controller.turn_on_led():
-            print("LED turned on.")
-        else:
-            print("Failed to turn on LED.")
-    if args.state == "off":
-        if led_controller.turn_off_led():
-            print("LED turned off.")
-        else:
-            print("Failed to turn off LED.")
+
+    if args.send and args.send != "":
+        res = led_controller.send_command(args.send)
+        print(f"<<<{res}>>>")
+    else:
+        if args.state == "on":
+            if led_controller.turn_on_led():
+                print("LED turned on.")
+            else:
+                print("Failed to turn on LED.")
+        if args.state == "off":
+            if led_controller.turn_off_led():
+                print("LED turned off.")
+            else:
+                print("Failed to turn off LED.")
     led_controller.disconnect()

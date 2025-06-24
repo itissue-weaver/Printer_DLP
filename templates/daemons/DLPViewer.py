@@ -101,7 +101,10 @@ class DlpViewer(threading.Thread):
             self.lift_height,
             self.lift_height_vat,
             self.delay_retract_init,
-        ) = (None,) * 17
+            self.offset_x,
+            self.offset_y,
+            self.screen_projector_size,
+        ) = (None,) * 20
         self.flag_reload = False
         self.mode = mode
         self.current_deposit_index = 0
@@ -137,6 +140,9 @@ class DlpViewer(threading.Thread):
         deposit = self.sequence[0] if len(self.sequence) > 0 else {}
         self.current_deposit_index = deposit.get("index", 0)
         self.current_deposit = deposit.get("deposit", 1)
+        self.offset_x = self.settings.get("offset_x_screen", 0)
+        self.offset_y = self.settings.get("offset_y_screen", 0)
+        self.screen_projector_size = self.settings.get("size_projector", 0.1)
 
     def load_texture(self):
         texture = glGenTextures(1)
@@ -253,32 +259,47 @@ class DlpViewer(threading.Thread):
                 glPushMatrix()
                 glEnable(GL_TEXTURE_2D)
                 glBindTexture(GL_TEXTURE_2D, self.texture)
-                offset_x = (
-                    0.00  # Ajusta este valor para mover la imagen hacia la derecha
-                )
-                offset_y = 0.05  # Ajusta este valor para mover la imagen hacia arriba
-
+                # Parámetros ajustables
+                # offset_x = 0.05  # Movimiento hacia la derecha
+                # offset_y = 0.05  # Movimiento hacia arriba
+                # size = 0.1       # Tamaño del medio lado del cuadrado
+                offset_x = self.offset_x
+                offset_y = self.offset_y
+                size = self.screen_projector_size
                 glBegin(GL_QUADS)
                 glTexCoord2f(0, 0)
-                glVertex2f(
-                    -0.1 + offset_x, -0.1 + offset_y
-                )  # Aplicando offsets en X y Y
+                glVertex2f(-size + offset_x, -size + offset_y)
 
                 glTexCoord2f(1, 0)
-                glVertex2f(
-                    +0.1 + offset_x, -0.1 + offset_y
-                )  # Aplicando offsets en X y Y
+                glVertex2f(+size + offset_x, -size + offset_y)
 
                 glTexCoord2f(1, 1)
-                glVertex2f(
-                    +0.1 + offset_x, +0.1 + offset_y
-                )  # Aplicando offsets en X y Y
+                glVertex2f(+size + offset_x, +size + offset_y)
 
                 glTexCoord2f(0, 1)
-                glVertex2f(
-                    -0.1 + offset_x, +0.1 + offset_y
-                )  # Aplicando offsets en X y Y
+                glVertex2f(-size + offset_x, +size + offset_y)
                 glEnd()
+                # glBegin(GL_QUADS)
+                # glTexCoord2f(0, 0)
+                # glTexCoord2f(1, 0)
+                # glVertex2f(
+                #     -0.1 + offset_x, -0.1 + offset_y
+                # )  # Aplicando offsets en X y Y
+                #
+                # glVertex2f(
+                #     +0.1 + offset_x, -0.1 + offset_y
+                # )  # Aplicando offsets en X y Y
+                #
+                # glTexCoord2f(1, 1)
+                # glVertex2f(
+                #     +0.1 + offset_x, +0.1 + offset_y
+                # )  # Aplicando offsets en X y Y
+                #
+                # glTexCoord2f(0, 1)
+                # glVertex2f(
+                #     -0.1 + offset_x, +0.1 + offset_y
+                # )  # Aplicando offsets en X y Y
+                # glEnd()
                 glDisable(GL_TEXTURE_2D)
                 glPopMatrix()
                 pygame.display.flip()
@@ -314,23 +335,6 @@ class DlpViewer(threading.Thread):
 
     def is_alive_projector(self):
         return self.running
-
-    # def change_z_motor(self):
-    #     r = 8 / 200
-    #     dist_free = self.lift_height
-    #     steps = int(dist_free / r)
-    #     msg = ""
-    #     result = subprocess_control_motor(
-    #         "move_z", "cw", "top", "z", steps, new_delay_z=self.delay_z_lift, new_delay_n=self.delay_n
-    #     )
-    #     msg += f"change z motor: {steps}, {result} {dist_free} {self.layer_depth}\n"
-    #     steps = int((dist_free - self.layer_depth) / r)
-    #     result = subprocess_control_motor(
-    #         "move_z", "ccw", "top", "z", steps, new_delay_z=self.delay_z_retract, new_delay_n=self.delay_n
-    #     )
-    #     msg += f"change z motor: {steps}, {result}\n"
-    #     # thread_log = threading.Thread(target=write_log, args=(msg,))
-    #     # thread_log.start()
 
     def change_vat(self, old_deposit, new_deposit):
         msg = ""

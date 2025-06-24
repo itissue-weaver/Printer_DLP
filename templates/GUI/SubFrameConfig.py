@@ -22,7 +22,7 @@ def create_input_widgets_display(master):
     )
     entry_projector_dimension = ttk.StringVar(
         value=", ".join(
-            [str(i) for i in settings.get("projector_dimension", [30.0, 20.0])]
+            [str(i) for i in settings.get("projector_dimension", [20.0, 20.0])]
         )
     )
     ttk.Entry(frame_inputs, textvariable=entry_projector_dimension, font=font_entry).grid(
@@ -48,7 +48,7 @@ def create_input_widgets_display(master):
     )
     entry_projector_offset = ttk.StringVar(
         value=", ".join(
-            [str(i) for i in settings.get("projector_offset", [0.0, 0.0, 10.0])]
+            [str(i) for i in settings.get("projector_offset", [0.0, 0.0, 0.0])]
         )
     )
     ttk.Entry(frame_inputs, textvariable=entry_projector_offset, font=font_entry).grid(
@@ -65,6 +65,14 @@ def create_input_widgets_display(master):
     )
     entries.append(entry_dpi)
 
+    ttk.Label(frame_inputs, text="Size projection [square normalized]:", style="Custom.TLabel").grid(
+        row=4, column=0, sticky="w", padx=10, pady=10
+    )
+    entry_size_projection = ttk.StringVar(value="0.1")
+    ttk.Entry(frame_inputs, textvariable=entry_size_projection, font=font_entry).grid(
+        row=4, column=1, sticky="w", padx=5, pady=5
+    )
+    entries.append(entry_size_projection)
     return entries
 
 
@@ -84,12 +92,18 @@ class DisplayConfig(ttk.Frame):
         projector_dimension = [float(i) for i in self.entries[0].get().split(",")]
         projector_resolution = [int(i) for i in self.entries[1].get().split(",")]
         projector_offset = [float(i) for i in self.entries[2].get().split(",")]
+        offset_x_screen = projector_offset[0]
+        offset_y_screen = projector_offset[1]
         dpi = int(self.entries[3].get())
+        size_projection = float(self.entries[4].get())
         update_settings(
             projector_dimension=projector_dimension,
             projector_resolution=projector_resolution,
             projector_offset=projector_offset,
             dpi=dpi,
+            offset_x_screen=offset_x_screen,
+            offset_y_screen=offset_y_screen,
+            size_projector=size_projection
         )
 
 
