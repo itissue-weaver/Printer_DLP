@@ -67,8 +67,9 @@ if __name__ == "__main__":
     led_controller.connect()
     print("Connected to the projector.")
     if args.send and args.send != "":
-        print(f">>>{args.send+"\r\n"}<<<")
-        res = led_controller.send_command(args.send+"\r\n")
+        command = args.send+"\r\n"
+        print(f">>>{command}<<<")
+        res = led_controller.send_command(command)
         print(f"<<<{res}>>>")
     else:
         if args.state == "on":
