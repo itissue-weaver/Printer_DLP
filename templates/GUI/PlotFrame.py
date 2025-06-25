@@ -6,6 +6,7 @@ __date__ = "$ 22/ene/2025  at 21:03 $"
 import ttkbootstrap as ttk
 from matplotlib.backends._backend_tk import NavigationToolbar2Tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from matplotlib.figure import Figure
 import pyslm.visualise
 from PIL import Image, ImageTk
@@ -39,18 +40,35 @@ class PlotSTL(ttk.Frame):
                 toolbar = NavigationToolbar2Tk(self.canvas, self)
                 toolbar.update()
                 self.canvas.get_tk_widget().pack(side=ttk.TOP, fill=ttk.BOTH, expand=1)
-                if solid_trimesh_part is not None:
-                    self.axes.plot_trisurf(
-                        solid_trimesh_part.vertices[:, 0],
-                        solid_trimesh_part.vertices[:, 1],
-                        solid_trimesh_part.vertices[:, 2],  # <- aquí va Z como argumento posicional
-                        triangles=solid_trimesh_part.faces,
-                        cmap="viridis",
-                    )
-                    self.axes.set_xlabel("X")
-                    self.axes.set_ylabel("Y")
-                    self.axes.set_zlabel("Z")
-                    # self.axes.set_title("3D Part")
+                if solid_part is not None:
+                    solid_trimesh_part = solid_part.geometry
+                    # self.axes.plot_trisurf(
+                    #     solid_trimesh_part.vertices[:, 0],
+                    #     solid_trimesh_part.vertices[:, 1],
+                    #     solid_trimesh_part.vertices[:, 2],  # <- aquí va Z como argumento posicional
+                    #     triangles=solid_trimesh_part.faces,
+                    #     cmap="viridis",
+                    # )
+                    # self.axes.set_xlabel("X")
+                    # self.axes.set_ylabel("Y")
+                    # self.axes.set_zlabel("Z")
+                    # # self.axes.set_title("3D Part")
+                    # Extrae vértices y caras
+                    vertices = solid_trimesh_part.vertices
+                    faces = solid_trimesh_part.faces
+                    mesh = Poly3DCollection(vertices[faces], alpha=0.7, edgecolor='k')
+                    self.axes.add_collection3d(mesh)
+
+                    # Ajusta límites
+                    scale = solid_trimesh_part.bounds.flatten()
+                    # self.axes.auto_scale_xyz(scale, scale, scale)
+
+                    self.axes.set_xlabel('X')
+                    self.axes.set_ylabel('Y')
+                    self.axes.set_zlabel('Z')
+                    # plt.title("STL Model in Specific Figure and Axes")
+                    # plt.tight_layout()
+                    # plt.show()
                 if self._from == "FramePrinting":
                     self.axes.set_axis_off()
                     self.save_capture()

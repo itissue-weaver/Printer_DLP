@@ -99,7 +99,7 @@ class ReadFile(ttk.Frame):
                 file_path=filepath,
             )
             self.frame_axes.destroy()
-            self.frame_axes = PlotSTL(self, solid_trimesh_part=solid_trimesh_part)
+            self.frame_axes = PlotSTL(self, solid_trimesh_part=solid_trimesh_part, solid_part=solid_part)
             self.frame_axes.grid(row=2, column=0, sticky="nsew")
             status_frames[1] = 1
         except Exception as e:

@@ -283,7 +283,7 @@ class FramePrinting(ttk.Frame):
             layer_depth = settings.get("layer_depth", 0.1)
             if len(sequence)==1:
                 from templates.GUI.PlotFrame import PlotSTL
-                self.frame_plot = PlotSTL(self.frame_main_info, solid_trimesh_part=solid_trimesh_part, _from="FramePrinting", callbacks={"render_thumbnails": self.callbacks["render_thumbnails"]})
+                self.frame_plot = PlotSTL(self.frame_main_info, solid_trimesh_part=solid_trimesh_part, _from="FramePrinting", callbacks={"render_thumbnails": self.callbacks["render_thumbnails"]}, solid_part=solid_part)
                 self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
             else:
                 threa_plot_parts = threading.Thread(target=self.plot_multiple_parts, kwargs={"solid_trimesh_part": solid_trimesh_part, "solid_part": solid_part, "n_parts": n_parts,"layer_depth": layer_depth })
@@ -324,7 +324,7 @@ class FramePrinting(ttk.Frame):
             layer_depth = settings.get("layer_depth", 0.1)
             if len(sequence) == 1:
                 from templates.GUI.PlotFrame import PlotSTL
-                self.frame_plot = PlotSTL(self.frame_main_info, solid_trimesh_part=solid_trimesh_part, _from="FramePrinting", callbacks={"render_thumbnails": self.callbacks["render_thumbnails"]})
+                self.frame_plot = PlotSTL(self.frame_main_info, solid_trimesh_part=solid_trimesh_part, _from="FramePrinting", callbacks={"render_thumbnails": self.callbacks["render_thumbnails"]}, solid_part=solid_part)
                 self.frame_plot.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
             else:
                 thread_plot_parts = threading.Thread(target=self.plot_multiple_parts, kwargs={"solid_trimesh_part": solid_trimesh_part, "solid_part": solid_part, "n_parts": n_parts, "layer_depth": layer_depth})

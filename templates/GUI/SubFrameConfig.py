@@ -65,10 +65,10 @@ def create_input_widgets_display(master):
     )
     entries.append(entry_dpi)
 
-    ttk.Label(frame_inputs, text="Size projection [square normalized]:", style="Custom.TLabel").grid(
+    ttk.Label(frame_inputs, text="Size projection [(x,y)square normalized]:", style="Custom.TLabel").grid(
         row=4, column=0, sticky="w", padx=10, pady=10
     )
-    entry_size_projection = ttk.StringVar(value="0.1")
+    entry_size_projection = ttk.StringVar(value=", ".join([str(settings.get("size_projector_x", 0.1)), str(settings.get("size_projector_y", 0.1))]))
     ttk.Entry(frame_inputs, textvariable=entry_size_projection, font=font_entry).grid(
         row=4, column=1, sticky="w", padx=5, pady=5
     )
@@ -95,7 +95,7 @@ class DisplayConfig(ttk.Frame):
         offset_x_screen = projector_offset[0]
         offset_y_screen = projector_offset[1]
         dpi = int(self.entries[3].get())
-        size_projection = float(self.entries[4].get())
+        size_projection = [float(i) for i in self.entries[4].get().split(", ")]
         update_settings(
             projector_dimension=projector_dimension,
             projector_resolution=projector_resolution,
@@ -103,7 +103,8 @@ class DisplayConfig(ttk.Frame):
             dpi=dpi,
             offset_x_screen=offset_x_screen,
             offset_y_screen=offset_y_screen,
-            size_projector=size_projection
+            size_projector_x=size_projection[0],
+            size_projector_y=size_projection[1]
         )
 
 

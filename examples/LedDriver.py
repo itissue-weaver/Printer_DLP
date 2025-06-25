@@ -17,10 +17,10 @@ class LEDController:
         except serial.SerialException as e:
             print(f"Error connecting to the serial port: {e}")
 
-    def send_command(self, command):
+    def send_command(self, command_txt):
         if self.serial_connection and self.serial_connection.is_open:
             try:
-                self.serial_connection.write(command.encode())
+                self.serial_connection.write(command_txt.encode())
                 time.sleep(0.5)  # Allow some time for a response
                 response = self.serial_connection.read_all().decode()
                 return response

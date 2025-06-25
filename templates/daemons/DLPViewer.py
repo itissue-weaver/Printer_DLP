@@ -103,8 +103,9 @@ class DlpViewer(threading.Thread):
             self.delay_retract_init,
             self.offset_x,
             self.offset_y,
-            self.screen_projector_size,
-        ) = (None,) * 20
+            self.screen_projector_size_x,
+            self.screen_projector_size_y,
+        ) = (None,) * 21
         self.flag_reload = False
         self.mode = mode
         self.current_deposit_index = 0
@@ -142,7 +143,9 @@ class DlpViewer(threading.Thread):
         self.current_deposit = deposit.get("deposit", 1)
         self.offset_x = self.settings.get("offset_x_screen", 0)
         self.offset_y = self.settings.get("offset_y_screen", 0)
-        self.screen_projector_size = self.settings.get("size_projector", 0.1)
+        self.screen_projector_size_x = self.settings.get("size_projector_x", 0.1)
+        self.screen_projector_size_y = self.settings.get("size_projector_y", 0.1)
+
 
     def load_texture(self):
         texture = glGenTextures(1)
@@ -265,19 +268,20 @@ class DlpViewer(threading.Thread):
                 # size = 0.1       # Tamaño del medio lado del cuadrado
                 offset_x = self.offset_x
                 offset_y = self.offset_y
-                size = self.screen_projector_size
+                size_x = self.screen_projector_size_x
+                size_y = self.screen_projector_size_y
                 glBegin(GL_QUADS)
                 glTexCoord2f(0, 0)
-                glVertex2f(-size + offset_x, -size + offset_y)
+                glVertex2f(-size_x + offset_x, -size_y + offset_y)
 
                 glTexCoord2f(1, 0)
-                glVertex2f(+size + offset_x, -size + offset_y)
+                glVertex2f(+size_x + offset_x, -size_y + offset_y)
 
                 glTexCoord2f(1, 1)
-                glVertex2f(+size + offset_x, +size + offset_y)
+                glVertex2f(+size_x + offset_x, +size_y + offset_y)
 
                 glTexCoord2f(0, 1)
-                glVertex2f(-size + offset_x, +size + offset_y)
+                glVertex2f(-size_x + offset_x, +size_y + offset_y)
                 glEnd()
                 # glBegin(GL_QUADS)
                 # glTexCoord2f(0, 0)

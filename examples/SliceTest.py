@@ -14,10 +14,41 @@ import pyslm
 import pyslm.visualise
 from pyslm import hatching as hatching
 import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+
 
 # Imports the part and sets the geometry to  an STL file (frameGuide.stl)
 solidPart = pyslm.Part('inversePyramid')
 solidPart.setGeometry('C:/Users/Weaver4/Downloads/W v1.stl')
+# solidtrimesh = trimesh.load('C:/Users/Weaver4/Downloads/W v1.stl')
+solidPart.origin[0] = 0.0
+solidPart.origin[1] = 0.0
+solidPart.scaleFactor = 1.0
+solidPart.rotation = [0, 0.0, 0]
+solidPart.dropToPlatform()
+
+
+solidtrimesh = solidPart.geometry
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+# Extrae vértices y caras
+vertices = solidtrimesh.vertices
+faces = solidtrimesh.faces
+mesh = Poly3DCollection(vertices[faces], alpha=0.7, edgecolor='k')
+ax.add_collection3d(mesh)
+
+# Ajusta límites
+scale = solidtrimesh.bounds.flatten()
+ax.auto_scale_xyz(scale, scale, scale)
+
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+plt.title("STL Model in Specific Figure and Axes")
+plt.tight_layout()
+plt.show()
 
 solidPart.origin[0] = 0.0
 solidPart.origin[1] = 0.0

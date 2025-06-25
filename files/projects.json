@@ -849,18 +849,18 @@
         "user": "prueba",
         "thumbnail": "",
         "status": 0,
-        "timestamp": "2025-06-16 10:53:38",
+        "timestamp": "2025-06-25 10:43:02",
         "settings": {
-            "filepath": "C:/Users/Weaver4/Downloads/W v1.stl",
+            "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
             "rotation": [
                 0.0,
                 0.0,
                 0.0
             ],
             "scale": [
-                0.0,
-                0.0,
-                0.0
+                1.0,
+                1.0,
+                1.0
             ],
             "translation": [
                 0.0,
@@ -868,8 +868,8 @@
                 0.0
             ],
             "width_part": 20.0,
-            "height_part": 19.991,
-            "depth_part": 10.0,
+            "height_part": 20.0,
+            "depth_part": 20.0,
             "hatcher_type": "Base",
             "hatch_angle": 10.0,
             "volume_offset_hatch": 0.0,
@@ -879,8 +879,8 @@
             "hatch_spacing": 0.5,
             "stripe_width": 0.5,
             "projector_dimension": [
-                20.0,
-                20.0
+                10.0,
+                10.0
             ],
             "projector_resolution": [
                 1920,
@@ -889,14 +889,14 @@
             "projector_offset": [
                 0.0,
                 0.0,
-                10.0
+                0.0
             ],
             "dpi": 300,
             "layer_depth": 0.05,
             "delta_layer": 20.0,
             "plate": 1,
             "HOST": "127.0.0.1",
-            "num_layers": 200,
+            "num_layers": 400,
             "material1": "Solucion1",
             "quantity1": 50.0,
             "material2": "Solution 2",
@@ -934,8 +934,8 @@
                 1.0
             ],
             "centroide": [
-                -0.0,
-                9.437,
+                0.0,
+                10.0,
                 0.0
             ],
             "sequence": [
@@ -946,11 +946,11 @@
                 }
             ],
             "min_x_part": -10.0,
-            "min_y_part": 0.004742803052067757,
+            "min_y_part": 0.0,
             "min_z_part": 0.0,
             "max_x_part": 10.0,
-            "max_y_part": 19.995256423950195,
-            "max_z_part": 10.0,
+            "max_y_part": 20.0,
+            "max_z_part": 20.0,
             "status_frames": [
                 1,
                 1,
@@ -1168,7 +1168,12 @@
             "msg": "Ok",
             "delay_z_lift": 0.01,
             "lift_height": 6.0,
-            "delay_retract_init": 0.01
+            "delay_retract_init": 0.01,
+            "offset_x_screen": 0.0,
+            "offset_y_screen": 0.0,
+            "size_projector": 0.1,
+            "size_projector_x": 0.08,
+            "size_projector_y": 0.1
         }
     },
     "meniscoprueba": {
