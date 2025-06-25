@@ -43,7 +43,7 @@ def create_input_widgets_display(master):
     )
     entries.append(entry_projector_resolution)
 
-    ttk.Label(frame_inputs, text="Projector offset [x, y, z] cm:", style="Custom.TLabel").grid(
+    ttk.Label(frame_inputs, text="Projector offset [x, y, z] normalized:", style="Custom.TLabel").grid(
         row=2, column=0, sticky="w", padx=10, pady=10
     )
     entry_projector_offset = ttk.StringVar(
