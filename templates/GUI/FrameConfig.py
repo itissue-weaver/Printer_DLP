@@ -16,17 +16,19 @@ class FrameConfig(ttk.Toplevel):
         self.columnconfigure(0, weight=1)
         self.rowconfigure((0, 1), weight=1)
         self.master = master
+        self.warning_var = ttk.StringVar(value="🛑Modifying these values can cause distortion in the layers and final result.")
         # ----------------------Frame----------------------
         self.display_frame = DisplayConfig(self)
         self.display_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=1)
         self.printer_frame = PrinterConfig(self)
         self.printer_frame.grid(row=1, column=0, sticky="nsew", padx=10, pady=1)
+        ttk.Label(self, textvariable=self.warning_var).grid(row=2, column=0, sticky="n", padx=10, pady=10)
         # ----------------------Button----------------------
         ttk.Button(
             self,
             text="Close",
             command=self.close_callback,
-        ).grid(row=2, column=0, sticky="n", padx=10, pady=10)
+        ).grid(row=3, column=0, sticky="n", padx=10, pady=10)
         # ttk.Button(
         #     self,
         #     text="Test",

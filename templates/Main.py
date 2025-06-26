@@ -16,14 +16,14 @@ from files.constants import (
 )
 from templates.AuxiliarFunctions import read_settings, save_settings_to_project, update_settings, update_flags
 from templates.GUI.FrameBiomaterials import FrameBiomaterials
+from templates.GUI.FrameConfig import FrameConfig
 from templates.GUI.FrameHome import HomePage
 from templates.GUI.FramePrinting import FramePrinting
 from templates.GUI.FrameSliceFile import SliceFile
 from templates.GUI.Frame_ManualControl import ManualControlFrame
 from templates.GUI.Frame_ReadFile import ReadFile
-from templates.GUI.FrameConfig import FrameConfig
-from templates.GUI.SubFrameInit import GifFrameApp, StartImageFrame
-from templates.midleware.MD_Printer import get_settings_printer, ask_status
+from templates.GUI.SubFrameInit import StartImageFrame
+from templates.midleware.MD_Printer import ask_status
 
 
 def configure_styles():

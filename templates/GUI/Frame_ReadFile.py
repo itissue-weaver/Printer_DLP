@@ -23,8 +23,8 @@ def create_input_widgets(master, **kwargs):
     entries.append(entry_path)
     ttk.Button(
         master,
-        text="Buscar archivo",
-        command=kwargs.get("callback_searchFile", None),
+        text="Select file",
+        command=kwargs.get("callback_searchFile", lambda: ()),
         style="primary.TButton",
     ).grid(row=0, column=0, sticky="ew", padx=3, pady=5)
     return entries
@@ -47,8 +47,8 @@ def import_file_stl(var_path, var_path_show):
 def create_buttons(master, **kwargs):
     ttk.Button(
         master,
-        text="Establecer Geometria",
-        command=kwargs.get("callback_setGeometry", None),
+        text="Establish geometry",
+        command=kwargs.get("callback_setGeometry", lambda: ()),
         style="Custom.TButton",
     ).grid(row=0, column=0, sticky="n")
 
