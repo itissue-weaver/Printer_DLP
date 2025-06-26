@@ -6,3 +6,6 @@ files/img/*.zip
 *_test.py
 files/settings.json
 files/flags.json
+*.exe
+/dist
+/build
