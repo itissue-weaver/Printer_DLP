@@ -2,14 +2,15 @@
 __author__ = "Edisson A. Naula"
 __date__ = "$ 22/ene/2025  at 21:05 $"
 
-from tkinter import messagebox
+import shutil
+from tkinter import messagebox, filedialog
 
 import pyslm
 import pyslm.visualise
 import ttkbootstrap as ttk
 from PIL import ImageTk, Image
 
-from files.constants import font_entry
+from files.constants import font_entry, temp_capture_slice
 from templates.AuxiliarFunctions import update_settings, read_settings
 from templates.GUI.PlotFrame import PlotSTL, ImageFrameApp
 from templates.AuxiliarHatcher import build_hatcher
@@ -17,6 +18,7 @@ from templates.AuxiliarHatcher import build_hatcher
 
 def create_input_widgets(master, **kwargs):
     entries = []
+    settings = kwargs.get("settings", read_settings())
     # ----------------------parameters hatching--------------------
     frame_inputs = ttk.LabelFrame(master, text="Parameters")
     frame_inputs.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
@@ -35,7 +37,8 @@ def create_input_widgets(master, **kwargs):
     ttk.Label(frame_geometry, text="Rotation[x,y,z]:", style="Custom.TLabel").grid(
         row=2, column=0, sticky="w", padx=5, pady=5
     )
-    entry_rotation = ttk.StringVar(value="0.0, 0.0, 0.0")
+    rotation = ", ".join([str(item) for item in settings.get("rotation", [0.0, 0.0, 0.0])])
+    entry_rotation = ttk.StringVar(value=rotation)
     ttk.Entry(frame_geometry, textvariable=entry_rotation, font=font_entry).grid(
         row=2, column=1, sticky="w", padx=5, pady=5
     )
@@ -43,7 +46,8 @@ def create_input_widgets(master, **kwargs):
     ttk.Label(frame_geometry, text="Scale[x,y,z]:", style="Custom.TLabel").grid(
         row=3, column=0, sticky="w", padx=5, pady=5
     )
-    entry_scale = ttk.StringVar(value="1.0, 1.0, 1.0")
+    scale = ", ".join([str(item) for item in settings.get("scale", [1.0, 1.0, 1.0])])
+    entry_scale = ttk.StringVar(value=scale)
     ttk.Entry(frame_geometry, textvariable=entry_scale, font=font_entry).grid(
         row=3, column=1, sticky="w", padx=5, pady=5
     )
@@ -51,7 +55,10 @@ def create_input_widgets(master, **kwargs):
     ttk.Label(frame_geometry, text="Translation[x,y,z]:", style="Custom.TLabel").grid(
         row=4, column=0, sticky="w", padx=5, pady=5
     )
-    entry_translation = ttk.StringVar(value="0.0, 0.0, 0.0")
+    translation = ", ".join(
+        [str(item) for item in settings.get("translation", [0.0, 0.0, 0.0])]
+    )
+    entry_translation = ttk.StringVar(value=translation)
     ttk.Entry(frame_geometry, textvariable=entry_translation, font=font_entry).grid(
         row=4, column=1, sticky="w", padx=5, pady=5
     )
@@ -64,7 +71,7 @@ def create_input_widgets(master, **kwargs):
     ttk.Label(frame_hatching, text="Hatcher type:", style="Custom.TLabel").grid(
         row=0, column=0, sticky="w", padx=10, pady=10
     )
-    entry_hatcher_type = ttk.StringVar(value="Base")
+    entry_hatcher_type = ttk.StringVar(value=settings.get("hatcher_type", "Base"))
     ttk.Combobox(
         frame_hatching,
         values=["Base", "Island", "Stripe"],
@@ -76,7 +83,7 @@ def create_input_widgets(master, **kwargs):
     ttk.Label(frame_hatching, text="Hatch angle [º]:", style="Custom.TLabel").grid(
         row=1, column=0, sticky="w", padx=10, pady=10
     )
-    entry_hatch_angle = ttk.StringVar(value="10.0")
+    entry_hatch_angle = ttk.StringVar(value=str(settings.get("hatch_angle", 10.0)))
     ttk.Entry(frame_hatching, textvariable=entry_hatch_angle, font=font_entry).grid(
         row=1, column=1, sticky="w", padx=5, pady=5
     )
@@ -84,47 +91,52 @@ def create_input_widgets(master, **kwargs):
     ttk.Label(
         frame_hatching, text="Volume offset hatch [mm]:", style="Custom.TLabel"
     ).grid(row=2, column=0, sticky="w", padx=10, pady=10)
-    entry_volume_offset = ttk.StringVar(value="0.0")
+    entry_volume_offset = ttk.StringVar(value=str(settings.get("volume_offset", 0.0)))
     ttk.Entry(frame_hatching, textvariable=entry_volume_offset, font=font_entry).grid(
         row=2, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_volume_offset)
+
     ttk.Label(
         frame_hatching, text="Spot compensation [mm]:", style="Custom.TLabel"
     ).grid(row=3, column=0, sticky="w", padx=10, pady=10)
-    entry_spot_compensation = ttk.StringVar(value="0.0")
+    entry_spot_compensation = ttk.StringVar(value=str(settings.get("spot_compensation", 0.0)))
     ttk.Entry(
         frame_hatching, textvariable=entry_spot_compensation, font=font_entry
     ).grid(row=3, column=1, sticky="w", padx=5, pady=5)
     entries.append(entry_spot_compensation)
+
     ttk.Label(frame_hatching, text="Inner contours:", style="Custom.TLabel").grid(
         row=4, column=0, sticky="w", padx=10, pady=10
     )
-    entry_inner_contours = ttk.StringVar(value="2")
+    entry_inner_contours = ttk.StringVar(value=str(settings.get("inner_contours", 2)))
     ttk.Entry(frame_hatching, textvariable=entry_inner_contours, font=font_entry).grid(
         row=4, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_inner_contours)
+
     ttk.Label(frame_hatching, text="Outer contours:", style="Custom.TLabel").grid(
         row=5, column=0, sticky="w", padx=10, pady=10
     )
-    entry_outer_contours = ttk.StringVar(value="1")
+    entry_outer_contours = ttk.StringVar(value=str(settings.get("outer_contours", 1)))
     ttk.Entry(frame_hatching, textvariable=entry_outer_contours, font=font_entry).grid(
         row=5, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_outer_contours)
+
     ttk.Label(frame_hatching, text="Hatch spacing [mm]:", style="Custom.TLabel").grid(
         row=6, column=0, sticky="w", padx=10, pady=10
     )
-    entry_hatch_spacing = ttk.StringVar(value="0.5")
+    entry_hatch_spacing = ttk.StringVar(value=str(settings.get("hatch_spacing", 0.5)))
     ttk.Entry(frame_hatching, textvariable=entry_hatch_spacing, font=font_entry).grid(
         row=6, column=1, sticky="w", padx=5, pady=5
     )
     entries.append(entry_hatch_spacing)
+
     ttk.Label(frame_hatching, text="Stripe width [mm]:", style="Custom.TLabel").grid(
         row=7, column=0, sticky="w", padx=10, pady=10
     )
-    entry_stripe_width = ttk.StringVar(value="0.5")
+    entry_stripe_width = ttk.StringVar(value=str(settings.get("stripe_width", 0.5)))
     ttk.Entry(frame_hatching, textvariable=entry_stripe_width, font=font_entry).grid(
         row=7, column=1, sticky="w", padx=5, pady=5
     )
@@ -138,15 +150,21 @@ def create_buttons(master, **kwargs):
     ttk.Button(
         master,
         text="Slice",
-        command=kwargs.get("callback_sliceFile", None),
+        command=kwargs.get("callback_sliceFile", lambda: ()),
         style="info.TButton",
     ).grid(row=0, column=0, sticky="n")
     ttk.Button(
         master,
         text="Save",
-        command=kwargs.get("callback_saveSettings", None),
+        command=kwargs.get("callback_saveSettings", lambda :()),
         style="info.TButton",
     ).grid(row=0, column=1, sticky="n")
+    ttk.Button(
+        master,
+        text="Save Capture",
+        command=kwargs.get("callback_saveCapture", lambda : ()),
+        style="info.TButton",
+    ).grid(row=0, column=2, sticky="n")
 
 
 def read_stl_frame(**kwargs):
@@ -163,7 +181,9 @@ def read_stl_frame(**kwargs):
     solid_part.translation = translation
     solid_part.scale = scale
     solid_part.dropToPlatform()
-    return solid_part
+    min_x, min_y, min_z, max_x, max_y, max_z = solid_part.boundingBox
+    update_settings(rotation=rotation, scale=scale, translation=translation, min_x_part=min_x, min_y_part=min_y, min_z_part=min_z, max_x_part=max_x, max_y_part=max_y, max_z_part=max_z)
+    return solid_part, (min_x, min_y, min_z, max_x, max_y, max_z)
 
 
 def get_geometry_parameters(entries):
@@ -212,7 +232,10 @@ def get_print_parameters(entries):
 def create_image_frame(master, canvas):
     if canvas is not None:
         canvas.destroy()
-    image = Image.open(r"files/img/temp.png")
+    # with open(temp_capture_slice, "rb") as f:
+    #     image = Image.open(f)
+    # image = Image.open(r"files/img/temp.png")
+    image = Image.open(temp_capture_slice)
     width, height = image.size
     new_width = int(width / 1)
     new_height = int(height / 1)
@@ -222,6 +245,18 @@ def create_image_frame(master, canvas):
     canvas.grid(row=0, column=0, sticky="nswe")
     canvas.create_image(0, 0, anchor="sw", image=image_start)
     return canvas
+
+
+def callback_save_capture():
+    # ask for o path to save copy file of temp
+    file_path = filedialog.asksaveasfilename(
+        defaultextension=".png",
+        filetypes=[("PNG files", "*.png"), ("All files", "*.*")],
+    )
+    if file_path:
+        # copy file
+        shutil.copy(temp_capture_slice, file_path)
+        print("file saved")
 
 
 class SliceFile(ttk.Frame):
@@ -239,6 +274,7 @@ class SliceFile(ttk.Frame):
         settings = read_settings()
         # self.check_parameter_settings(settings)
         filepath = settings.get("filepath")
+        self.filepath_solid = filepath
         self.z_value = 0.0
         self.show_path = ttk.StringVar(
             value=filepath.split("/")[-1] if filepath is not None else "No file selected"
@@ -258,6 +294,7 @@ class SliceFile(ttk.Frame):
             self.frame_inputs,
             callback_scale=lambda value: self.scale_callback(value),
             var_path=self.show_path,
+            settings=settings,
         )
         # ----------------------axes---------------------------
         self.frame_axes = ttk.LabelFrame(self.frame_widgets, text="Preview")
@@ -283,14 +320,15 @@ class SliceFile(ttk.Frame):
         ttk.Label(frame_visual, textvariable=self.min_value, style="Custom.TLabel").grid(
             row=0, column=2, sticky="w", padx=5, pady=5
         )
-        ttk.Scale(
+        self.scale_z = ttk.Scale(
             frame_visual,
             from_=0.0,
             to=self.z_max,
             orient="horizontal",
             command=self.scale_callback,
             variable=entry_z,
-        ).grid(row=0, column=3, sticky="ew", padx=15, pady=5)
+        )
+        self.scale_z.grid(row=0, column=3, sticky="ew", padx=15, pady=5)
         self.entry_z = entry_z
         self.max_value = ttk.StringVar(value=f"Max: {self.z_max}")
         ttk.Label(frame_visual, textvariable=self.max_value, style="Custom.TLabel").grid(
@@ -299,11 +337,12 @@ class SliceFile(ttk.Frame):
         # ----------------------buttons----------------------
         self.frame_buttons = ttk.Frame(self)
         self.frame_buttons.grid(row=2, column=0, sticky="nsew", padx=15, pady=15)
-        self.frame_buttons.columnconfigure(0, weight=1)
+        self.frame_buttons.columnconfigure((0, 1, 2), weight=1)
         create_buttons(
             self.frame_buttons,
             callback_sliceFile=self.slice_geometry,
-            callback_saveSettings=self.print_file_callback,
+            callback_saveSettings=self.save_settings_callback,
+            callback_saveCapture=callback_save_capture,
         )
         print("init slice file")
 
@@ -341,7 +380,13 @@ class SliceFile(ttk.Frame):
         self.callbacks["change_tab_text"](status_frames, "from init slice")
         update_settings(status_frames=status_frames)
 
-    def print_file_callback(self):
+    def update_max_value(self, value):
+        value = round(value, 3)
+        self.max_value.set(f"Max: {value}")
+        self.z_max = value
+        self.scale_z.configure(to=self.z_max)
+
+    def save_settings_callback(self):
         if self.display_thread is not None:
             # kill the thread
             self.display_thread.join()
@@ -357,6 +402,15 @@ class SliceFile(ttk.Frame):
             hatch_spacing,
             stripe_width,
         ) = get_hatching_parameters(self.entries)
+        solid_part, bounding_box = read_stl_frame(
+            file_path=self.filepath_solid,
+            rotation=rotation,
+            scale=scale,
+            translation=translation,
+        )
+        # self.z_max = bounding_box[5] # - bounding_box[2]
+        self.update_max_value(bounding_box[5] - bounding_box[2])
+
         # ---------------------update parameters--------------------
         update_settings(
             rotation=rotation,
@@ -374,7 +428,8 @@ class SliceFile(ttk.Frame):
         settings = read_settings()
         status_frames = settings.get("status_frames")
         status_frames[2] = 1
-        self.callbacks["change_tab_text"](status_frames, "from slice print file")
+        # self.callbacks["change_tab_text"](status_frames, "from slice print file")
+        self.callbacks["init_tabs"](True)
 
     def scale_callback(self, value):
         value = float(value)
@@ -383,16 +438,21 @@ class SliceFile(ttk.Frame):
             self.entry_z.set(self.z_value)
             self.slice_geometry()
 
+
     def slice_geometry(self):
         try:
             settings = read_settings()
-            rotation, scale, translation = get_geometry_parameters(self.entries)
-            solid_part = read_stl_frame(
+            # rotation, scale, translation = get_geometry_parameters(self.entries)
+            rotation = settings.get("rotation")
+            scale = settings.get("scale")
+            translation = settings.get("translation")
+            solid_part, bounding_box = read_stl_frame(
                 file_path=settings.get("filepath"),
                 rotation=rotation,
-                scale=rotation,
+                scale=scale,
                 translation=translation,
             )
+            self.update_max_value(bounding_box[5] - bounding_box[2])
             if solid_part is None:
                 return None
             (
@@ -430,9 +490,12 @@ class SliceFile(ttk.Frame):
                 hatch_spacing=hatch_spacing,
                 stripe_width=stripe_width,
             )
-            print("current z: ", current_z, "mm")
-            geom_slice = solid_part.getVectorSlice(current_z, simplificationFactor=0.01, simplificationFactorMode="absolute", simplificationPreserveTopology=True)
-            print(geom_slice)
+            geom_slice = solid_part.getVectorSlice(
+                current_z,
+                simplificationFactor=0.01,
+                simplificationFactorMode="absolute",
+                simplificationPreserveTopology=True
+            )
             layer = my_hatcher.hatch(geom_slice)
             dpi = settings.get("dpi")
             if self.plotter is None:
@@ -442,19 +505,18 @@ class SliceFile(ttk.Frame):
                     type_plot="layer",
                     dpi=200,
                     save_temp_flag=True,
-                    path_to_save="files/img/temp.png",
+                    path_to_save=temp_capture_slice,
                 )
             projector_dimension = settings.get("projector_dimension")
             centroide = settings.get("centroide", [0, 0, 0])
             width = settings.get("width_part", 0.0)
             height = settings.get("height_part", 0.0)
-            print(width, height, "slice frame")
             self.plotter.plot_layer(
                 200,
                 layer,
                 projector_dimension[0],
                 projector_dimension[1],
-                "files/img/temp.png",
+                temp_capture_slice,
                 centroide,
                 width,
                 height,

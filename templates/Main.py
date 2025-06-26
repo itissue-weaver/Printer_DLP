@@ -237,9 +237,9 @@ class MainGUI(ttk.Window):
     def change_title(self, new_title):
         self.title(new_title)
 
-    def init_tabs_callback(self):
-        self.tab3.load_biomaterial("", True)
-        self.tab1.set_geometry_from_file(True)
+    def init_tabs_callback(self, is_init=True):
+        self.tab1.set_geometry_from_file(is_init)
+        self.tab3.load_biomaterial("", is_init)
         self.tab2.check_parameter_settings()
         self.tab4.check_parameter_settings()
 

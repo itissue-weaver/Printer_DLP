@@ -90,13 +90,19 @@ class ReadFile(ttk.Frame):
         solid_trimesh_part = None
         flag_error = False
         try:
-            filepath = self.file_path.get() if  not is_init else settings.get("filepath", "")
+            filepath = self.file_path.get() if  not is_init else settings.get("filepath")
             self.file_path_show.set(value=filepath.split("/")[-1])
             if filepath == "":
                 print("No file selected set geometry button")
                 return None
+            rotation = settings.get("rotation")
+            scale = settings.get("scale")
+            translation = settings.get("translation")
             solid_trimesh_part, solid_part = read_stl(
                 file_path=filepath,
+                rotation=rotation,
+                scale=scale,
+                translation=translation
             )
             self.frame_axes.destroy()
             self.frame_axes = PlotSTL(self, solid_trimesh_part=solid_trimesh_part, solid_part=solid_part)

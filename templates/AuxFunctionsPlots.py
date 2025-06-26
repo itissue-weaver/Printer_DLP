@@ -53,7 +53,6 @@ def postprocessor_image(path_image, is_final):
     try:
         # Cargar la imagen con transparencia
         imagen = cv2.imread(path_image, cv2.IMREAD_UNCHANGED)
-
         # Separar los canales
         b, g, r, a = cv2.split(imagen)
 
