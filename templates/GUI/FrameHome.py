@@ -145,10 +145,20 @@ class HomePage(ttk.Frame):
 
     def new_project_callback(self):
         if self.frame_new_project is None:
-            callback = {"reload_treeview": self.reload_treeview}
+            callback = {
+                "reload_treeview": self.reload_treeview,
+                "clean_frame_np": self.clean_new_project_frame
+            }
             self.frame_new_project = NewProjectWindow(self, callbacks=callback)
+        else:
+            self.frame_new_project.lift()
+
+    def clean_new_project_frame(self):
+        if self.frame_new_project is not None:
+            self.frame_new_project = None
 
     def reload_treeview(self):
+
         projects = read_projects()
         data_lists = [
             [
@@ -205,11 +215,13 @@ class NewProjectWindow(ttk.Toplevel):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
         self.frame = NewProjectForm(self, **kwargs)
+        self.callbacks = kwargs.get("callbacks")
         self.frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
         self.protocol("WM_DELETE_WINDOW", self.on_close)
 
     def on_close(self):
         self.frame.on_close(from_parent=True)
+        self.callbacks["clean_frame_np"]()
         self.destroy()
 
 

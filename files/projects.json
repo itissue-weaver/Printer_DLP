@@ -1507,5 +1507,20 @@
             "lift_height": 6.0,
             "delay_retract_init": 0.01
         }
+    },
+    "test3": {
+        "name": "Test3",
+        "user": "Edisson",
+        "thumbnail": "",
+        "status": 0,
+        "timestamp": "2025-06-27 11:29:05",
+        "settings": {
+            "status_frames": [
+                0,
+                0,
+                0,
+                0
+            ]
+        }
     }
 }
