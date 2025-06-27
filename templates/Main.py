@@ -83,7 +83,7 @@ class MainGUI(ttk.Window):
         self.frame_config = None
         self.connected = ttk.BooleanVar(value=False)
         # --------------------Start Animation -------------------
-        # self.show_gif_toplevel()
+        self.show_gif_toplevel()
         # --------------------notebook-------------------
         self.frame_content = ttk.Frame(self)
         self.frame_content.grid(

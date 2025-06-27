@@ -432,6 +432,8 @@ class FramePrinting(ttk.Frame):
     def callback_print_process(self):
         if self.frame_process_print is None:
             self.frame_process_print = FramePrintingProcess(self)
+        else:
+            self.frame_process_print.lift()
 
     def on_close_print_process(self):
         self.frame_process_print = None

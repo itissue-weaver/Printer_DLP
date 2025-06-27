@@ -849,7 +849,7 @@
         "user": "prueba",
         "thumbnail": "",
         "status": 0,
-        "timestamp": "2025-06-25 11:15:23",
+        "timestamp": "2025-06-26 16:57:40",
         "settings": {
             "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
             "rotation": [
@@ -893,7 +893,7 @@
             ],
             "dpi": 300,
             "layer_depth": 0.05,
-            "delta_layer": 20.0,
+            "delta_layer": 15.0,
             "plate": 1,
             "HOST": "127.0.0.1",
             "num_layers": 400,
@@ -955,7 +955,7 @@
                 1,
                 1,
                 1,
-                0
+                1
             ],
             "materials": [
                 {
@@ -1005,8 +1005,16 @@
             "mode_biomaterial": "mode_1",
             "delay_z": 0.006,
             "delay_n": 0.01,
-            "b_layers": 5,
-            "e_time_b_layers": 130.0,
+            "b_layers": 1,
+            "e_time_b_layers": 50.0,
+            "delay_z_lift": 0.01,
+            "lift_height": 6.0,
+            "delay_retract_init": 0.01,
+            "offset_x_screen": 0.035,
+            "offset_y_screen": 0.105,
+            "size_projector": 0.1,
+            "size_projector_x": 0.08,
+            "size_projector_y": 0.08,
             "data": {
                 "filepath": "C:/Users/Weaver4/Downloads/Simple Cube (20 x 20 x 20 mm).stl",
                 "rotation": [
@@ -1165,15 +1173,7 @@
                 "b_layers": 1,
                 "e_time_b_layers": 40.0
             },
-            "msg": "Ok",
-            "delay_z_lift": 0.01,
-            "lift_height": 6.0,
-            "delay_retract_init": 0.01,
-            "offset_x_screen": 0.035,
-            "offset_y_screen": 0.105,
-            "size_projector": 0.1,
-            "size_projector_x": 0.08,
-            "size_projector_y": 0.08
+            "msg": "Ok"
         }
     },
     "meniscoprueba": {
