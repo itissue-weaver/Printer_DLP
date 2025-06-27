@@ -1,39 +1,17 @@
-# Printer_DLP
-## Intro
-Adapted from notes from [Mark Wexler](http://wexler.free.fr)
+# Weaver4 KNIT
+## DLP Printer Software for Biomaterials
 
-The units we've seen came with outdated firmware. In order to use 180 and 1440 Hz modes, the firmware on the projector needs to be updated. This has to be done on a Windows PC using TI's graphic control tool.
-
-- Connect the projector's USB port to your PC using the supplied cable
-- Download and install the graphic control tool
-- Download the latest version of the firmware
-- Install the firmware using the Firmware/Update Firmware tab of the graphic control tool
-
-To check the version of firmware that you've installed, click the "Get" button in the lower-right corner of the first tab (Information) of graphic control tool.
-
-## Running
-
-If change_mode is true, then you must:
-- install the dlpmode.exe program and any required DLLs
-- set the dlpmode_exe global variable (below) to the absolute or relative
-  path of dlpmode.exe
-
-> Run the *App_test.py* file with the required libraries and the device conected with usb and hdmi ports.
-
-
-# DLP Printer Software for Biomaterials
-
-## Introduction
+### Introduction
 The DLP printer software was developed to facilitate the control and configuration of a DLP4710 projector for printing biomaterials. This innovative system integrates a Raspberry Pi, a PC, and the DLP projector to create a seamless workflow for creating precise 3D printed models. The software architecture is designed to optimize both server-based control and user-friendly graphical interfaces. It ensures the adaptability needed for handling biomaterials while maintaining precise execution of tasks like slicing, projecting, and motor control.
 
-## Methods and Materials
+### Methods and Materials
 
-### Hardware Components:
+#### Hardware Components:
 - **Raspberry Pi**: For server and hardware control (motors and projector).
 - **PC**: For GUI application.
 - **Texas Instruments DLP4710 projector**: For 3D model projection.
 
-### Software Modules:
+#### Software Modules:
 - **Server Module**: A Flask application running on the Raspberry Pi, enabling motor control and DLP projector operation through defined API endpoints.
 - **GUI Module**: Designed for the PC, allowing users to:
   - Load STL files.
@@ -42,9 +20,9 @@ The DLP printer software was developed to facilitate the control and configurati
   - Adjust projector settings.
   - Send configurations to the Raspberry Pi for execution.
 
-## Scripts and Results
+### Scripts and Results
 
-### File Architecture:
+#### File Architecture:
 ```plaintext
 ├── files/
 │   └── img/
@@ -73,10 +51,20 @@ The DLP printer software was developed to facilitate the control and configurati
   - `app_gui.py` and `app_api.py`: Main scripts for the GUI and API functionalities.
   - `wsgi.py`: Handles the deployment process for the Flask application.
 
-### Results:
+#### Results:
 - The software successfully enables:
   - Slicing and projection of 3D models.
   - Sequential layer-by-layer control for biomaterial printing.
   - Intuitive GUI-based interactions, making it accessible to both novice and experienced users.
 - The modular design ensures scalability and adaptability for future improvements, such as incorporating additional biomaterial types or expanding hardware capabilities.
 
+Shield: [![CC BY-NC 4.0][cc-by-nc-shield]][cc-by-nc]
+
+This work is licensed under a
+[Creative Commons Attribution-NonCommercial 4.0 International License][cc-by-nc].
+
+[![CC BY-NC 4.0][cc-by-nc-image]][cc-by-nc]
+
+[cc-by-nc]: https://creativecommons.org/licenses/by-nc/4.0/
+[cc-by-nc-image]: https://licensebuttons.net/l/by-nc/4.0/88x31.png
+[cc-by-nc-shield]: https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg
